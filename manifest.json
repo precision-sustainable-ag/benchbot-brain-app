@@ -1,0 +1,13 @@
+{
+    "services": {
+        "example-app": {
+            "type": "app",
+            "python": true,
+            "args": [
+                "main.py --config /opt/farmng/config.json --port 8042"
+            ],
+            "http_gui_port": 8042,
+            "display_name": "Example App"
+        }
+    }
+}

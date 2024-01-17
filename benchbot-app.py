@@ -9,15 +9,23 @@ import os
 app = FastAPI()
 amiga_motors = Motors()
 
+
 @app.get("/")
 async def root():
     sup.create_new_dir()
     return "Welcome!"
 
+
 @app.get("/forward")
 async def move_forward():
     await amiga_motors.forward()
 
+
 @app.get("/reverse")
 async def move_reverse():
     await amiga_motors.reverse()
+
+
+if __name__ == "__main__":
+    # run the server
+    uvicorn.run(app, host="0.0.0.0", port=8042)

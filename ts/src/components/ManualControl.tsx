@@ -50,7 +50,7 @@ function ManualControl() {
         <input
           value={yValue}
           onChange={(e) =>
-            setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            setYValue(e.target.value === "" ? 0 : parseInt(e.target.value))
           }
         />
         <Button name={"+ Y"} onClick={() => {}} />
@@ -66,7 +66,7 @@ function ManualControl() {
         <input
           value={zValue}
           onChange={(e) =>
-            setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
           }
         />
         <Button name={"+ Z"} onClick={() => {}} />

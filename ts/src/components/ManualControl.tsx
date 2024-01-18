@@ -2,16 +2,33 @@ import { useState } from "react";
 import Button from "./Button";
 import Row from "./Row";
 
-const logs = [
-  "Jan 18 14:16:34 gold-garbanzo python3[476402]: /mnt/managed_home/farm-ng-user-ted-xu/benchbot-brain-app",
-  'INFO:     127.0.0.1:51512 - "GET / HTTP/1.1" 304 Not Modified',
+const defaultLogs = [
   'INFO:     127.0.0.1:51512 - "GET /assets/index-b572195d.js HTTP/1.1" 304 Not Modified',
+  'INFO:     127.0.0.1:51512 - "GET / HTTP/1.1" 304 Not Modified',
 ];
+
+const baseUrl = "http://localhost:8042";
 
 function ManualControl() {
   const [xValue, setXValue] = useState(0);
   const [yValue, setYValue] = useState(0);
   const [zValue, setZValue] = useState(0);
+
+  const [logs, setLogs] = useState(defaultLogs);
+
+  const moveRobot = async (x: number, y = 0, z: number) => {
+    console.log("api call param", x, y, z);
+    setLogs([`move x: ${x} z: ${z}`, ...logs]);
+    const url = baseUrl + `/clearcore?x=${x}&z=${z}`;
+    const res = await (await fetch(url)).json();
+    console.log(res);
+  };
+
+  const takeImage = async () => {
+    const url = baseUrl + "/image";
+    const res = await (await fetch(url)).json();
+    console.log(res);
+  };
 
   return (
     <div>
@@ -19,7 +36,12 @@ function ManualControl() {
 
       <Row>
         <Button name={"Home X"} onClick={() => {}} />
-        <Button name={"Home Z"} onClick={() => {}} />
+        <Button
+          name={"Home Z"}
+          onClick={() => {
+            moveRobot(999, 0, 999);
+          }}
+        />
       </Row>
 
       <Row>
@@ -31,8 +53,18 @@ function ManualControl() {
           }
           style={{ fontSize: "2rem", width: "300px" }}
         />
-        <Button name={"+ X"} onClick={() => {}} />
-        <Button name={"- X"} onClick={() => {}} />
+        <Button
+          name={"+ X"}
+          onClick={() => {
+            moveRobot(xValue, 0, 0);
+          }}
+        />
+        <Button
+          name={"- X"}
+          onClick={() => {
+            moveRobot(-xValue, 0, 0);
+          }}
+        />
       </Row>
 
       <Row>
@@ -57,22 +89,38 @@ function ManualControl() {
           }
           style={{ fontSize: "2rem", width: "300px" }}
         />
-        <Button name={"+ Z"} onClick={() => {}} />
-        <Button name={"- Z"} onClick={() => {}} />
+        <Button
+          name={"+ Z"}
+          onClick={() => {
+            moveRobot(0, 0, zValue);
+          }}
+        />
+        <Button
+          name={"- Z"}
+          onClick={() => {
+            moveRobot(0, 0, -zValue);
+          }}
+        />
       </Row>
 
       <Row>
         <Button
           name={"Emergency Stop"}
-          onClick={() => {}}
           styles={{ color: "red" }}
+          onClick={() => {}}
         />
-        <Button name={"To this position"} onClick={() => {}} />
+        <Button
+          name={"To this position"}
+          onClick={() => {
+            moveRobot(xValue, 0, zValue);
+          }}
+        />
         <Button name={"Pause"} onClick={() => {}} />
       </Row>
+
       <div>
         <div style={{ textAlign: "center" }}>Logs:</div>
-        {logs.reverse().map((log, i) => (
+        {logs.map((log, i) => (
           <p key={i} style={{ fontSize: "1rem" }}>
             {log}
           </p>

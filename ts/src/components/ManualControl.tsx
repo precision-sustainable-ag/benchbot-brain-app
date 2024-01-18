@@ -24,11 +24,11 @@ function ManualControl() {
     console.log(res);
   };
 
-  const takeImage = async () => {
-    const url = baseUrl + "/image";
-    const res = await (await fetch(url)).json();
-    console.log(res);
-  };
+  // const takeImage = async () => {
+  //   const url = baseUrl + "/image";
+  //   const res = await (await fetch(url)).json();
+  //   console.log(res);
+  // };
 
   return (
     <div>

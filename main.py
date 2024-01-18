@@ -109,6 +109,7 @@ if __name__ == "__main__":
 
     # NOTE: we only serve the react app in debug mode
     if not args.debug:
+        print(Path(__file__).parent)
         react_build_directory = Path(__file__).parent / "ts" / "dist"
 
         app.mount(

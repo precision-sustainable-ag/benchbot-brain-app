@@ -23,8 +23,8 @@ async def root():
     return "Welcome!"
 
 
-@app.get("/movey/{dist}")
-async def move_reverse():
+@app.get("/move_yaxis/{dist}")
+async def move_yaxis():
     await amiga_motors.move_y(dist)
 
 

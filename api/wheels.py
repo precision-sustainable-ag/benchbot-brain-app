@@ -12,8 +12,8 @@ from farm_ng.core.events_file_reader import proto_from_json_file
 LINEAR_VELOCITY = 0.1
 ACC = 0.05
 ANGULAR_VELOCITY = 0.05
-DISTANCE = 0.30 # in m
-TIME_REQ = (DISTANCE/LINEAR_VELOCITY) - 0.1
+# DISTANCE = 0.30 # in m
+
 
 class Motors():
     def __init__(self, file_path="api/service_config.json"):
@@ -22,20 +22,22 @@ class Motors():
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
         self.client: EventClient = EventClient(config)
 
-    async def move_motors(self, speeds) -> None:
+    async def move_motors(self, speeds, T_REQ) -> None:
         for speed in speeds:
             self.twist.linear_velocity_x = speed
-            if abs(speed) == LINEAR_VELOCITY: treq = TIME_REQ
+            if abs(speed) == LINEAR_VELOCITY: treq = T_REQ
             else: treq = 0.05
             st = time.time()
             while time.time()-st < treq:
                 await self.client.request_reply("/twist", self.twist)
                 await asyncio.sleep(0.05)
     
-    async def forward(self) -> None:
+    async def forward(self, distance) -> None:
+        TIME_REQ = (distance/LINEAR_VELOCITY) - 0.1
         fspeeds = [ACC, LINEAR_VELOCITY, ACC, 0]
-        await self.move_motors(fspeeds)
+        await self.move_motors(fspeeds, TIME_REQ)
 
-    async def reverse(self) -> None:
+    async def reverse(self, distance) -> None:
+        TIME_REQ = (distance/LINEAR_VELOCITY) - 0.1
         rspeeds = [-ACC, -LINEAR_VELOCITY, -ACC, 0]
-        await self.move_motors(rspeeds)
+        await self.move_motors(rspeeds, TIME_REQ)

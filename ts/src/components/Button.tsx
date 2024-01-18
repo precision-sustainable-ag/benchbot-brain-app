@@ -1,15 +1,20 @@
+import { CSSProperties } from "react";
+
 const buttonStyle = {
-  height: "50px",
+  height: "100px",
+  minWidth: "100px",
+  fontSize: "36px",
 };
 
 interface ButtonProps {
   name: string;
   onClick: () => void;
+  styles?: CSSProperties;
 }
 
-function Button({ name, onClick }: ButtonProps) {
+function Button({ name, onClick, styles }: ButtonProps) {
   return (
-    <button onClick={onClick} style={buttonStyle}>
+    <button onClick={onClick} style={{ ...buttonStyle, ...styles }}>
       {name}
     </button>
   );

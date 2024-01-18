@@ -25,16 +25,19 @@ function ManualControl() {
   };
 
   const moveY = async (y: number) => {
+    console.log("api call move y",  y);
+    setLogs([`move y: ${y}`, ...logs]);
     const url = baseUrl + `/move_yaxis/${y}`;
     const res = await (await fetch(url)).json();
     console.log(res);
   }
 
-  // const takeImage = async () => {
-  //   const url = baseUrl + "/image";
-  //   const res = await (await fetch(url)).json();
-  //   console.log(res);
-  // };
+  const takeImage = async () => {
+    
+    const url = baseUrl + "/image";
+    const res = await (await fetch(url)).json();
+    console.log(res);
+  };
 
   return (
     <div>
@@ -127,6 +130,9 @@ function ManualControl() {
           }}
         />
         <Button name={"Pause"} onClick={() => {}} />
+        <Button name={"Take Image"} onClick={() => {
+          takeImage();
+        }} />
       </Row>
 
       <div>

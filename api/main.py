@@ -6,7 +6,7 @@ import asyncio
 import os
 import socket
 import uvicorn
-
+import requests
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 amiga_motors = Motors()
@@ -48,11 +48,11 @@ def move_xz_axis(x, z):
   # print(message)
 
   clear_core.send(msgbyte)
-  take_image()
+#   take_image()
   return(clear_core.recv(1024))
 
 
-# @app.get("/image")
+@app.get("/image")
 def take_image():
     res = requests.get("http://10.95.76.50:5000/image")
     print(res.status_code, res.text)

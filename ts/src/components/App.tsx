@@ -5,6 +5,8 @@ import CameraConfig from "./CameraConfig";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
+// call to localhost:8042?x=1&z=-1
+
 function App() {
   return (
     <BrowserRouter>

@@ -24,6 +24,12 @@ function ManualControl() {
     console.log(res);
   };
 
+  const moveY = async (y: number) => {
+    const url = baseUrl + `/move_yaxis/${y}`;
+    const res = await (await fetch(url)).json();
+    console.log(res);
+  }
+
   // const takeImage = async () => {
   //   const url = baseUrl + "/image";
   //   const res = await (await fetch(url)).json();
@@ -76,8 +82,12 @@ function ManualControl() {
           }}
           style={{ fontSize: "2rem", width: "300px" }}
         />
-        <Button name={"+ Y"} onClick={() => {}} />
-        <Button name={"- Y"} onClick={() => {}} />
+        <Button name={"+ Y"} onClick={() => {
+          moveY(yValue);
+        }} />
+        <Button name={"- Y"} onClick={() => {
+          moveY(-yValue);
+        }} />
       </Row>
 
       <Row>
@@ -113,6 +123,7 @@ function ManualControl() {
           name={"To this position"}
           onClick={() => {
             moveRobot(xValue, 0, zValue);
+            moveY(yValue);
           }}
         />
         <Button name={"Pause"} onClick={() => {}} />

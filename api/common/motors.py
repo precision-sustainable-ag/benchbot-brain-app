@@ -14,30 +14,30 @@ ACC = 0.05
 ANGULAR_VELOCITY = 0.05
 # DISTANCE = 0.30 # in m
 
-
 class Motors():
-    def __init__(self, file_path="api/service_config.json"):
+    def __init__(self, file_path="common/service_config.json"):
         service_config_path = Path(file_path)
         self.twist = Twist2d()
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
         self.client: EventClient = EventClient(config)
 
-    async def move_motors(self, speeds, T_REQ) -> None:
+    async def move_motors(self, speeds, time_required) -> None:
         for speed in speeds:
             self.twist.linear_velocity_x = speed
-            if abs(speed) == LINEAR_VELOCITY: treq = T_REQ
+            if abs(speed) == LINEAR_VELOCITY: treq = time_required
             else: treq = 0.05
             st = time.time()
             while time.time()-st < treq:
                 await self.client.request_reply("/twist", self.twist)
                 await asyncio.sleep(0.05)
-    
-    async def forward(self, distance) -> None:
-        TIME_REQ = (distance/LINEAR_VELOCITY) - 0.1
-        fspeeds = [ACC, LINEAR_VELOCITY, ACC, 0]
-        await self.move_motors(fspeeds, TIME_REQ)
 
-    async def reverse(self, distance) -> None:
-        TIME_REQ = (distance/LINEAR_VELOCITY) - 0.1
-        rspeeds = [-ACC, -LINEAR_VELOCITY, -ACC, 0]
-        await self.move_motors(rspeeds, TIME_REQ)
+    async def move_y(self, distance) -> None:
+      time_required = (distance/LINEAR_VELOCITY) - 0.1
+
+      if distance < 0:
+        speeds = [-ACC, -LINEAR_VELOCITY, -ACC, 0]
+      else:
+        speeds = [ACC, LINEAR_VELOCITY, ACC, 0]
+
+      await self.move_motors(speeds, time_required)
+

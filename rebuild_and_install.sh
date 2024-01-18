@@ -1,11 +1,7 @@
 #!/bin/bash -x
 
-# create virtual environment for the backend in the api folder
-cd api/
-source venv/bin/activate
-
 # build the frontend in the ts directory
-cd ../ts/
+cd ts/
 npm run build
 
 # install the app on the brain

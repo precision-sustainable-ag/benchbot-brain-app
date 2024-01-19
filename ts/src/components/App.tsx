@@ -10,8 +10,8 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ width: "800px", fontSize: "36px" }}>
-        <nav style={{ textAlign: "center" }}>
+      <div style={{ fontSize: "36px" }}>
+        <nav style={{ textAlign: "left" }}>
           <button style={{ fontSize: "2rem" }}>
             <Link to="/" style={LinkStyle}>
               Manual Control

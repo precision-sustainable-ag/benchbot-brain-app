@@ -25,123 +25,166 @@ function ManualControl() {
   };
 
   const moveY = async (y: number) => {
-    console.log("api call move y",  y);
+    console.log("api call move y", y);
     setLogs([`move y: ${y}`, ...logs]);
     const url = baseUrl + `/move_yaxis/${y}`;
     const res = await (await fetch(url)).json();
     console.log(res);
-  }
+  };
 
   const takeImage = async () => {
-    
     const url = baseUrl + "/image";
     const res = await (await fetch(url)).json();
     console.log(res);
   };
 
   return (
-    <div>
-      <h1 style={{ textAlign: "center" }}>Manual Control</h1>
+    <div style={{ display: "flex" }}>
+      <div style={{ width: "800px" }}>
+        <h5 style={{ textAlign: "center", margin: "1rem" }}>Manual Control</h5>
 
-      <Row>
-        <Button name={"Home X"} onClick={() => {}} />
-        <Button
-          name={"Home Z"}
-          onClick={() => {
-            moveRobot(999, 0, 999);
-          }}
-        />
-      </Row>
+        <Row>
+          <Button name={"Home X"} onClick={() => {}} />
+          <Button
+            name={"Home Z"}
+            onClick={() => {
+              moveRobot(999, 0, 999);
+            }}
+          />
+        </Row>
 
-      <Row>
-        <input
-          value={xValue}
-          type="number"
-          onChange={(e) =>
-            setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-          }
-          style={{ fontSize: "2rem", width: "300px" }}
-        />
-        <Button
-          name={"+ X"}
-          onClick={() => {
-            moveRobot(xValue, 0, 0);
-          }}
-        />
-        <Button
-          name={"- X"}
-          onClick={() => {
-            moveRobot(-xValue, 0, 0);
-          }}
-        />
-      </Row>
+        <Row>
+          <input
+            value={xValue}
+            type="number"
+            onChange={(e) =>
+              setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            }
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          <Button
+            name={"+ X"}
+            onClick={() => {
+              moveRobot(xValue, 0, 0);
+            }}
+          />
+          <Button
+            name={"- X"}
+            onClick={() => {
+              moveRobot(-xValue, 0, 0);
+            }}
+          />
+        </Row>
 
-      <Row>
-        <input
-          type="number"
-          value={yValue}
-          onChange={(e) => {
-            setYValue(e.target.value === "" ? 0 : parseInt(e.target.value));
-          }}
-          style={{ fontSize: "2rem", width: "300px" }}
-        />
-        <Button name={"+ Y"} onClick={() => {
-          moveY(yValue);
-        }} />
-        <Button name={"- Y"} onClick={() => {
-          moveY(-yValue);
-        }} />
-      </Row>
+        <Row>
+          <input
+            type="number"
+            value={yValue}
+            onChange={(e) => {
+              setYValue(e.target.value === "" ? 0 : parseInt(e.target.value));
+            }}
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          <Button
+            name={"+ Y"}
+            onClick={() => {
+              moveY(yValue);
+            }}
+          />
+          <Button
+            name={"- Y"}
+            onClick={() => {
+              moveY(-yValue);
+            }}
+          />
+        </Row>
 
-      <Row>
-        <input
-          type="number"
-          value={zValue}
-          onChange={(e) =>
-            setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-          }
-          style={{ fontSize: "2rem", width: "300px" }}
-        />
-        <Button
-          name={"+ Z"}
-          onClick={() => {
-            moveRobot(0, 0, zValue);
-          }}
-        />
-        <Button
-          name={"- Z"}
-          onClick={() => {
-            moveRobot(0, 0, -zValue);
-          }}
-        />
-      </Row>
+        <Row>
+          <input
+            type="number"
+            value={zValue}
+            onChange={(e) =>
+              setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            }
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          <Button
+            name={"+ Z"}
+            onClick={() => {
+              moveRobot(0, 0, zValue);
+            }}
+          />
+          <Button
+            name={"- Z"}
+            onClick={() => {
+              moveRobot(0, 0, -zValue);
+            }}
+          />
+        </Row>
 
-      <Row>
-        <Button
-          name={"Emergency Stop"}
-          styles={{ color: "red" }}
-          onClick={() => {}}
-        />
-        <Button
-          name={"To this position"}
-          onClick={() => {
-            moveRobot(xValue, 0, zValue);
-            moveY(yValue);
-          }}
-        />
-        <Button name={"Pause"} onClick={() => {}} />
-        <Button name={"Take Image"} onClick={() => {
-          takeImage();
-        }} />
-      </Row>
+        <Row>
+          <Button
+            name={"Emergency Stop"}
+            styles={{ color: "red" }}
+            onClick={() => {}}
+          />
+          <Button
+            name={"To this position"}
+            onClick={() => {
+              moveRobot(xValue, 0, zValue);
+              moveY(yValue);
+            }}
+          />
+          <Button name={"Pause"} onClick={() => {}} />
+          <Button
+            name={"Take Image"}
+            onClick={() => {
+              takeImage();
+            }}
+          />
+        </Row>
+      </div>
 
-      <div>
-        <div style={{ textAlign: "center" }}>Logs:</div>
-        {logs.map((log, i) => (
-          <p key={i} style={{ fontSize: "1rem" }}>
-            {log}
-          </p>
+      <div
+        style={{
+          border: "1px solid black",
+          width: "400px",
+          height: "500px",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "20px",
+          padding: "20px",
+        }}
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
+          <button
+            key={number}
+            onClick={() => {}}
+            style={{ padding: "10px", fontSize: "16px" }}
+          >
+            {number}
+          </button>
         ))}
+
+        <button
+          onClick={() => {}}
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          .
+        </button>
+        <button
+          onClick={() => {}}
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+          }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );

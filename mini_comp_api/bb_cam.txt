@@ -1,0 +1,11 @@
+[Unit]
+Description=bbsetupscript
+After=network.target
+
+[Service]
+User=benchbot
+WorkingDirectory=/home/benchbot/benchbot-brain-app/mini_comp_api
+ExecStart=/bin/bash ./setup.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -19,7 +19,7 @@ clear_core.connect((UDP_IP, UDP_PORT))
 
 @app.get("/move_yaxis/{dist}")
 async def move_yaxis(dist):
-    print(dist)
+    print('Y: ' + dist)
     await amiga_motors.move_y(float(dist))
 
 

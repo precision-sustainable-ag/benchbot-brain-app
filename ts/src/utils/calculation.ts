@@ -40,7 +40,7 @@ export const saveBenchBotConfig = (
 };
 
 export const initBenchBotMap = (config: BenchBotConfig) => {
-  const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+  const { potsPerRow, numberOfRows } = config;
   const location = [0, 0];
   const map = Array(numberOfRows)
     .fill(0)
@@ -60,7 +60,7 @@ export const traverseBenchBot = async (
 ) => {
   let { location, map, direction } = data;
   let [row, pot] = location;
-  const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+  const { potsPerRow, numberOfRows } = config;
   for (; row < numberOfRows; row += 1) {
     // move benchbot by potSpacing(not move on first loop)
     // if (direction < 0) pot = potsPerRow - 1;

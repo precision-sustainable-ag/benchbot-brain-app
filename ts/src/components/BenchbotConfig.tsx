@@ -20,9 +20,7 @@ const ValInput = ({ name, value, onChange }: NumInputProps) => {
     <>
       <span style={{ width: "400px" }}>{name}</span>
       <input
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
+        type="number"
         value={value}
         onChange={onChange}
         style={{ fontSize: "2rem", flex: 1 }}
@@ -75,15 +73,17 @@ export default function BenchbotConfig() {
   ) => {
     let { location, map, direction } = data;
     let [row, pot] = location;
-    const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+    let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+    // potsPerRow -= 1;
+    // numberOfRows -= 1;
     for (; row < numberOfRows; row += 1) {
-      if (row !== 0) moveY(rowSpacing / 100);
       // move benchbot by potSpacing(not move on first loop)
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`, stop);
-        await sleep(1000);
         // move benchbot by rowSpacing
+    await sleep(5000);
+
         moveX(direction * potSpacing);
         let a = false;
         setStop((prev) => {
@@ -95,24 +95,28 @@ export default function BenchbotConfig() {
           saveBenchBotConfig(
             { potsPerRow, numberOfRows, rowSpacing, potSpacing },
             { location, map, direction }
-          );
-          break;
+            );
+            break;
+          }
         }
-      }
-      let a = false;
-      setStop((prev) => {
-        a = prev;
-        return prev;
-      });
-      if (a) {
-        let location = [row, pot];
-        saveBenchBotConfig(
-          { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-          { location, map, direction }
-        );
-        break;
-      }
-
+        let a = false;
+        setStop((prev) => {
+          a = prev;
+          return prev;
+        });
+        if (a) {
+          let location = [row, pot];
+          saveBenchBotConfig(
+            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+            { location, map, direction }
+            );
+            break;
+          }
+      // move benchbot by potSpacing(not move on first loop)
+    await sleep(5000);
+          
+            moveY(rowSpacing / 100);
+      // change here for postPerRow
       if (pot === potsPerRow) pot -= 1;
       if (pot === -1) pot += 1;
       direction *= -1;

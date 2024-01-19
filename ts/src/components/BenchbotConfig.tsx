@@ -58,8 +58,6 @@ export default function BenchbotConfig() {
 
   const [stop, setStop] = useState(false);
 
-  console.log(stop);
-
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
   };
@@ -74,30 +72,19 @@ export default function BenchbotConfig() {
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
-    // potsPerRow -= 1;
-    // numberOfRows -= 1;
     for (; row < numberOfRows; row += 1) {
-      // move benchbot by potSpacing(not move on first loop)
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`, stop);
-        // move benchbot by rowSpacing
-    await sleep(5000);
-
-        moveX(direction * potSpacing);
-        let a = false;
-        setStop((prev) => {
-          a = prev;
-          return prev;
-        });
-        if (a) {
-          let location = [row, pot];
-          saveBenchBotConfig(
-            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-            { location, map, direction }
-            );
-            break;
-          }
+        // move benchbot by rowSpacing (not move when at two edge of a row)
+        if (
+          !(
+            (pot === 0 && direction === -1) ||
+            (pot === potsPerRow - 1 && direction === 1)
+          )
+        ) {
+          await sleep(1000);
+          moveX(direction * potSpacing);
         }
         let a = false;
         setStop((prev) => {
@@ -109,13 +96,28 @@ export default function BenchbotConfig() {
           saveBenchBotConfig(
             { potsPerRow, numberOfRows, rowSpacing, potSpacing },
             { location, map, direction }
-            );
-            break;
-          }
-      // move benchbot by potSpacing(not move on first loop)
-    await sleep(5000);
-          
-            moveY(rowSpacing / 100);
+          );
+          break;
+        }
+      }
+      let a = false;
+      setStop((prev) => {
+        a = prev;
+        return prev;
+      });
+      if (a) {
+        let location = [row, pot];
+        saveBenchBotConfig(
+          { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+          { location, map, direction }
+        );
+        break;
+      }
+      // move benchbot by potSpacing
+      await sleep(1000);
+      if (row !== numberOfRows - 1) {
+        moveY(rowSpacing / 100);
+      }
       // change here for postPerRow
       if (pot === potsPerRow) pot -= 1;
       if (pot === -1) pot += 1;
@@ -126,14 +128,14 @@ export default function BenchbotConfig() {
   const baseUrl = "http://localhost:8042";
 
   const moveX = async (x: number) => {
-    console.log("api call param", x);
+    console.log("move x", x);
     const url = baseUrl + `/clearcore?x=${x}&z=0`;
     const res = await (await fetch(url)).json();
     console.log(res);
   };
 
   const moveY = async (y: number) => {
-    console.log("api call move y", y);
+    console.log("move y", y);
     const url = baseUrl + `/move_yaxis/${y}`;
     const res = await (await fetch(url)).json();
     console.log(res);

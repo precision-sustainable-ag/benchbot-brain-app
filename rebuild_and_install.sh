@@ -3,6 +3,7 @@
 # create virtual environment for the backend in the api folder
 cd api/
 source venv/bin/activate
+pip install -r requirements.txt
 
 # build the frontend in the ts directory
 cd ../ts/

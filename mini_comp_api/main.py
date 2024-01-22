@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response, send_file
 from from_root import from_root, from_here
 from pathlib import Path
 import os
@@ -7,6 +7,9 @@ import shutil
 import threading
 from datetime import datetime
 import logging
+import glob
+import cv2
+import io
 
 # create directory for saving day's images
 STATE = 'NC'
@@ -82,6 +85,23 @@ def capture_image():
         message += "missing"
         logging.info(message)
         return message, 417
+    
+
+@app.route('/img_preview', methods=['GET'])
+def preview_image():
+    list_of_files = glob.glob(f'{dirName}/*.JPG')
+    fileName = max(list_of_files, key=os.path.getctime)
+    image = cv2.imread(fileName)
+    preview = cv2.resize(image, None, fx = 0.5, fy = 0.5)
+    _, img_encoded = cv2.imencode('.jpg', preview)
+    byte_stream = img_encoded.tobytes()
+
+    if byte_stream is None:
+        return "No Preview Available!", 400
+
+    response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
+
+    return response
 
  
 if __name__ == '__main__':

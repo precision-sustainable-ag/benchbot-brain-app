@@ -83,6 +83,7 @@ export default function BenchbotConfig() {
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         map[row][pot] = 1;
+        console.log(`visit pot at row ${row} pot ${pot}`);
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -91,10 +92,7 @@ export default function BenchbotConfig() {
         ) {
           // move benchbot by rowSpacing (not move when at two edge of a row)
           await sleep(1000);
-          console.log(`visit pot at row ${row} pot ${pot}`);
-          appendLog(
-            `move X: ${direction * potSpacing}, visit pot at row ${row} pot ${pot}`
-          );
+          appendLog(`move X: ${direction * potSpacing}`);
           moveXandZ(direction * potSpacing, 0);
         }
         // test if stop button has triggered
@@ -140,6 +138,20 @@ export default function BenchbotConfig() {
       direction *= -1;
     }
   };
+
+  useEffect(() => {
+    // load
+    const res = loadBenchBotConfig();
+    if (!res) return;
+    const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = res;
+    setBenchBotConfig({
+      ...benchBotConfig,
+      potsPerRow,
+      numberOfRows,
+      rowSpacing,
+      potSpacing,
+    });
+  }, []);
 
   return (
     <div style={{ display: "flex" }}>
@@ -246,33 +258,36 @@ export default function BenchbotConfig() {
         </Row>
         <Row>
           <Button name="Save" onClick={() => initBenchBotMap(benchBotConfig)} />
-          <Button name="Load" onClick={() => loadBenchBotConfig()} />
           <Button
             name="Start"
             onClick={() => {
               setStop(false);
               const res = loadBenchBotConfig();
-              const {
-                potsPerRow,
-                numberOfRows,
-                rowSpacing,
-                potSpacing,
-                location,
-                map,
-                direction,
-              } = res!;
-              console.log("start stop", stop);
-              traverseBenchBot(
-                { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-                { location, map, direction }
-              );
+              if (!res) {
+                const { location, map, direction } =
+                  initBenchBotMap(benchBotConfig);
+                traverseBenchBot(benchBotConfig, { location, map, direction });
+              } else {
+                const {
+                  potsPerRow,
+                  numberOfRows,
+                  rowSpacing,
+                  potSpacing,
+                  location,
+                  map,
+                  direction,
+                } = res;
+                traverseBenchBot(
+                  { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+                  { location, map, direction }
+                );
+              }
             }}
             styles={{ color: "#f65a5b" }}
           />
           <Button
             name="Stop"
             onClick={() => {
-              // console.log("clicked");
               setStop(true);
               console.log("stop", stop);
             }}

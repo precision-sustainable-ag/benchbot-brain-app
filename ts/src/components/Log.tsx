@@ -5,13 +5,14 @@ interface LogProps {
 
 export default function Log({ logs, clearLog }: LogProps) {
   return (
-    <div>
+    <div style={{ width: "400px" }}>
       <p style={{ margin: 0 }}>Log</p>
       <button onClick={clearLog}>Clear All Logs</button>
 
       <textarea
         value={logs.reverse().join("\n")}
         style={{ width: "400px", height: "400px" }}
+        readOnly
       />
     </div>
   );

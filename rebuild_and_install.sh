@@ -1,13 +1,14 @@
 #!/bin/bash -x
 
+# build the frontend in the ts directory
+cd ts/
+npm run build
+
 # create virtual environment for the backend in the api folder
-cd api/
+cd ../api/
 source venv/bin/activate
 pip install -r requirements.txt
-
-# build the frontend in the ts directory
-cd ../ts/
-npm run build
+python main.py
 
 # install the app on the brain
 set -uxeo pipefail

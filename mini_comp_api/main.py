@@ -69,24 +69,26 @@ def homepage():
 # route for triggering the camera to take the images
 @app.route('/image', methods=['GET'])
 def capture_image():
-    os.system(CAM_PATH)
-    time.sleep(3)
-    t_stamp = str(int(time.time()))
-    missing_list = check_files(t_stamp)
-    threading.Thread(target=move_files()).start()
-    if not missing_list:
-        message = "Images taken successfully"
-        logging.info(message)
-        return message, 200
-    else:
-        message = ""
-        for istr in missing_list:
-            message += istr + " "
-        message += "missing"
-        logging.info(message)
-        return message, 417
-    
+    for i in range(2):
+        os.system(CAM_PATH)
+        time.sleep(3)
+        t_stamp = str(int(time.time()))
+        missing_list = check_files(t_stamp)
+        threading.Thread(target=move_files()).start()
+        if not missing_list:
+            message = "Images taken successfully"
+            logging.info(message)
+            return message, 200
 
+    message = ""
+    for istr in missing_list:
+        message += istr + " "
+    message += "missing"
+    logging.info(message)
+    return message, 417
+
+
+# route for providing preview of most recent image
 @app.route('/img_preview', methods=['GET'])
 def preview_image():
     list_of_files = glob.glob(f'{dirName}/*.JPG')

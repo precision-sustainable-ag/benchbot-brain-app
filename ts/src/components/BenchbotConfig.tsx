@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, useRef } from "react";
 import Row from "./Row";
 import Button from "./Button";
 import {
@@ -60,6 +60,7 @@ export default function BenchbotConfig() {
   );
   const [logs, setLogs] = useState([""]);
   const [stop, setStop] = useState(false);
+  const stopRef = useRef(stop);
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
@@ -96,12 +97,8 @@ export default function BenchbotConfig() {
           moveXandZ(direction * potSpacing, 0);
         }
         // test if stop button has triggered
-        let a = false;
-        setStop((prev) => {
-          a = prev;
-          return prev;
-        });
-        if (a) {
+        // console.log("test stopRef", stopRef.current);
+        if (stopRef.current) {
           // if hit stop button, save current info and break loop
           let location = [row, pot];
           saveBenchBotConfig(
@@ -111,12 +108,8 @@ export default function BenchbotConfig() {
           break;
         }
       }
-      let a = false;
-      setStop((prev) => {
-        a = prev;
-        return prev;
-      });
-      if (a) {
+
+      if (stopRef.current) {
         let location = [row, pot];
         saveBenchBotConfig(
           { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -152,6 +145,11 @@ export default function BenchbotConfig() {
       potSpacing,
     });
   }, []);
+
+  useEffect(() => {
+    stopRef.current = stop;
+    // console.log("stopRef.current", stopRef.current);
+  }, [stop]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -264,9 +262,9 @@ export default function BenchbotConfig() {
               setStop(false);
               const res = loadBenchBotConfig();
               if (!res) {
-                const { location, map, direction } =
-                  initBenchBotMap(benchBotConfig);
-                traverseBenchBot(benchBotConfig, { location, map, direction });
+                // const { location, map, direction } =
+                //   initBenchBotMap(benchBotConfig);
+                // traverseBenchBot(benchBotConfig, { location, map, direction });
               } else {
                 const {
                   potsPerRow,
@@ -283,16 +281,16 @@ export default function BenchbotConfig() {
                 );
               }
             }}
-            styles={{ color: "#f65a5b" }}
+            styles={{ color: "#61dac3" }}
           />
           <Button
             name="Stop"
             onClick={() => {
               setStop(true);
-              console.log("stop", stop);
             }}
-            styles={{ color: "#61dac3" }}
+            styles={{ color: "#f65a5b" }}
           />
+          {/* <span>{stop === true ? "true" : "false"}</span> */}
         </Row>
       </div>
       <Log logs={logs} clearLog={() => setLogs([""])} />

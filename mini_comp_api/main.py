@@ -60,26 +60,31 @@ def check_files(time_stamp):
                 return missing_images
 
 
+# function for triggering the camera to take the images
+def trigger_camera():
+    os.system(CAM_PATH)
+    time.sleep(3)
+    t_stamp = str(int(time.time()))
+    missing_imgs = check_files(t_stamp)
+    threading.Thread(target=move_files()).start()
+    return missing_imgs
+
+
 # route for helping debug, to check if server is running or not
 @app.route('/', methods=['GET'])
 def homepage():
     return 'Homepage, server is up and running', 200
 
 
-# route for triggering the camera to take the images
+# route for capturing the image using the camera
 @app.route('/image', methods=['GET'])
 def capture_image():
     for i in range(2):
-        os.system(CAM_PATH)
-        time.sleep(3)
-        t_stamp = str(int(time.time()))
-        missing_list = check_files(t_stamp)
-        threading.Thread(target=move_files()).start()
+        missing_list = trigger_camera()
         if not missing_list:
             message = "Images taken successfully"
             logging.info(message)
             return message, 200
-
     message = ""
     for istr in missing_list:
         message += istr + " "
@@ -91,18 +96,19 @@ def capture_image():
 # route for providing preview of most recent image
 @app.route('/img_preview', methods=['GET'])
 def preview_image():
-    list_of_files = glob.glob(f'{dirName}/*.JPG')
-    fileName = max(list_of_files, key=os.path.getctime)
-    image = cv2.imread(fileName)
-    preview = cv2.resize(image, None, fx = 0.5, fy = 0.5)
-    _, img_encoded = cv2.imencode('.jpg', preview)
-    byte_stream = img_encoded.tobytes()
-
-    if byte_stream is None:
-        return "No Preview Available!", 400
-
-    response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
-
+    missing_list = trigger_camera()
+    if not missing_list:
+        list_of_files = glob.glob(f'{dirName}/*.JPG')
+        fileName = max(list_of_files, key=os.path.getctime)
+        image = cv2.imread(fileName)
+        preview = cv2.resize(image, None, fx = 0.5, fy = 0.5)
+        _, img_encoded = cv2.imencode('.jpg', preview)
+        byte_stream = img_encoded.tobytes()
+        if byte_stream is None:
+            return "No Preview Available!", 400
+        response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
+    else:
+        response = make_response("Preview Image not available!", 400)
     return response
 
  

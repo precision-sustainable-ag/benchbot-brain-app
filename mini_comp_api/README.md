@@ -66,7 +66,7 @@ cd ~
 sudo nano /etc/systemd/system/bb_cam.service
 ```
 
-Add contents of bb_cam.txt to this file, make sure the ExecStart has the path to the script in your system.
+Add contents of boot_on_launch.txt to this file, make sure the ExecStart has the path to the script in your system.
 Save the file and exit the text editor. Then run the following:
 
 ```

@@ -42,15 +42,16 @@ def check_files(time_stamp):
         for file_name in os.listdir('.'):
             # if image file is found
             if file_name.startswith(STATE):
-                to_remove = None
                 if file_name.endswith('.JPG'):
                     new_name = f"{STATE}_{time_stamp}.JPG"
                     to_remove = "JPEG"
                 elif file_name.endswith('.ARW'):
                     new_name = f"{STATE}_{time_stamp}.ARW"
                     to_remove = "RAW"
-                if to_remove is not None:
+                try:
                     missing_images.remove(to_remove)
+                except:
+                    pass
                 try:
                     os.rename(file_name, new_name)
                 except:
@@ -101,7 +102,7 @@ def preview_image():
         list_of_files = glob.glob(f'{dirName}/*.JPG')
         fileName = max(list_of_files, key=os.path.getctime)
         image = cv2.imread(fileName)
-        preview = cv2.resize(image, None, fx = 0.5, fy = 0.5)
+        preview = cv2.resize(image, None, fx = 0.2, fy = 0.2)
         _, img_encoded = cv2.imencode('.jpg', preview)
         byte_stream = img_encoded.tobytes()
         if byte_stream is None:

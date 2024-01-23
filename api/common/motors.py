@@ -39,5 +39,5 @@ class Motors():
       else:
         speeds = [ACC, LINEAR_VELOCITY, ACC, 0]
 
-      await self.move_motors(speeds, time_required)
+      await self.move_motors(speeds, abs(time_required))
 

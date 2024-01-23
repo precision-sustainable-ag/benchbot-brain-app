@@ -11,6 +11,7 @@ const Row = ({ children }: RowProps) => {
         padding: "10px 0",
         display: "flex",
         justifyContent: "space-around",
+        alignItems: "center",
       }}
     >
       {children}

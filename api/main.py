@@ -6,7 +6,8 @@ import asyncio
 import os
 import socket
 import uvicorn
-
+import requests
+from fastapi.staticfiles import StaticFiles
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 amiga_motors = Motors()
@@ -16,16 +17,10 @@ clear_core = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 clear_core.connect((UDP_IP, UDP_PORT))
 
 
-
-
-@app.get("/")
-async def root():
-    return "Welcome!"
-
-
-@app.get("/movey/{dist}")
-async def move_reverse():
-    await amiga_motors.move_y(dist)
+@app.get("/move_yaxis/{dist}")
+async def move_yaxis(dist):
+    print('Y: ' + dist)
+    await amiga_motors.move_y(float(dist))
 
 
 # x, and z distance in cm
@@ -48,6 +43,7 @@ def move_xz_axis(x, z):
   # print(message)
 
   clear_core.send(msgbyte)
+#   take_image()
   return(clear_core.recv(1024))
 
 
@@ -62,4 +58,22 @@ def take_image():
 
 if __name__ == "__main__":
     # run the server
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--config", type=Path, required=True, help="config file")
+    # parser.add_argument("--port", type=int, default=8042, help="port to run the server")
+    # parser.add_argument("--debug", action="store_true", help="debug mode")
+    # args = parser.parse_args()
+
+    # # NOTE: we only serve the react app in debug mode
+    # if not args.debug:
+        # print("entered if block")
+    react_build_directory = from_root("ts/dist")
+
+    print(react_build_directory)
+
+    app.mount(
+        "/",
+        StaticFiles(directory=str(react_build_directory.resolve()), html=True),
+    )
+
     uvicorn.run(app, host="0.0.0.0", port=8042)

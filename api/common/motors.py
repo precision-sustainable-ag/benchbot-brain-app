@@ -32,12 +32,12 @@ class Motors():
                 await asyncio.sleep(0.05)
 
     async def move_y(self, distance) -> None:
-      time_required = (distance/LINEAR_VELOCITY) - 0.1
-
+      distance_in_m = abs (distance / 10)
+      time_required = (distance_in_m/LINEAR_VELOCITY) - 0.1
       if distance < 0:
         speeds = [-ACC, -LINEAR_VELOCITY, -ACC, 0]
       else:
         speeds = [ACC, LINEAR_VELOCITY, ACC, 0]
 
-      await self.move_motors(speeds, time_required)
+      await self.move_motors(speeds, abs(time_required))
 

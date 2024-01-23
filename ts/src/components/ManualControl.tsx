@@ -1,86 +1,184 @@
 import { useState } from "react";
 import Button from "./Button";
+import Row from "./Row";
+import { moveXandZ, moveY, takeImage } from "../utils/api";
+import ControlButtons from "./ControlButtons";
+import Log from "./Log";
 
 function ManualControl() {
   const [xValue, setXValue] = useState(0);
   const [yValue, setYValue] = useState(0);
   const [zValue, setZValue] = useState(0);
 
+  const [logs, setLogs] = useState([""]);
+
+  const appendLog = (log: string) => {
+    const currentTime = new Date().toLocaleString();
+    setLogs([currentTime + ": " + log, ...logs]);
+  };
+
   return (
-    <div style={{ width: "500px" }}>
-      <div>ManualControl Page</div>
+    <div style={{ display: "flex" }}>
+      <div style={{ width: "800px" }}>
+        <h5 style={{ textAlign: "center", margin: "1rem" }}>Manual Control</h5>
 
-      <div
-        style={{
-          padding: "10px 0",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <Button name={"Home X"} onClick={() => {}} />
-        <Button name={"Home Z"} onClick={() => {}} />
+        <Row>
+          <Button name={"Home X"} onClick={() => {}} />
+          <Button
+            name={"Home Z"}
+            onClick={() => {
+              moveXandZ(999, 999);
+            }}
+          />
+        </Row>
+
+        <Row>
+          <input
+            value={xValue}
+            type="number"
+            onChange={(e) =>
+              setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            }
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          cm
+          <ControlButtons setValue={(num) => setXValue(xValue + num)} />
+          <Button
+            name={"+ X"}
+            onClick={() => {
+              appendLog(`move X: ${xValue}cm`);
+              moveXandZ(xValue, 0);
+            }}
+          />
+          <Button
+            name={"- X"}
+            onClick={() => {
+              appendLog(`move X: ${-xValue}cm`);
+              moveXandZ(-xValue, 0);
+            }}
+          />
+        </Row>
+
+        <Row>
+          <input
+            type="number"
+            value={yValue}
+            onChange={(e) => {
+              setYValue(e.target.value === "" ? 0 : parseInt(e.target.value));
+            }}
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          cm
+          <ControlButtons setValue={(num) => setYValue(yValue + num)} />
+          <Button
+            name={"+ Y"}
+            onClick={() => {
+              appendLog(`move Y: ${yValue}cm`);
+              moveY(yValue / 100);
+            }}
+          />
+          <Button
+            name={"- Y"}
+            onClick={() => {
+              appendLog(`move Y: ${-yValue}cm`);
+              moveY(-yValue / 100);
+            }}
+          />
+        </Row>
+
+        <Row>
+          <input
+            type="number"
+            value={zValue}
+            onChange={(e) =>
+              setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            }
+            style={{ fontSize: "2rem", width: "300px" }}
+          />
+          cm
+          <ControlButtons setValue={(num) => setZValue(zValue + num)} />
+          <Button
+            name={"+ Z"}
+            onClick={() => {
+              appendLog(`move Z: ${zValue}cm`);
+              moveXandZ(0, zValue);
+            }}
+          />
+          <Button
+            name={"- Z"}
+            onClick={() => {
+              appendLog(`move Z: ${-zValue}cm`);
+              moveXandZ(0, -zValue);
+            }}
+          />
+        </Row>
+
+        <Row>
+          <Button
+            name={"Emergency Stop"}
+            styles={{ color: "red" }}
+            onClick={() => {}}
+          />
+          <Button
+            name={"To this position"}
+            onClick={() => {
+              moveXandZ(xValue, zValue);
+              moveY(yValue);
+            }}
+          />
+          <Button name={"Pause"} onClick={() => {}} />
+          <Button
+            name={"Take Image"}
+            onClick={() => {
+              takeImage();
+            }}
+          />
+        </Row>
       </div>
 
-      <div
-        style={{
-          padding: "10px 0",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <input
-          value={xValue}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          onChange={(e) =>
-            setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-          }
-        />
-        <Button name={"+ X"} onClick={() => {}} />
-        <Button name={"- X"} onClick={() => {}} />
-      </div>
-      <div
-        style={{
-          padding: "10px 0",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <input
-          value={yValue}
-          onChange={(e) =>
-            setYValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-          }
-        />
-        <Button name={"+ Y"} onClick={() => {}} />
-        <Button name={"- Y"} onClick={() => {}} />
-      </div>
-      <div
-        style={{
-          padding: "10px 0",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <input
-          value={zValue}
-          onChange={(e) =>
-            setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-          }
-        />
-        <Button name={"+ Z"} onClick={() => {}} />
-        <Button name={"- Z"} onClick={() => {}} />
-      </div>
-      <div
-        style={{
-          padding: "10px 0",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <Button name={"Emergency Stop"} onClick={() => {}} />
-        <Button name={"Pause"} onClick={() => {}} />
+      <div>
+        <div
+          style={{
+            border: "1px solid black",
+            width: "400px",
+            height: "500px",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "20px",
+            padding: "20px",
+          }}
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
+            <button
+              key={number}
+              onClick={() => {}}
+              style={{ padding: "10px", fontSize: "16px" }}
+            >
+              {number}
+            </button>
+          ))}
+
+          <button
+            onClick={() => {}}
+            style={{
+              padding: "10px",
+              fontSize: "16px",
+              fontWeight: "bold",
+            }}
+          >
+            .
+          </button>
+          <button
+            onClick={() => {}}
+            style={{
+              padding: "10px",
+              fontSize: "16px",
+            }}
+          >
+            Delete
+          </button>
+        </div>
+        <Log logs={logs} clearLog={() => setLogs([""])} />
       </div>
     </div>
   );

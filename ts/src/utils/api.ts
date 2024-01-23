@@ -22,7 +22,7 @@ export const takeImage = async () => {
   const url = imageUrl;
   const res = await fetch(url);
   const data = await res.blob();
-  console.log(res);
+  console.log(data);
   return data;
 };
 

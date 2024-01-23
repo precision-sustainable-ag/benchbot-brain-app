@@ -1,3 +1,5 @@
 farm-ng-amiga
 fastapi
 uvicorn
+from_root
+requests

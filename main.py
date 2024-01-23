@@ -104,17 +104,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True, help="config file")
     parser.add_argument("--port", type=int, default=8042, help="port to run the server")
-    parser.add_argument("--debug", action="store_true", help="debug mode")
+    # parser.add_argument("--debug", action="store_true", help="debug mode")
     args = parser.parse_args()
 
-    # NOTE: we only serve the react app in debug mode
-    if not args.debug:
-        react_build_directory = Path(__file__).parent / "ts" / "dist"
+    print("test")
 
-        app.mount(
-            "/",
-            StaticFiles(directory=str(react_build_directory.resolve()), html=True),
-        )
+    # NOTE: we only serve the react app in debug mode
+    # if not args.debug:
+    react_build_directory = Path(__file__).parent / "ts" / "dist"
+
+    print(react_build_directory)
+
+    app.mount(
+        "/",
+        StaticFiles(directory=str(react_build_directory.resolve()), html=True),
+    )
 
     # config list with all the configs
     config_list: EventServiceConfigList = proto_from_json_file(args.config, EventServiceConfigList())
@@ -129,4 +133,4 @@ if __name__ == "__main__":
         clients[config.name] = client
 
     # run the server
-    uvicorn.run(app, host="0.0.0.0", port=args.port)  # noqa: S104
+    uvicorn.run(app, host="0.0.0.0", port=args.port)

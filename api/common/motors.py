@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 import time
+from from_root import from_root, from_here
 
 from farm_ng.canbus.canbus_pb2 import Twist2d
 from farm_ng.core.event_client import EventClient
@@ -15,7 +16,7 @@ ANGULAR_VELOCITY = 0.05
 # DISTANCE = 0.30 # in m
 
 class Motors():
-    def __init__(self, file_path="common/service_config.json"):
+    def __init__(self, file_path=from_root("api/common/service_config.json")):
         service_config_path = Path(file_path)
         self.twist = Twist2d()
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())

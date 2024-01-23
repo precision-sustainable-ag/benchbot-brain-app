@@ -12,9 +12,16 @@ function ManualControl() {
 
   const [logs, setLogs] = useState([""]);
 
+  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
-    setLogs([currentTime + ": " + log, ...logs]);
+    setLogs([...logs, currentTime + ": " + log]);
+  };
+
+  const loadImage = async () => {
+    const imageData = await takeImage();
+    setImagePreview(imageData);
   };
 
   return (
@@ -127,17 +134,12 @@ function ManualControl() {
             }}
           />
           <Button name={"Pause"} onClick={() => {}} />
-          <Button
-            name={"Take Image"}
-            onClick={() => {
-              takeImage();
-            }}
-          />
+          <Button name={"Take Image"} onClick={loadImage} />
         </Row>
       </div>
 
       <div>
-        <div
+        {/* <div
           style={{
             border: "1px solid black",
             width: "400px",
@@ -177,8 +179,14 @@ function ManualControl() {
           >
             Delete
           </button>
-        </div>
+        </div> */}
         <Log logs={logs} clearLog={() => setLogs([""])} />
+        <img
+          // src="../../test_plant.jpg"
+          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
+          alt="taken image"
+          style={{ width: "400px", paddingLeft: "40px" }}
+        />
       </div>
     </div>
   );

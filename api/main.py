@@ -39,21 +39,24 @@ def move_xz_axis(x, z):
   message = f"X:{x_counts} Z:{z_counts}"
   msgbyte = bytes(message, 'ascii')
   print(message)
-
-  # print(message)
-
   clear_core.send(msgbyte)
-#   take_image()
   return(clear_core.recv(1024))
 
 
-@app.get("/image")
-def take_image():
-    res = requests.get("http://10.95.76.50:5000/image")
-    print(res.status_code, res.text)
-    if res.status_code != 200:
-        resr = requests.get("http://10.95.76.50:5000/image")
-    return
+@app.get("/home_x")
+def home_x():
+  message = f"X:999 Z:0"
+  msgbyte = bytes(message, 'ascii')
+  clear_core.send(msgbyte)
+  return(clear_core.recv(1024))
+
+
+@app.get("/home_z")
+def home_z():
+  message = f"X:0 Z:999"
+  msgbyte = bytes(message, 'ascii')
+  clear_core.send(msgbyte)
+  return(clear_core.recv(1024))
 
 
 if __name__ == "__main__":

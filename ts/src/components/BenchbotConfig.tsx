@@ -8,7 +8,7 @@ import {
 } from "../utils/calculation";
 import ControlButtons from "./ControlButtons";
 import Log from "./Log";
-import { moveXandZ, moveY } from "../utils/api";
+import { moveXandZ, moveY, takeImage } from "../utils/api";
 
 const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
 
@@ -21,12 +21,13 @@ interface ValInputProps {
 const ValInput = ({ name, value, onChange }: ValInputProps) => {
   return (
     <>
-      <span style={{ width: "400px" }}>{name}</span>
+      <span style={{ width: "300px" }}>{name}</span>
       <input
         type="number"
         value={value}
         onChange={onChange}
-        style={{ fontSize: "2rem", flex: 1 }}
+        size={2}
+        style={{ fontSize: "2rem", flex: 1, width: "50px" }}
       />
     </>
   );
@@ -62,13 +63,20 @@ export default function BenchbotConfig() {
   const [stop, setStop] = useState(false);
   const stopRef = useRef(stop);
 
+  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+
+  const loadImage = async () => {
+    const imageData = await takeImage();
+    setImagePreview(imageData);
+  };
+
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
   };
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
-    setLogs((prev) => [currentTime + ": " + log, ...prev]);
+    setLogs((prev) => [...prev, currentTime + ": " + log]);
   };
 
   const sleep = (delay: number) =>
@@ -85,6 +93,8 @@ export default function BenchbotConfig() {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
+        // wait response of image
+        await loadImage();
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -153,7 +163,7 @@ export default function BenchbotConfig() {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ width: "1000px" }}>
+      <div style={{ width: "800px" }}>
         <h1 style={{ textAlign: "center" }}>Benchbot Config</h1>
         <Row>
           <ValInput
@@ -293,7 +303,15 @@ export default function BenchbotConfig() {
           {/* <span>{stop === true ? "true" : "false"}</span> */}
         </Row>
       </div>
-      <Log logs={logs} clearLog={() => setLogs([""])} />
+      <div>
+        <Log logs={logs} clearLog={() => setLogs([""])} />
+        <img
+          // src="../../test_plant.jpg"
+          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
+          alt="taken image"
+          style={{ width: "400px", paddingLeft: "40px" }}
+        />
+      </div>
     </div>
   );
 }

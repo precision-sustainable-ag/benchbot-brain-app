@@ -1,5 +1,7 @@
 const baseUrl = "http://localhost:8042";
 
+const imageUrl = "http://10.95.76.50:5000/image";
+
 export const moveXandZ = async (x: number, z: number) => {
   console.log("move x", x, "move z", z);
   const url = baseUrl + `/clearcore?x=${x}&z=${z}`;
@@ -17,9 +19,11 @@ export const moveY = async (y: number) => {
 
 export const takeImage = async () => {
   console.log("take image");
-  const url = baseUrl + "/image";
-  const res = await (await fetch(url)).json();
-  console.log(res);
+  const url = imageUrl;
+  const res = await fetch(url);
+  const data = await res.blob();
+  console.log(data);
+  return data;
 };
 
 export const home = async () => {

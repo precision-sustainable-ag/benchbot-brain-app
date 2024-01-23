@@ -1,0 +1,7 @@
+/home/benchbot/camera/build/CMakeFiles/RemoteCli.dir
+/home/benchbot/camera/build/CMakeFiles/edit_cache.dir
+/home/benchbot/camera/build/CMakeFiles/rebuild_cache.dir
+/home/benchbot/camera/build/CMakeFiles/list_install_components.dir
+/home/benchbot/camera/build/CMakeFiles/install.dir
+/home/benchbot/camera/build/CMakeFiles/install/local.dir
+/home/benchbot/camera/build/CMakeFiles/install/strip.dir

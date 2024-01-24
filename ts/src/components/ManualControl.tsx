@@ -1,7 +1,14 @@
 import { useState } from "react";
 import Button from "./Button";
 import Row from "./Row";
-import { homeX, homeZ, moveXandZ, moveY, takeImage } from "../utils/api";
+import {
+  homeX,
+  homeZ,
+  moveXandZ,
+  moveY,
+  takeImage,
+  getImagePreview,
+} from "../utils/api";
 import ControlButtons from "./ControlButtons";
 import Log from "./Log";
 
@@ -20,7 +27,8 @@ function ManualControl() {
   };
 
   const loadImage = async () => {
-    const imageData = await takeImage();
+    takeImage();
+    const imageData = await getImagePreview();
     setImagePreview(imageData);
   };
 

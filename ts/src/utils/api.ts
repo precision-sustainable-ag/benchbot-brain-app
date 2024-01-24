@@ -1,6 +1,8 @@
 const baseUrl = "http://localhost:8042";
 
-const imageUrl = "http://10.95.76.50:5000/image";
+const takeImageUrl = "http://10.95.76.50:5000/image";
+
+const previewImageUrl = "http://10.95.76.50:5000/img_preview";
 
 export const moveXandZ = async (x: number, z: number) => {
   console.log("move x", x, "move z", z);
@@ -19,10 +21,17 @@ export const moveY = async (y: number) => {
 
 export const takeImage = async () => {
   console.log("take image");
-  const url = imageUrl;
+  const url = takeImageUrl;
+  const res = await fetch(url);
+  console.log(res);
+};
+
+export const getImagePreview = async () => {
+  console.log("take image");
+  const url = previewImageUrl;
   const res = await fetch(url);
   const data = await res.blob();
-  console.log(data);
+  console.log(res, data);
   return data;
 };
 

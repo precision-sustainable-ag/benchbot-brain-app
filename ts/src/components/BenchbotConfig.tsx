@@ -61,14 +61,8 @@ export default function BenchbotConfig() {
   );
   const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
-  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
 
   const stopRef = useRef(stop);
-
-  const loadImage = async () => {
-    const imageData = await takeImage();
-    setImagePreview(imageData);
-  };
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
@@ -96,7 +90,7 @@ export default function BenchbotConfig() {
         // visit pot, take image
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
-        await loadImage();
+        await takeImage();
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -307,11 +301,6 @@ export default function BenchbotConfig() {
       </div>
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
-        <img
-          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt="taken image"
-          style={{ width: "400px", paddingLeft: "20px" }}
-        />
       </div>
     </div>
   );

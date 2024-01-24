@@ -13,7 +13,7 @@ export const moveXandZ = async (x: number, z: number) => {
 
 export const moveY = async (y: number) => {
   // param is in meter scale
-  console.log("move y", y * 100);
+  console.log("move y", y);
   const url = baseUrl + `/move_yaxis/${y}`;
   const res = await (await fetch(url)).json();
   console.log(res);

@@ -22,7 +22,7 @@ export default function Log({ logs, clearLog }: LogProps) {
 
       <textarea
         ref={textareaRef}
-        value={logs.reverse().join("\n")}
+        value={logs.join("\n")}
         style={{ width: "400px", height: "400px" }}
         readOnly
       />

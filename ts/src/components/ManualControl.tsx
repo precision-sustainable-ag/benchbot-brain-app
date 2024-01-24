@@ -27,7 +27,6 @@ function ManualControl() {
   };
 
   const loadImage = async () => {
-    takeImage();
     const imageData = await getImagePreview();
     setImagePreview(imageData);
   };
@@ -84,14 +83,14 @@ function ManualControl() {
             name={"+ Y"}
             onClick={() => {
               appendLog(`move Y: ${yValue}cm`);
-              moveY(yValue / 100);
+              moveY(yValue);
             }}
           />
           <Button
             name={"- Y"}
             onClick={() => {
               appendLog(`move Y: ${-yValue}cm`);
-              moveY(-yValue / 100);
+              moveY(-yValue);
             }}
           />
         </Row>
@@ -133,6 +132,7 @@ function ManualControl() {
             name={"To this position"}
             styles={{ width: "300px" }}
             onClick={() => {
+              appendLog(`move X: ${xValue}cm, Y: ${yValue}cm, Z: ${zValue}cm`);
               moveXandZ(xValue, zValue);
               moveY(yValue);
             }}
@@ -148,7 +148,9 @@ function ManualControl() {
           <Button
             name={"Take Image"}
             styles={{ width: "300px" }}
-            onClick={loadImage}
+            onClick={() => {
+              appendLog('Take Image.')
+              loadImage();}}
           />
         </Row>
       </div>

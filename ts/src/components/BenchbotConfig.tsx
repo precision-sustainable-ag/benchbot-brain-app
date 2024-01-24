@@ -128,7 +128,7 @@ export default function BenchbotConfig() {
       await sleep(1000);
       if (row !== numberOfRows - 1) {
         appendLog(`move Y: ${rowSpacing / 100}`);
-        moveY(rowSpacing / 100);
+        moveY(rowSpacing);
       }
 
       // change here for postPerRow

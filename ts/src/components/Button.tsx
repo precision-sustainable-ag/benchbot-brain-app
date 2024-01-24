@@ -1,7 +1,7 @@
 import { CSSProperties } from "react";
 
 const buttonStyle = {
-  height: "100px",
+  height: "75px",
   minWidth: "100px",
   fontSize: "36px",
 };

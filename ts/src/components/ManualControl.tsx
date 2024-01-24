@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "./Button";
 import Row from "./Row";
-import { moveXandZ, moveY, takeImage } from "../utils/api";
+import { homeX, homeZ, moveXandZ, moveY, takeImage } from "../utils/api";
 import ControlButtons from "./ControlButtons";
 import Log from "./Log";
 
@@ -10,7 +10,7 @@ function ManualControl() {
   const [yValue, setYValue] = useState(0);
   const [zValue, setZValue] = useState(0);
 
-  const [logs, setLogs] = useState([""]);
+  const [logs, setLogs] = useState<string[]>([]);
 
   const [imagePreview, setImagePreview] = useState<Blob | null>(null);
 
@@ -30,13 +30,8 @@ function ManualControl() {
         <h5 style={{ textAlign: "center", margin: "1rem" }}>Manual Control</h5>
 
         <Row>
-          <Button name={"Home X"} onClick={() => {}} />
-          <Button
-            name={"Home Z"}
-            onClick={() => {
-              moveXandZ(999, 999);
-            }}
-          />
+          <Button name={"Home X"} onClick={homeX} />
+          <Button name={"Home Z"} onClick={homeZ} />
         </Row>
 
         <Row>
@@ -123,18 +118,30 @@ function ManualControl() {
         <Row>
           <Button
             name={"Emergency Stop"}
-            styles={{ color: "red" }}
+            styles={{ color: "red", width: "300px" }}
             onClick={() => {}}
           />
           <Button
             name={"To this position"}
+            styles={{ width: "300px" }}
             onClick={() => {
               moveXandZ(xValue, zValue);
               moveY(yValue);
             }}
           />
-          <Button name={"Pause"} onClick={() => {}} />
-          <Button name={"Take Image"} onClick={loadImage} />
+        </Row>
+
+        <Row>
+          <Button
+            name={"Pause"}
+            styles={{ width: "300px" }}
+            onClick={() => {}}
+          />
+          <Button
+            name={"Take Image"}
+            styles={{ width: "300px" }}
+            onClick={loadImage}
+          />
         </Row>
       </div>
 
@@ -180,12 +187,11 @@ function ManualControl() {
             Delete
           </button>
         </div> */}
-        <Log logs={logs} clearLog={() => setLogs([""])} />
+        <Log logs={logs} clearLog={() => setLogs([])} />
         <img
-          // src="../../test_plant.jpg"
           src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
           alt="taken image"
-          style={{ width: "400px", paddingLeft: "40px" }}
+          style={{ width: "400px", paddingLeft: "20px" }}
         />
       </div>
     </div>

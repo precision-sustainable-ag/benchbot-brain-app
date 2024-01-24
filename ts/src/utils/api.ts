@@ -26,9 +26,15 @@ export const takeImage = async () => {
   return data;
 };
 
-export const home = async () => {
-  // TODO: update 999 to correct number
-  const url = baseUrl + `/clearcore?x=999&z=999`;
+// TODO: temporary home function
+export const homeX = async () => {
+  const url = baseUrl + `/home_x`;
+  const res = await (await fetch(url)).json();
+  console.log(res);
+};
+
+export const homeZ = async () => {
+  const url = baseUrl + `/home_z`;
   const res = await (await fetch(url)).json();
   console.log(res);
 };

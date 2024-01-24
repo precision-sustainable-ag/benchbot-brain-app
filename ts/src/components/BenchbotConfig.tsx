@@ -59,11 +59,11 @@ export default function BenchbotConfig() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
-  const [logs, setLogs] = useState([""]);
+  const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
-  const stopRef = useRef(stop);
-
   const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+
+  const stopRef = useRef(stop);
 
   const loadImage = async () => {
     const imageData = await takeImage();
@@ -79,21 +79,23 @@ export default function BenchbotConfig() {
     setLogs((prev) => [...prev, currentTime + ": " + log]);
   };
 
-  const sleep = (delay: number) =>
-    new Promise((resolve) => setTimeout(resolve, delay));
-
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
   ) => {
+    // mock sleep function
+    const sleep = (delay: number) =>
+      new Promise((resolve) => setTimeout(resolve, delay));
+
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
+        // visit pot, take image
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
-        // wait response of image
         await loadImage();
         if (
           !(
@@ -106,10 +108,10 @@ export default function BenchbotConfig() {
           appendLog(`move X: ${direction * potSpacing}`);
           moveXandZ(direction * potSpacing, 0);
         }
+
         // test if stop button has triggered
-        // console.log("test stopRef", stopRef.current);
         if (stopRef.current) {
-          // if hit stop button, save current info and break loop
+          // if stop, save current info and break loop
           let location = [row, pot];
           saveBenchBotConfig(
             { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -142,8 +144,8 @@ export default function BenchbotConfig() {
     }
   };
 
+  // load benchbot config from localstorage
   useEffect(() => {
-    // load
     const res = loadBenchBotConfig();
     if (!res) return;
     const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = res;
@@ -156,6 +158,7 @@ export default function BenchbotConfig() {
     });
   }, []);
 
+  // update stopRef
   useEffect(() => {
     stopRef.current = stop;
     // console.log("stopRef.current", stopRef.current);
@@ -300,16 +303,14 @@ export default function BenchbotConfig() {
             }}
             styles={{ color: "#f65a5b" }}
           />
-          {/* <span>{stop === true ? "true" : "false"}</span> */}
         </Row>
       </div>
       <div>
-        <Log logs={logs} clearLog={() => setLogs([""])} />
+        <Log logs={logs} clearLog={() => setLogs([])} />
         <img
-          // src="../../test_plant.jpg"
           src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
           alt="taken image"
-          style={{ width: "400px", paddingLeft: "40px" }}
+          style={{ width: "400px", paddingLeft: "20px" }}
         />
       </div>
     </div>

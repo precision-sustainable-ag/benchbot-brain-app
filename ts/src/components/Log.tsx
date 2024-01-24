@@ -16,7 +16,7 @@ export default function Log({ logs, clearLog }: LogProps) {
   }, [logs]);
 
   return (
-    <div style={{ width: "400px", paddingLeft: "40px" }}>
+    <div style={{ width: "400px", paddingLeft: "20px" }}>
       <p style={{ margin: 0 }}>Log</p>
       <button onClick={clearLog}>Clear All Logs</button>
 

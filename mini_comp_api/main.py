@@ -1,4 +1,5 @@
 from flask import Flask, make_response, send_file
+from flask_cors import CORS
 from from_root import from_root, from_here
 from pathlib import Path
 import os
@@ -25,7 +26,7 @@ logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(me
 
 
 app = Flask(__name__)
-
+CORS(app)
 
 # funtion to move image files to day's image collection directory
 def move_files():

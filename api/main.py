@@ -1,15 +1,23 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from from_root import from_root, from_here
 from common.motors import Motors
-import asyncio
-import os
 import socket
 import uvicorn
 import requests
-from fastapi.staticfiles import StaticFiles
+
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 amiga_motors = Motors()
 UDP_IP = "10.95.76.21"
 UDP_PORT = 8888
@@ -30,33 +38,33 @@ async def move_yaxis(dist):
 def move_xz_axis(x, z):
   # x axis -> 0.003175 cm per enocoder count
   # z axis -> 0.00529167 cm per encoder count
-  x_steps_to_cm = 0.003175
-  z_steps_to_cm = 0.000529167
+    x_steps_to_cm = 0.003175
+    z_steps_to_cm = 0.000529167
 
-  x_counts = int(x) // x_steps_to_cm
-  z_counts = int(z) // z_steps_to_cm
+    x_counts = int(x) // x_steps_to_cm
+    z_counts = int(z) // z_steps_to_cm
 
-  message = f"X:{x_counts} Z:{z_counts}"
-  msgbyte = bytes(message, 'ascii')
-  print(message)
-  clear_core.send(msgbyte)
-  return(clear_core.recv(1024))
+    message = f"X:{x_counts} Z:{z_counts}"
+    msgbyte = bytes(message, 'ascii')
+    print(message)
+    clear_core.send(msgbyte)
+    return(clear_core.recv(1024))
 
 
 @app.get("/home_x")
 def home_x():
-  message = f"X:999 Z:0"
-  msgbyte = bytes(message, 'ascii')
-  clear_core.send(msgbyte)
-  return(clear_core.recv(1024))
+    message = f"X:999 Z:0"
+    msgbyte = bytes(message, 'ascii')
+    clear_core.send(msgbyte)
+    return(clear_core.recv(1024))
 
 
 @app.get("/home_z")
 def home_z():
-  message = f"X:0 Z:999"
-  msgbyte = bytes(message, 'ascii')
-  clear_core.send(msgbyte)
-  return(clear_core.recv(1024))
+    message = f"X:0 Z:999"
+    msgbyte = bytes(message, 'ascii')
+    clear_core.send(msgbyte)
+    return(clear_core.recv(1024))
 
 
 if __name__ == "__main__":

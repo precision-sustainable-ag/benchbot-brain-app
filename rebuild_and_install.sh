@@ -9,12 +9,12 @@ rm -f ~/manifest.json
 ln -s "$DIR/manifest.json" ~/manifest.json
 
 # build the frontend in the ts directory
-cd ts/
+cd front_end/
 npm run build
 
 # activate venv, install requirements, and run main.py 
 cd ../
 source venv/bin/activate
-cd ./api
+cd ./brain_api
 pip install -r requirements.txt
 python main.py

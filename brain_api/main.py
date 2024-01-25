@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # # NOTE: we only serve the react app in debug mode
     # if not args.debug:
         # print("entered if block")
-    react_build_directory = from_root("ts/dist")
+    react_build_directory = from_root("front_end/dist")
 
     print(react_build_directory)
 

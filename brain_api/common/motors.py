@@ -16,7 +16,7 @@ ANGULAR_VELOCITY = 0.05
 # DISTANCE = 0.30 # in m
 
 class Motors():
-    def __init__(self, file_path=from_root("api/common/service_config.json")):
+    def __init__(self, file_path=from_root("brain_api/common/service_config.json")):
         service_config_path = Path(file_path)
         self.twist = Twist2d()
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())

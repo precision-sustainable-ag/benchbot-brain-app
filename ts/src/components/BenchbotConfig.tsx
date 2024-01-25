@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import Row from "./Row";
 import Button from "./Button";
 import {
@@ -34,11 +34,6 @@ const defaultBenchBotConfig = {
   species: "",
 };
 
-// TODO:
-// use map to test if visited
-// test logic for traversal
-// add a grid for the map on the right
-
 export default function BenchbotConfig() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
@@ -71,25 +66,23 @@ export default function BenchbotConfig() {
 
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
-        // visit pot, take image
+        // if this pot had visited, continue the loop
+        if (map[row][pot] === 1) continue;
+        await sleep(1000);
+        await takeImage();
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
-        await takeImage();
         if (
           !(
             (pot === 0 && direction === -1) ||
             (pot === potsPerRow - 1 && direction === 1)
           )
         ) {
-          // move benchbot by rowSpacing (not move when at two edge of a row)
-          await sleep(1000);
           appendLog(`move X: ${direction * potSpacing}`);
-          moveXandZ(direction * potSpacing, 0);
+          await moveXandZ(direction * potSpacing, 0);
         }
 
-        // test if stop button has triggered
         if (stopRef.current) {
-          // if stop, save current info and break loop
           let location = [row, pot];
           saveBenchBotConfig(
             { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -99,26 +92,27 @@ export default function BenchbotConfig() {
         }
       }
 
-      if (stopRef.current) {
-        let location = [row, pot];
-        saveBenchBotConfig(
-          { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-          { location, map, direction }
-        );
-        break;
-      }
+      // break outside loop if stop triggered
+      if (stopRef.current) break;
 
-      // move benchbot by potSpacing
-      await sleep(1000);
       if (row !== numberOfRows - 1) {
+        await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
-        moveY(rowSpacing);
+        await moveY(rowSpacing);
       }
 
-      // change here for postPerRow
+      // set overflowed postPerRow back
       if (pot === potsPerRow) pot -= 1;
       if (pot === -1) pot += 1;
       direction *= -1;
+    }
+    if (!stopRef.current) {
+      appendLog("BenchBot traversal finished.");
+      let location = [row, pot];
+      saveBenchBotConfig(
+        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+        { location, map, direction }
+      );
     }
   };
 
@@ -134,6 +128,7 @@ export default function BenchbotConfig() {
       rowSpacing,
       potSpacing,
     });
+    appendLog("Loaded config from history");
   }, []);
 
   // update stopRef
@@ -236,11 +231,10 @@ export default function BenchbotConfig() {
               setStop(false);
               const res = loadBenchBotConfig();
               if (!res) {
-                // const { location, map, direction } =
-                //   initBenchBotMap(benchBotConfig);
-                // traverseBenchBot(benchBotConfig, { location, map, direction });
+                const { location, map, direction } =
+                  initBenchBotMap(benchBotConfig);
+                traverseBenchBot(benchBotConfig, { location, map, direction });
               } else {
-                appendLog("Loaded config from history");
                 const {
                   potsPerRow,
                   numberOfRows,
@@ -250,7 +244,7 @@ export default function BenchbotConfig() {
                   map,
                   direction,
                 } = res;
-                appendLog("Started BenchBot traversal.");
+                appendLog("Start BenchBot traversal.");
                 traverseBenchBot(
                   { potsPerRow, numberOfRows, rowSpacing, potSpacing },
                   { location, map, direction }

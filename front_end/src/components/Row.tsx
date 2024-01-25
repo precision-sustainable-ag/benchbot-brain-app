@@ -1,17 +1,19 @@
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
 
 interface RowProps {
   children: ReactNode;
+  styles?: CSSProperties;
 }
 
-const Row = ({ children }: RowProps) => {
+const Row = ({ children, styles }: RowProps) => {
   return (
     <div
       style={{
         padding: "10px 0",
         display: "flex",
-        justifyContent: "space-around",
         alignItems: "center",
+        gap: "1rem",
+        ...styles,
       }}
     >
       {children}

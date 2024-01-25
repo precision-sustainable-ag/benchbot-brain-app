@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import Row from "./Row";
 import Button from "./Button";
 import {
@@ -6,32 +6,11 @@ import {
   loadBenchBotConfig,
   saveBenchBotConfig,
 } from "../utils/calculation";
-import ControlButtons from "./ControlButtons";
+import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 
 const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
-
-interface ValInputProps {
-  name: string;
-  value: number;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const ValInput = ({ name, value, onChange }: ValInputProps) => {
-  return (
-    <>
-      <span style={{ width: "300px" }}>{name}</span>
-      <input
-        type="number"
-        value={value}
-        onChange={onChange}
-        size={2}
-        style={{ fontSize: "2rem", flex: 1, width: "50px" }}
-      />
-    </>
-  );
-};
 
 export interface BenchBotConfig {
   potsPerRow: number;
@@ -59,16 +38,10 @@ export default function BenchbotConfig() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
-  const [logs, setLogs] = useState([""]);
+  const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
+
   const stopRef = useRef(stop);
-
-  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
-
-  const loadImage = async () => {
-    const imageData = await takeImage();
-    setImagePreview(imageData);
-  };
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
@@ -79,37 +52,37 @@ export default function BenchbotConfig() {
     setLogs((prev) => [...prev, currentTime + ": " + log]);
   };
 
-  const sleep = (delay: number) =>
-    new Promise((resolve) => setTimeout(resolve, delay));
-
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
   ) => {
+    // mock sleep function
+    const sleep = (delay: number) =>
+      new Promise((resolve) => setTimeout(resolve, delay));
+
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
+        // if this pot had visited, continue the loop
+        if (map[row][pot] === 1) continue;
+        await sleep(1000);
+        await takeImage();
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
-        // wait response of image
-        await loadImage();
         if (
           !(
             (pot === 0 && direction === -1) ||
             (pot === potsPerRow - 1 && direction === 1)
           )
         ) {
-          // move benchbot by rowSpacing (not move when at two edge of a row)
-          await sleep(1000);
           appendLog(`move X: ${direction * potSpacing}`);
-          moveXandZ(direction * potSpacing, 0);
+          await moveXandZ(direction * potSpacing, 0);
         }
-        // test if stop button has triggered
-        // console.log("test stopRef", stopRef.current);
+
         if (stopRef.current) {
-          // if hit stop button, save current info and break loop
           let location = [row, pot];
           saveBenchBotConfig(
             { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -119,31 +92,32 @@ export default function BenchbotConfig() {
         }
       }
 
-      if (stopRef.current) {
-        let location = [row, pot];
-        saveBenchBotConfig(
-          { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-          { location, map, direction }
-        );
-        break;
-      }
+      // break outside loop if stop triggered
+      if (stopRef.current) break;
 
-      // move benchbot by potSpacing
-      await sleep(1000);
       if (row !== numberOfRows - 1) {
+        await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
-        moveY(rowSpacing / 100);
+        await moveY(rowSpacing);
       }
 
-      // change here for postPerRow
+      // set overflowed postPerRow back
       if (pot === potsPerRow) pot -= 1;
       if (pot === -1) pot += 1;
       direction *= -1;
     }
+    if (!stopRef.current) {
+      appendLog("BenchBot traversal finished.");
+      let location = [row, pot];
+      saveBenchBotConfig(
+        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+        { location, map, direction }
+      );
+    }
   };
 
+  // load benchbot config from localstorage
   useEffect(() => {
-    // load
     const res = loadBenchBotConfig();
     if (!res) return;
     const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = res;
@@ -154,97 +128,82 @@ export default function BenchbotConfig() {
       rowSpacing,
       potSpacing,
     });
+    appendLog("Loaded config from history");
   }, []);
 
+  // update stopRef
   useEffect(() => {
     stopRef.current = stop;
     // console.log("stopRef.current", stopRef.current);
   }, [stop]);
 
+  const ValInput = ({
+    name,
+    value,
+    setValue,
+    unit,
+  }: {
+    name: string;
+    value: number;
+    setValue: (param: string, value: number | string) => void;
+    unit?: string;
+  }) => {
+    return (
+      <>
+        <span style={{ width: "300px" }}>{name}</span>
+        <ControlButtonsMinus setValue={(num) => setValue(name, value + num)} />
+        <div>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) =>
+              setValue(
+                name,
+                e.target.value === "" ? 0 : parseInt(e.target.value)
+              )
+            }
+            size={2}
+            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
+          />
+          {unit}
+        </div>
+        <ControlButtonsPlus setValue={(num) => setValue(name, value + num)} />
+      </>
+    );
+  };
+
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: "800px" }}>
-        <h1 style={{ textAlign: "center" }}>Benchbot Config</h1>
+        <h5 style={{ textAlign: "center", margin: "1rem" }}>Benchbot Config</h5>
         <Row>
           <ValInput
             name={"Pots per row:"}
             value={benchBotConfig.potsPerRow}
-            onChange={(e) =>
-              setBenchBotConfigByParam(
-                "potsPerRow",
-                e.target.value === "" ? 0 : parseInt(e.target.value)
-              )
-            }
-          />
-          <ControlButtons
-            setValue={(num) => {
-              setBenchBotConfigByParam(
-                "potsPerRow",
-                benchBotConfig.potsPerRow + num
-              );
-            }}
+            setValue={setBenchBotConfigByParam}
           />
         </Row>
         <Row>
           <ValInput
             name={"Number of rows: "}
             value={benchBotConfig.numberOfRows}
-            onChange={(e) =>
-              setBenchBotConfigByParam(
-                "numberOfRows",
-                e.target.value === "" ? 0 : parseInt(e.target.value)
-              )
-            }
-          />
-          <ControlButtons
-            setValue={(num) => {
-              setBenchBotConfigByParam(
-                "numberOfRows",
-                benchBotConfig.numberOfRows + num
-              );
-            }}
+            setValue={setBenchBotConfigByParam}
           />
         </Row>
         <Row>
           <ValInput
             name={"Row spacing: "}
             value={benchBotConfig.rowSpacing}
-            onChange={(e) =>
-              setBenchBotConfigByParam(
-                "rowSpacing",
-                e.target.value === "" ? 0 : parseInt(e.target.value)
-              )
-            }
-          />
-          cm
-          <ControlButtons
-            setValue={(num) => {
-              setBenchBotConfigByParam(
-                "rowSpacing",
-                benchBotConfig.rowSpacing + num
-              );
-            }}
+            setValue={setBenchBotConfigByParam}
+            unit="cm"
           />
         </Row>
         <Row>
           <ValInput
             name={"Pot spacing: "}
             value={benchBotConfig.potSpacing}
-            onChange={(e) =>
-              setBenchBotConfigByParam(
-                "potSpacing",
-                e.target.value === "" ? 0 : parseInt(e.target.value)
-              )
-            }
-          />
-          cm
-          <ControlButtons
-            setValue={(num) => {
-              setBenchBotConfigByParam(
-                "potSpacing",
-                benchBotConfig.potSpacing + num
-              );
-            }}
+            setValue={setBenchBotConfigByParam}
+            unit="cm"
           />
         </Row>
         <Row>
@@ -264,7 +223,7 @@ export default function BenchbotConfig() {
             ))}
           </select>
         </Row>
-        <Row>
+        <Row styles={{ justifyContent: "space-around" }}>
           <Button name="Save" onClick={() => initBenchBotMap(benchBotConfig)} />
           <Button
             name="Start"
@@ -272,9 +231,9 @@ export default function BenchbotConfig() {
               setStop(false);
               const res = loadBenchBotConfig();
               if (!res) {
-                // const { location, map, direction } =
-                //   initBenchBotMap(benchBotConfig);
-                // traverseBenchBot(benchBotConfig, { location, map, direction });
+                const { location, map, direction } =
+                  initBenchBotMap(benchBotConfig);
+                traverseBenchBot(benchBotConfig, { location, map, direction });
               } else {
                 const {
                   potsPerRow,
@@ -285,6 +244,7 @@ export default function BenchbotConfig() {
                   map,
                   direction,
                 } = res;
+                appendLog("Start BenchBot traversal.");
                 traverseBenchBot(
                   { potsPerRow, numberOfRows, rowSpacing, potSpacing },
                   { location, map, direction }
@@ -294,23 +254,17 @@ export default function BenchbotConfig() {
             styles={{ color: "#61dac3" }}
           />
           <Button
-            name="Stop"
+            name="Pause"
             onClick={() => {
+              appendLog("Paused BenchBot traversal.");
               setStop(true);
             }}
             styles={{ color: "#f65a5b" }}
           />
-          {/* <span>{stop === true ? "true" : "false"}</span> */}
         </Row>
       </div>
       <div>
-        <Log logs={logs} clearLog={() => setLogs([""])} />
-        <img
-          // src="../../test_plant.jpg"
-          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt="taken image"
-          style={{ width: "400px", paddingLeft: "40px" }}
-        />
+        <Log logs={logs} clearLog={() => setLogs([])} />
       </div>
     </div>
   );

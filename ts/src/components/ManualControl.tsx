@@ -13,6 +13,7 @@ function ManualControl() {
   const [logs, setLogs] = useState<string[]>([]);
 
   const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+  const [imageErrMsg, setImageErrMsg] = useState("No image available.");
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
@@ -21,7 +22,8 @@ function ManualControl() {
 
   const loadImage = async () => {
     const imageData = await getImagePreview();
-    setImagePreview(imageData);
+    if (!imageData.error && imageData.data) setImagePreview(imageData.data);
+    else setImageErrMsg(imageData.message);
   };
 
   const moveRobot = (axis: "X" | "Y" | "Z", distance: number) => {
@@ -148,7 +150,7 @@ function ManualControl() {
         <Log logs={logs} clearLog={() => setLogs([])} />
         <img
           src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt="No image available now."
+          alt={imageErrMsg}
           style={{ width: "400px", paddingLeft: "20px" }}
         />
       </div>

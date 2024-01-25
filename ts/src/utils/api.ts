@@ -7,6 +7,17 @@ const previewImageUrl = "http://10.95.76.50:5000/img_preview";
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log
 
+interface apiResponse {
+  error: boolean;
+  message: string;
+  data?: Blob;
+}
+
+const defaultResponse: apiResponse = {
+  error: false,
+  message: "",
+};
+
 export const moveXandZ = async (x: number, z: number) => {
   console.log("move x", x, "move z", z);
   const url = baseUrl + `/clearcore?x=${x}&z=${z}`;
@@ -23,28 +34,32 @@ export const moveY = async (y: number) => {
 };
 
 export const takeImage = async () => {
-  console.log("take image");
+  const response = defaultResponse;
   const url = takeImageUrl;
   const res = await fetch(url);
-  console.log(res);
+  // error handling
+  if (!res.ok) {
+    response.error = true;
+    response.message = await res.json();
+  }
+  return response;
 };
 
 export const getImagePreview = async () => {
-  console.log("take image");
+  const response = defaultResponse;
   const url = previewImageUrl;
   const res = await fetch(url);
   // error handling
   if (!res.ok) {
-    const errorMsg = await res.json();
-    return errorMsg;
+    response.error = true;
+    response.message = await res.json();
+    return response;
   }
-  // TODO: add error handling for 400, 417, show error in logs
-  const data = await res.blob();
-  console.log(res, data);
-  return data;
+  response.data = await res.blob();
+  return response;
 };
 
-// TODO: temporary home function
+// FIXME: update home function api param for clearcore
 export const homeX = async () => {
   const url = baseUrl + `/home_x`;
   const res = await (await fetch(url)).json();

@@ -40,7 +40,7 @@ rm -rf ~/miniconda3/miniconda.sh
 ~/miniconda3/bin/conda init bash
 ```
 
-Navigate to the mini_comp_api directory and then use these commands to create a new environment and install all required packages:
+Navigate to the mini_computer_api directory and then use these commands to create a new environment and install all required packages:
 ```
 conda env create -f requirements.yml
 # activate environment

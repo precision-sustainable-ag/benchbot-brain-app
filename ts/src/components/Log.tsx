@@ -17,13 +17,17 @@ export default function Log({ logs, clearLog }: LogProps) {
 
   return (
     <div style={{ width: "400px", paddingLeft: "20px" }}>
-      <p style={{ margin: 0 }}>Log</p>
-      <button onClick={clearLog}>Clear All Logs</button>
+      <p style={{ margin: 0 }}>
+        Log
+        <button onClick={clearLog} style={{ marginLeft: "100px" }}>
+          Clear All Logs
+        </button>
+      </p>
 
       <textarea
         ref={textareaRef}
         value={logs.join("\n")}
-        style={{ width: "400px", height: "400px" }}
+        style={{ width: "400px", height: "300px" }}
         readOnly
       />
     </div>

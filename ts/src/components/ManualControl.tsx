@@ -1,15 +1,8 @@
 import { useState } from "react";
 import Button from "./Button";
 import Row from "./Row";
-import {
-  homeX,
-  homeZ,
-  moveXandZ,
-  moveY,
-  takeImage,
-  getImagePreview,
-} from "../utils/api";
-import ControlButtons from "./ControlButtons";
+import { homeX, homeZ, moveXandZ, moveY, getImagePreview } from "../utils/api";
+import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
 
 function ManualControl() {
@@ -31,98 +24,93 @@ function ManualControl() {
     setImagePreview(imageData);
   };
 
+  const moveRobot = (axis: "X" | "Y" | "Z", distance: number) => {
+    appendLog(`move ${axis}: ${distance}cm`);
+    if (axis === "X") moveXandZ(distance, 0);
+    else if (axis === "Y") moveY(distance);
+    else if (axis === "Z") moveXandZ(0, distance);
+  };
+
+  const AxisControl = ({
+    axis,
+    value,
+    setAxisValue,
+    moveRobot,
+  }: {
+    axis: "X" | "Y" | "Z";
+    value: number;
+    setAxisValue: (num: number) => void;
+    moveRobot: (axis: "X" | "Y" | "Z", distance: number) => void;
+  }) => {
+    return (
+      <>
+        <ControlButtonsMinus setValue={(num) => setAxisValue(value + num)} />
+        <div>
+          <input
+            value={value}
+            type="number"
+            onChange={(e) =>
+              setAxisValue(e.target.value === "" ? 0 : parseInt(e.target.value))
+            }
+            style={{ fontSize: "2rem", width: "200px" }}
+          />
+          cm
+        </div>
+        <ControlButtonsPlus setValue={(num) => setAxisValue(value + num)} />
+        <Button
+          name={`+ ${axis}`}
+          onClick={() => {
+            moveRobot(axis, value);
+          }}
+        />
+        <Button
+          name={`- ${axis}`}
+          onClick={() => {
+            moveRobot(axis, -value);
+          }}
+        />
+      </>
+    );
+  };
+
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: "800px" }}>
         <h5 style={{ textAlign: "center", margin: "1rem" }}>Manual Control</h5>
 
-        <Row>
+        <Row styles={{ justifyContent: "space-around" }}>
           <Button name={"Home X"} onClick={homeX} />
           <Button name={"Home Z"} onClick={homeZ} />
         </Row>
 
         <Row>
-          <input
+          <AxisControl
+            axis="X"
             value={xValue}
-            type="number"
-            onChange={(e) =>
-              setXValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-            }
-            style={{ fontSize: "2rem", width: "300px" }}
-          />
-          cm
-          <ControlButtons setValue={(num) => setXValue(xValue + num)} />
-          <Button
-            name={"+ X"}
-            onClick={() => {
-              appendLog(`move X: ${xValue}cm`);
-              moveXandZ(xValue, 0);
-            }}
-          />
-          <Button
-            name={"- X"}
-            onClick={() => {
-              appendLog(`move X: ${-xValue}cm`);
-              moveXandZ(-xValue, 0);
-            }}
+            setAxisValue={setXValue}
+            moveRobot={moveRobot}
           />
         </Row>
 
         <Row>
-          <input
-            type="number"
+          <AxisControl
+            axis="Y"
             value={yValue}
-            onChange={(e) => {
-              setYValue(e.target.value === "" ? 0 : parseInt(e.target.value));
-            }}
-            style={{ fontSize: "2rem", width: "300px" }}
-          />
-          cm
-          <ControlButtons setValue={(num) => setYValue(yValue + num)} />
-          <Button
-            name={"+ Y"}
-            onClick={() => {
-              appendLog(`move Y: ${yValue}cm`);
-              moveY(yValue);
-            }}
-          />
-          <Button
-            name={"- Y"}
-            onClick={() => {
-              appendLog(`move Y: ${-yValue}cm`);
-              moveY(-yValue);
-            }}
+            setAxisValue={setYValue}
+            moveRobot={moveRobot}
           />
         </Row>
 
         <Row>
-          <input
-            type="number"
+          <AxisControl
+            axis="Z"
             value={zValue}
-            onChange={(e) =>
-              setZValue(e.target.value === "" ? 0 : parseInt(e.target.value))
-            }
-            style={{ fontSize: "2rem", width: "300px" }}
-          />
-          cm
-          <ControlButtons setValue={(num) => setZValue(zValue + num)} />
-          <Button
-            name={"+ Z"}
-            onClick={() => {
-              appendLog(`move Z: ${zValue}cm`);
-              moveXandZ(0, zValue);
-            }}
-          />
-          <Button
-            name={"- Z"}
-            onClick={() => {
-              appendLog(`move Z: ${-zValue}cm`);
-              moveXandZ(0, -zValue);
-            }}
+            setAxisValue={setZValue}
+            moveRobot={moveRobot}
           />
         </Row>
 
-        <Row>
+        <Row styles={{ justifyContent: "space-around" }}>
           <Button
             name={"Emergency Stop"}
             styles={{ color: "red", width: "300px" }}
@@ -139,7 +127,7 @@ function ManualControl() {
           />
         </Row>
 
-        <Row>
+        <Row styles={{ justifyContent: "space-around" }}>
           <Button
             name={"Pause"}
             styles={{ width: "300px" }}
@@ -149,58 +137,18 @@ function ManualControl() {
             name={"Take Image"}
             styles={{ width: "300px" }}
             onClick={() => {
-              appendLog('Take Image.')
-              loadImage();}}
+              appendLog("Take Image.");
+              loadImage();
+            }}
           />
         </Row>
       </div>
 
       <div>
-        {/* <div
-          style={{
-            border: "1px solid black",
-            width: "400px",
-            height: "500px",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "20px",
-            padding: "20px",
-          }}
-        >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
-            <button
-              key={number}
-              onClick={() => {}}
-              style={{ padding: "10px", fontSize: "16px" }}
-            >
-              {number}
-            </button>
-          ))}
-
-          <button
-            onClick={() => {}}
-            style={{
-              padding: "10px",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            .
-          </button>
-          <button
-            onClick={() => {}}
-            style={{
-              padding: "10px",
-              fontSize: "16px",
-            }}
-          >
-            Delete
-          </button>
-        </div> */}
         <Log logs={logs} clearLog={() => setLogs([])} />
         <img
           src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt="taken image"
+          alt="No image available now."
           style={{ width: "400px", paddingLeft: "20px" }}
         />
       </div>

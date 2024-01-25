@@ -4,6 +4,9 @@ const takeImageUrl = "http://10.95.76.50:5000/image";
 
 const previewImageUrl = "http://10.95.76.50:5000/img_preview";
 
+// TODO: build a interface for error message, add error handling for all apis,
+// if an error happens, show it in the log
+
 export const moveXandZ = async (x: number, z: number) => {
   console.log("move x", x, "move z", z);
   const url = baseUrl + `/clearcore?x=${x}&z=${z}`;
@@ -30,6 +33,12 @@ export const getImagePreview = async () => {
   console.log("take image");
   const url = previewImageUrl;
   const res = await fetch(url);
+  // error handling
+  if (!res.ok) {
+    const errorMsg = await res.json();
+    return errorMsg;
+  }
+  // TODO: add error handling for 400, 417, show error in logs
   const data = await res.blob();
   console.log(res, data);
   return data;

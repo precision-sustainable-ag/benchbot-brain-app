@@ -12,9 +12,8 @@ ln -s "$DIR/manifest.json" ~/manifest.json
 cd front_end/
 npm run build
 
-# activate venv, install requirements, and run main.py 
+# activate venv, and run main.py 
 cd ../
 source venv/bin/activate
 cd ./brain_api
-pip install -r requirements.txt
 python main.py

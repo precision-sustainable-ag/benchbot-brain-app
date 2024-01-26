@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
-import ManualControl from "./ManualControl";
-import BenchbotConfig from "./BenchbotConfig";
-import CameraConfig from "./CameraConfig";
+import ManualControl from "./pages/ManualControl";
+import BenchbotConfig from "./pages/BenchbotConfig";
+import CameraConfig from "./pages/CameraConfig";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
@@ -10,7 +10,7 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ fontSize: "36px" }}>
+      <div style={{ width: "1280px", height: "800px", fontSize: "36px" }}>
         <nav style={{ textAlign: "left" }}>
           <button style={{ fontSize: "2rem" }}>
             <Link to="/" style={LinkStyle}>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Row from "./Row";
-import Button from "./Button";
+import Row from "../components/Row";
+import Button from "../components/Button";
 
 export default function CameraConfig() {
   const [ipAddress, setIpAddress] = useState("0.0.0.0");

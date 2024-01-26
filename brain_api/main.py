@@ -3,8 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from from_root import from_root, from_here
-from common.motors import Motors
-from common.motor_controller import MotorController
+from common.motor_controller_y import MotorControllerY
+from common.motor_controller_xz import MotorControllerXZ
 import uvicorn
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
@@ -16,37 +16,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-amiga_motors = Motors()
-clear_core = MotorController()
+y_motor_control = MotorControllerY()
+xz_motor_control = MotorControllerXZ()
 
 
-@app.get("/move_yaxis/{dist}")
-async def move_yaxis(dist):
+@app.get("/move_y_axis/{dist}")
+async def move_y_axis(dist):
     print('Y: ' + dist)
-    await amiga_motors.move_y(float(dist))
+    await y_motor_control.move_y(float(dist))
 
 
 # x, and z distance in cm
 # +x is left, -x is right
 # +z is down, -z is up
-@app.get("/clearcore")
+@app.get("/move_xz_axis")
 def move_xz_axis(x, z):
-    return clear_core.move_motors(x, z)
+    return xz_motor_control.move_motors(x, z)
 
 
 @app.get("/home_x")
 def home_x():
-    return clear_core.homing_x()
+    return xz_motor_control.homing_x()
 
 
 @app.get("/home_z")
 def home_z():
-    return clear_core.homing_z()
+    return xz_motor_control.homing_z()
 
 
 @app.get("/udp_update")
 def update_udp_config(udp_ip, udp_port):
-    clear_core.update_config(udp_ip, udp_port)
+    xz_motor_control.update_config(udp_ip, udp_port)
 
 
 if __name__ == "__main__":

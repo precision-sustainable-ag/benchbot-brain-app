@@ -3,7 +3,7 @@ import socket
 from from_root import from_here
 
 
-class MotorController():
+class MotorControllerXZ():
     def __init__(self):
         # x axis -> 0.003175 cm per enocoder count
         # z axis -> 0.00529167 cm per encoder count

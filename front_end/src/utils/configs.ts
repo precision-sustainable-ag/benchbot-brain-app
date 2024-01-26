@@ -1,9 +1,15 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 
-const localStorageKey = "BenchBotConfig";
+const BenchBotConfigKey = "BenchBotConfig";
+const CameraConfigKey = "CameraConfig";
+
+interface CameraConfig {
+  IP: string;
+  port: string;
+}
 
 export const loadBenchBotConfig = () => {
-  const data = localStorage.getItem(localStorageKey);
+  const data = localStorage.getItem(BenchBotConfigKey);
   if (!data) return;
   const {
     potsPerRow,
@@ -36,5 +42,21 @@ export const saveBenchBotConfig = (
   data: BenchBotData
 ) => {
   console.log("saved data", config, data);
-  localStorage.setItem(localStorageKey, JSON.stringify({ ...config, ...data }));
+  localStorage.setItem(
+    BenchBotConfigKey,
+    JSON.stringify({ ...config, ...data })
+  );
+};
+
+export const loadCameraConfig = () => {
+  const data = localStorage.getItem(CameraConfigKey);
+  if (!data) return;
+  const { IP, port } = JSON.parse(data);
+  console.log("loaded data", IP, port);
+  return { IP, port };
+};
+
+export const saveCameraConfig = (cameraConfig: CameraConfig) => {
+  console.log("saved data", cameraConfig);
+  localStorage.setItem(CameraConfigKey, JSON.stringify(cameraConfig));
 };

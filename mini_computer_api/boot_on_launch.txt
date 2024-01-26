@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=benchbot
-WorkingDirectory=/home/benchbot/benchbot-brain-app/mini_comp_api
+WorkingDirectory=/home/benchbot/benchbot-brain-app/mini_computer_api
 ExecStart=/bin/bash ./setup.sh
 
 [Install]

@@ -4,10 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from from_root import from_root, from_here
 from common.motors import Motors
-import socket
+from common.udp_conn import UDP_CONN
 import uvicorn
-import requests
-
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 app.add_middleware(
@@ -19,10 +17,7 @@ app.add_middleware(
 )
 
 amiga_motors = Motors()
-UDP_IP = "10.95.76.21"
-UDP_PORT = 8888
-clear_core = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-clear_core.connect((UDP_IP, UDP_PORT))
+clear_core = UDP_CONN()
 
 
 @app.get("/move_yaxis/{dist}")
@@ -36,8 +31,8 @@ async def move_yaxis(dist):
 # +z is down, -z is up
 @app.get("/clearcore")
 def move_xz_axis(x, z):
-  # x axis -> 0.003175 cm per enocoder count
-  # z axis -> 0.00529167 cm per encoder count
+    # x axis -> 0.003175 cm per enocoder count
+    # z axis -> 0.00529167 cm per encoder count
     x_steps_to_cm = 0.003175
     z_steps_to_cm = 0.000529167
 
@@ -45,26 +40,24 @@ def move_xz_axis(x, z):
     z_counts = int(z) // z_steps_to_cm
 
     message = f"X:{x_counts} Z:{z_counts}"
-    msgbyte = bytes(message, 'ascii')
-    print(message)
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    return clear_core.send_message(message)
 
 
 @app.get("/home_x")
 def home_x():
-    message = f"X:999 Z:0"
-    msgbyte = bytes(message, 'ascii')
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    message = "X:999 Z:0"
+    return clear_core.send_message(message)
 
 
 @app.get("/home_z")
 def home_z():
-    message = f"X:0 Z:999"
-    msgbyte = bytes(message, 'ascii')
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    message = "X:0 Z:999"
+    return clear_core.send_message(message)
+
+
+@app.get("/udp_update")
+def update_udp_config(udp_ip, udp_port):
+    clear_core.update_config(udp_ip, udp_port)
 
 
 if __name__ == "__main__":

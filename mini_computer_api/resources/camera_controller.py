@@ -1,6 +1,6 @@
 from flask import make_response, send_file
 from from_root import from_root
-from datetime import datetime
+from datetime import date
 from pathlib import Path
 import os
 import time
@@ -11,17 +11,18 @@ import cv2
 import io
 
 
-class Camera():
+class CameraController():
 
     def __init__(self, state):
         # setup directory to save images
         self.location = state
-        imgDir = f"Loc_{self.location}_{datetime.utcnow().strftime('%Y-%m-%d')}"
-        self.dirName = from_root("mini_computer_api", imgDir)
+        parent_dir = "mini_computer_api"
+        imgDir = f"Loc_{self.location}_{date.today()}"
+        self.dirName = from_root(parent_dir, imgDir)
         Path(self.dirName).mkdir(parents=True, exist_ok=True)
 
         # define the path to executable file of the camera
-        self.camera_exe_path = from_root("mini_computer_api", "resources", "RemoteCli")
+        self.camera_exe_path = from_root(parent_dir, "resources", "RemoteCli")
 
 
     # function for capturing a set of images and if successful, send a preview of the image captured
@@ -80,7 +81,10 @@ class Camera():
     def move_files(self):
         for file_name in os.listdir('.'):
             if file_name.startswith(self.location):
-                shutil.move(file_name, self.dirName)
+                try:
+                    shutil.move(file_name, self.dirName)
+                except:
+                    continue
 
 
     # function to find the latest jpeg file in the image directory

@@ -1,16 +1,16 @@
 from flask import Flask
 from flask_cors import CORS
-from resources.camera import Camera
-from datetime import datetime
+from resources.camera_controller import CameraController
+from datetime import date
 import logging
 
 
 # setup the logging file and logging configurations
-logfile = f"{datetime.utcnow().strftime('%Y-%m-%d')}_server_log.log"
+logfile = f"{date.today()}_server_log.log"
 logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
 STATE = 'NC'
-sony_camera = Camera(STATE)
+sony_camera = CameraController(STATE)
 app = Flask(__name__)
 CORS(app)
 

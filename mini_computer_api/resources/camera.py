@@ -17,11 +17,11 @@ class Camera():
         # setup directory to save images
         self.location = state
         imgDir = f"Loc_{self.location}_{datetime.utcnow().strftime('%Y-%m-%d')}"
-        self.dirName = from_root("mini_comp_api", imgDir)
+        self.dirName = from_root("mini_computer_api", imgDir)
         Path(self.dirName).mkdir(parents=True, exist_ok=True)
 
         # define the path to executable file of the camera
-        self.camera_exe_path = from_root("mini_comp_api", "resources", "RemoteCli")
+        self.camera_exe_path = from_root("mini_computer_api", "resources", "RemoteCli")
 
 
     # function for capturing a set of images and if successful, send a preview of the image captured

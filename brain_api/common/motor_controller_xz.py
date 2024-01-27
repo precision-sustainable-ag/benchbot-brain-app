@@ -9,6 +9,7 @@ class MotorControllerXZ():
         # z axis -> 0.00529167 cm per encoder count
         self.x_steps_to_cm = 0.003175
         self.z_steps_to_cm = 0.000529167
+        self.conn_status = False
 
         self.config_file = from_here('udp_config.json')
         with open(self.config_file, 'r') as openfile:
@@ -29,14 +30,10 @@ class MotorControllerXZ():
         self.init_connection()
 
     def init_connection(self):
-        try:
-            # returns None value when connection not available, need to check what happens when connection is available
-            rep = self.server_socket.connect((self.ip, self.port))
-            print(rep)
-            conn_status = True
-        except:
-            conn_status = False
-        return conn_status
+        self.server_socket.connect((self.ip, self.port))
+        response_msg = self.move_motors(0, 0)
+        if "Error" not in response_msg:
+            self.conn_status = True
 
     def send_message(self, msg_in):
         msgbyte = bytes(msg_in, 'ascii')
@@ -51,13 +48,13 @@ class MotorControllerXZ():
     def move_motors(self, x_val, z_val):
         x_counts = int(x_val) // self.x_steps_to_cm
         z_counts = int(z_val) // self.z_steps_to_cm
-        message = f"X:{x_counts} Z:{z_counts}"
+        message = f"X:{int(x_counts)} Z:{int(z_counts)}"
         return self.send_message(message)
 
-    def homing_x(self):
+    def home_x(self):
         message = "X:999 Z:0"
         return self.send_message(message)
     
-    def homing_z(self):
+    def home_z(self):
         message = "X:0 Z:999"
         return self.send_message(message)

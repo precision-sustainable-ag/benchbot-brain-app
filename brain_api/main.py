@@ -6,6 +6,7 @@ from from_root import from_root, from_here
 from common.motor_controller_y import MotorControllerY
 from common.motor_controller_xz import MotorControllerXZ
 import uvicorn
+import logging
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 app.add_middleware(
@@ -18,6 +19,8 @@ app.add_middleware(
 
 y_motor_control = MotorControllerY()
 xz_motor_control = MotorControllerXZ()
+if not xz_motor_control.conn_status:
+    logging.ERROR("Connection to ClearCore not successful!")
 
 
 @app.get("/move_y_axis/{dist}")
@@ -36,12 +39,12 @@ def move_xz_axis(x, z):
 
 @app.get("/home_x")
 def home_x():
-    return xz_motor_control.homing_x()
+    return xz_motor_control.home_x()
 
 
 @app.get("/home_z")
 def home_z():
-    return xz_motor_control.homing_z()
+    return xz_motor_control.home_z()
 
 
 @app.get("/udp_update")

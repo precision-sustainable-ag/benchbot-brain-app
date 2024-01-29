@@ -149,11 +149,13 @@ export default function BenchbotConfig() {
 
   const ValInput = ({
     name,
+    configName,
     value,
     setValue,
     unit,
   }: {
     name: string;
+    configName: string;
     value: number;
     setValue: (param: string, value: number | string) => void;
     unit?: string;
@@ -161,14 +163,16 @@ export default function BenchbotConfig() {
     return (
       <>
         <span style={{ width: "300px" }}>{name}</span>
-        <ControlButtonsMinus setValue={(num) => setValue(name, value + num)} />
+        <ControlButtonsMinus
+          setValue={(num) => setValue(configName, value + num)}
+        />
         <div>
           <input
             type="number"
             value={value}
             onChange={(e) =>
               setValue(
-                name,
+                configName,
                 e.target.value === "" ? 0 : parseInt(e.target.value)
               )
             }
@@ -177,7 +181,9 @@ export default function BenchbotConfig() {
           />
           {unit}
         </div>
-        <ControlButtonsPlus setValue={(num) => setValue(name, value + num)} />
+        <ControlButtonsPlus
+          setValue={(num) => setValue(configName, value + num)}
+        />
       </>
     );
   };
@@ -189,6 +195,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Pots per row:"}
+            configName={"potsPerRow"}
             value={benchBotConfig.potsPerRow}
             setValue={setBenchBotConfigByParam}
           />
@@ -196,6 +203,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Number of rows: "}
+            configName={"numberOfRows"}
             value={benchBotConfig.numberOfRows}
             setValue={setBenchBotConfigByParam}
           />
@@ -203,6 +211,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Row spacing: "}
+            configName={"rowSpacing"}
             value={benchBotConfig.rowSpacing}
             setValue={setBenchBotConfigByParam}
             unit="cm"
@@ -211,6 +220,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Pot spacing: "}
+            configName={"potSpacing"}
             value={benchBotConfig.potSpacing}
             setValue={setBenchBotConfigByParam}
             unit="cm"

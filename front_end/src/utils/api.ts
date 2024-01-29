@@ -38,7 +38,7 @@ export const takeImage = async () => {
     const res = await fetch(url);
     if (!res.ok) {
       response.error = true;
-      response.message = await res.json();
+      response.message = await res.text();
       return response;
     }
     response.data = await res.blob();
@@ -60,7 +60,7 @@ export const getImagePreview = async () => {
     const res = await fetch(url);
     if (!res.ok) {
       response.error = true;
-      response.message = await res.json();
+      response.message = await res.text();
       return response;
     }
     response.data = await res.blob();

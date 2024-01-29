@@ -13,6 +13,7 @@ export default function ImagePreview({
         <img
           src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
           alt={"Image not available"}
+          style={{ width: "400px" }}
         />
       ) : (
         <p style={{ color: "red" }}> Error: {imageErrMsg} </p>

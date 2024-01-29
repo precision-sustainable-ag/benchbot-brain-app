@@ -9,6 +9,7 @@ import threading
 import glob
 import cv2
 import io
+import logging
 
 
 class CameraController():
@@ -53,16 +54,16 @@ class CameraController():
     def find_and_rename_files(self, time_stamp):
         missing_files = ["JPEG", "RAW"]
         timeout_start = time.time()
-        new_name = f"{self.location}_{time_stamp}"
+        new_filename = f"{self.location}_{time_stamp}"
         while True:
             for file_name in os.listdir('.'):
                 # if image file is found
                 if file_name.startswith(self.location):
                     if file_name.endswith('.JPG'):
-                        new_name += ".JPG"
+                        new_name = new_filename + ".JPG"
                         to_remove = "JPEG"
                     elif file_name.endswith('.ARW'):
-                        new_name += ".ARW"
+                        new_name = new_filename + ".ARW"
                         to_remove = "RAW"
                     try:
                         missing_files.remove(to_remove)
@@ -90,7 +91,9 @@ class CameraController():
     # function to find the latest jpeg file in the image directory
     def find_latest_image(self):
         list_of_files = glob.glob(f'{self.location}/*.JPG')
-        fileName = max(list_of_files, key=os.path.getctime)
+        fileName = None
+        if list_of_files is not None:
+            fileName = max(list_of_files, key=os.path.getctime)
         return fileName
 
 
@@ -105,7 +108,9 @@ class CameraController():
             if byte_stream is None:
                 response = make_response("Image not available!", 400)
             else:
+                logging.DEBUG('image encoded')
                 response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
+                response.status_code = 200
         else:
             response = make_response("No image file found!", 400)
         return response

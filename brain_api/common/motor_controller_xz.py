@@ -40,7 +40,8 @@ class MotorControllerXZ():
         self.server_socket.send(msgbyte)
         try:
             self.server_socket.settimeout(2)
-            msg_reply = self.server_socket.recv(1024)
+            cc_reply = self.server_socket.recv(1024)
+            msg_reply = cc_reply.decode()
         except:
             msg_reply = "Error! No reply from server"
         return msg_reply

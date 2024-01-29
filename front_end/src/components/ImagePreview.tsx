@@ -15,7 +15,7 @@ export default function ImagePreview({
           alt={"Image not available"}
         />
       ) : (
-        <p>{imageErrMsg}</p>
+        <p style={{ color: "red" }}> Error: {imageErrMsg} </p>
       )}
     </div>
   );

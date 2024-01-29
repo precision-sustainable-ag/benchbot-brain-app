@@ -34,29 +34,45 @@ export const moveY = async (y: number) => {
 export const takeImage = async () => {
   const response = defaultResponse;
   const url = imageUrl + "/image";
-  const res = await fetch(url);
-  // error handling
-  if (!res.ok) {
-    response.error = true;
-    response.message = await res.json();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      response.error = true;
+      response.message = await res.json();
+      return response;
+    }
+    response.data = await res.blob();
     return response;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      response.error = true;
+      response.message = error.message;
+      return response;
+    }
+    else return response;
   }
-  response.data = await res.blob();
-  return response;
 };
 
 export const getImagePreview = async () => {
   const response = defaultResponse;
   const url = imageUrl + "/image_latest";
-  const res = await fetch(url);
-  // error handling
-  if (!res.ok) {
-    response.error = true;
-    response.message = await res.json();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      response.error = true;
+      response.message = await res.json();
+      return response;
+    }
+    response.data = await res.blob();
     return response;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      response.error = true;
+      response.message = error.message;
+      return response;
+    }
+    else return response;
   }
-  response.data = await res.blob();
-  return response;
 };
 
 // FIXME: update home function api param for clearcore

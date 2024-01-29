@@ -1,8 +1,6 @@
 const baseUrl = "http://localhost:8042";
 
-const takeImageUrl = "http://10.95.76.50:5000/image";
-
-const previewImageUrl = "http://10.95.76.50:5000/img_preview";
+const imageUrl = "http://10.95.76.50:5000";
 
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log
@@ -35,19 +33,21 @@ export const moveY = async (y: number) => {
 
 export const takeImage = async () => {
   const response = defaultResponse;
-  const url = takeImageUrl;
+  const url = imageUrl + "/image";
   const res = await fetch(url);
   // error handling
   if (!res.ok) {
     response.error = true;
     response.message = await res.json();
+    return response;
   }
+  response.data = await res.blob();
   return response;
 };
 
 export const getImagePreview = async () => {
   const response = defaultResponse;
-  const url = previewImageUrl;
+  const url = imageUrl + "/image_latest";
   const res = await fetch(url);
   // error handling
   if (!res.ok) {

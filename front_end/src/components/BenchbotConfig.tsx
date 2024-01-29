@@ -8,6 +8,7 @@ import {
 } from "../utils/calculation";
 import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
+import ImagePreview from "./ImagePreview";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 
 const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
@@ -41,6 +42,9 @@ export default function BenchbotConfig() {
   const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
 
+  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+  const [imageErrMsg, setImageErrMsg] = useState("No image available.");
+
   const stopRef = useRef(stop);
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
@@ -50,6 +54,12 @@ export default function BenchbotConfig() {
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
     setLogs((prev) => [...prev, currentTime + ": " + log]);
+  };
+
+  const loadImage = async () => {
+    const imageData = await takeImage();
+    if (!imageData.error && imageData.data) setImagePreview(imageData.data);
+    else setImageErrMsg(imageData.message);
   };
 
   const traverseBenchBot = async (
@@ -69,7 +79,7 @@ export default function BenchbotConfig() {
         // if this pot had visited, continue the loop
         if (map[row][pot] === 1) continue;
         await sleep(1000);
-        await takeImage();
+        await loadImage();
         map[row][pot] = 1;
         console.log(`visit pot at row ${row} pot ${pot}`);
         if (
@@ -265,6 +275,7 @@ export default function BenchbotConfig() {
       </div>
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
+        <ImagePreview imagePreview={imagePreview} imageErrMsg={imageErrMsg} />
       </div>
     </div>
   );

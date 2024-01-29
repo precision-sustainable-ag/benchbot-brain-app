@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Button from "./Button";
 import Row from "./Row";
-import { homeX, homeZ, moveXandZ, moveY, getImagePreview } from "../utils/api";
+import { homeX, homeZ, moveXandZ, moveY, takeImage } from "../utils/api";
 import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
+import ImagePreview from "./ImagePreview";
 
 function ManualControl() {
   const [xValue, setXValue] = useState(0);
@@ -21,7 +22,7 @@ function ManualControl() {
   };
 
   const loadImage = async () => {
-    const imageData = await getImagePreview();
+    const imageData = await takeImage();
     if (!imageData.error && imageData.data) setImagePreview(imageData.data);
     else setImageErrMsg(imageData.message);
   };
@@ -148,11 +149,7 @@ function ManualControl() {
 
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
-        <img
-          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt={imageErrMsg}
-          style={{ width: "400px", paddingLeft: "20px" }}
-        />
+        <ImagePreview imagePreview={imagePreview} imageErrMsg={imageErrMsg} />
       </div>
     </div>
   );

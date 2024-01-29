@@ -46,7 +46,6 @@ class CameraController():
         time.sleep(3)
         t_stamp = str(int(time.time()))
         missing_images = self.find_and_rename_files(t_stamp)
-        threading.Thread(target=self.move_files()).start()
         return missing_images
 
 
@@ -71,6 +70,7 @@ class CameraController():
                         pass
                     try:
                         os.rename(file_name, new_name)
+                        threading.Thread(target=self.move_files(new_name)).start()
                     except:
                         continue
                 # if both images files are found or timeout occurs
@@ -79,21 +79,24 @@ class CameraController():
 
 
     # funtion to move image files to day's image collection directory
-    def move_files(self):
-        for file_name in os.listdir('.'):
-            if file_name.startswith(self.location):
-                try:
-                    shutil.move(file_name, self.dirName)
-                except:
-                    continue
+    def move_files(self, file_name):
+        try:
+            shutil.move(file_name, self.dirName)
+        except:
+            return
+        # for file_name in os.listdir('.'):
+        #     if file_name.startswith(self.location):
+        #         try:
+        #             shutil.move(file_name, self.dirName)
+        #         except:
+        #             continue
 
 
     # function to find the latest jpeg file in the image directory
     def find_latest_image(self):
         list_of_files = glob.glob(f'{self.dirName}/*.JPG')
-        print('\n', list_of_files, '\n')
         fileName = None
-        if list_of_files is not None:
+        if list_of_files:
             fileName = max(list_of_files, key=os.path.getctime)
         return fileName
 
@@ -109,7 +112,6 @@ class CameraController():
             if byte_stream is None:
                 response = make_response("Image not available!", 400)
             else:
-                logging.DEBUG('image encoded')
                 response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
                 response.status_code = 200
         else:

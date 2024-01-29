@@ -49,7 +49,7 @@ class MotorControllerXZ():
     def move_motors(self, x_val, z_val):
         x_counts = int(x_val) // self.x_steps_to_cm
         z_counts = int(z_val) // self.z_steps_to_cm
-        message = f"X:{int(x_counts)} Z:{int(z_counts)}"
+        message = f"X:{x_counts} Z:{z_counts}"
         return self.send_message(message)
 
     def home_x(self):

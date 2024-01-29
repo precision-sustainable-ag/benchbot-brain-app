@@ -25,7 +25,7 @@ def homepage():
 @app.route('/image', methods=['GET'])
 def capture_image():
     response_msg = sony_camera.capture_images()
-    # logging.info(response_msg)
+    logging.info(response_msg)
     return response_msg
 
 
@@ -33,7 +33,7 @@ def capture_image():
 @app.route('/image_latest', methods=['GET'])
 def latest_jpeg_image():
     response_msg = sony_camera.encode_latest_image()
-    # logging.info(response_msg)
+    logging.info(response_msg)
     return response_msg
 
  

@@ -9,7 +9,6 @@ import threading
 import glob
 import cv2
 import io
-import logging
 
 
 class CameraController():
@@ -66,9 +65,6 @@ class CameraController():
                         to_remove = "RAW"
                     try:
                         missing_files.remove(to_remove)
-                    except:
-                        pass
-                    try:
                         os.rename(file_name, new_name)
                         threading.Thread(target=self.move_files(new_name)).start()
                     except:
@@ -84,12 +80,6 @@ class CameraController():
             shutil.move(file_name, self.dirName)
         except:
             return
-        # for file_name in os.listdir('.'):
-        #     if file_name.startswith(self.location):
-        #         try:
-        #             shutil.move(file_name, self.dirName)
-        #         except:
-        #             continue
 
 
     # function to find the latest jpeg file in the image directory
@@ -110,7 +100,7 @@ class CameraController():
             _, img_encoded = cv2.imencode('.jpg', preview)
             byte_stream = img_encoded.tobytes()
             if byte_stream is None:
-                response = make_response("Image not available!", 400)
+                response = make_response("Image encoding failed!", 400)
             else:
                 response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
                 response.status_code = 200

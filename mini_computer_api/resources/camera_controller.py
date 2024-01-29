@@ -90,7 +90,7 @@ class CameraController():
 
     # function to find the latest jpeg file in the image directory
     def find_latest_image(self):
-        list_of_files = glob.glob(f'{self.location}/*.JPG')
+        list_of_files = glob.glob(f'{self.dirName}/*.JPG')
         print('\n', list_of_files, '\n')
         fileName = None
         if list_of_files is not None:

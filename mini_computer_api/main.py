@@ -6,8 +6,8 @@ import logging
 
 
 # setup the logging file and logging configurations
-logfile = f"{date.today()}_server_log.log"
-logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
+# logfile = f"{date.today()}_server_log.log"
+# logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
 STATE = 'NC'
 sony_camera = CameraController(STATE)

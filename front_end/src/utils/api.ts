@@ -71,3 +71,9 @@ export const homeZ = async () => {
   const res = await (await fetch(url)).json();
   console.log(res);
 };
+
+export const updateIPandPort = async (ip: string, port: string) => {
+  const url = baseUrl + `/udp_update?udp_ip=${ip}&udp_port=${port}`;
+  const res = await (await fetch(url)).json();
+  console.log(res);
+};

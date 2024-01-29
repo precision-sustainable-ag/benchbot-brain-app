@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import Row from "../components/Row";
 import Button from "../components/Button";
-import { loadCameraConfig, saveCameraConfig } from "../utils/configs";
+import { loadCameraConfig } from "../utils/configs";
+import { updateIPandPort } from "../utils/api";
 
 export default function CameraConfig() {
-  const [ipAddress, setIpAddress] = useState("0.0.0.0");
-  const [port, setPort] = useState("0000");
+  const [ipAddress, setIpAddress] = useState("127.0.0.1");
+  const [port, setPort] = useState("1234");
 
   const [ipAddressValidate, setIpAddressValidate] = useState(true);
   const [portValidate, setPortValidate] = useState(true);
   const [validateText, setValidateText] = useState("");
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const ipRegex = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
     const ipTest = ipRegex.test(ipAddress) ? true : false;
     setIpAddressValidate(ipTest);
@@ -21,7 +22,9 @@ export default function CameraConfig() {
       isNaN(portNumber) || portNumber < 0 || portNumber > 65535 ? false : true;
     setPortValidate(portTest);
     if (ipTest && portTest) {
-      saveCameraConfig({ IP: ipAddress, port });
+      // saveCameraConfig({ IP: ipAddress, port });
+      // call backend to update ip and port
+      await updateIPandPort(ipAddress, port);
       setValidateText("Camera config saved.");
     } else {
       setValidateText("Please check your input!");

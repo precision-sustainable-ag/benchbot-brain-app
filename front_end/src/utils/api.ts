@@ -40,16 +40,19 @@ export const takeImage = async () => {
       response.error = true;
       response.message = await res.text();
       return response;
-    }
-    response.data = await res.blob();
-    return response;
-  } catch (error) {
-    if (error instanceof TypeError) {
-      response.error = true;
-      response.message = error.message;
+    } else {
+      response.error = false;
+      response.data = await res.blob();
+      console.log("response", response);
       return response;
     }
-    else return response;
+  } catch (error) {
+    console.log("error", error);
+    response.error = true;
+    if (error instanceof TypeError) {
+      response.message = error.message;
+      return response;
+    } else return response;
   }
 };
 
@@ -66,12 +69,11 @@ export const getImagePreview = async () => {
     response.data = await res.blob();
     return response;
   } catch (error) {
+    response.error = true;
     if (error instanceof TypeError) {
-      response.error = true;
       response.message = error.message;
       return response;
-    }
-    else return response;
+    } else return response;
   }
 };
 

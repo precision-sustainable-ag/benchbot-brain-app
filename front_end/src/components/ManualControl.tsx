@@ -6,6 +6,18 @@ import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
 import ImagePreview from "./ImagePreview";
 
+export interface Image {
+  status: "pending" | "success" | "error";
+  image: Blob | null;
+  errorMsg: string;
+}
+
+export const defaultImage: Image = {
+  status: "error",
+  image: null,
+  errorMsg: "No image available",
+};
+
 function ManualControl() {
   const [xValue, setXValue] = useState(0);
   const [yValue, setYValue] = useState(0);
@@ -13,8 +25,7 @@ function ManualControl() {
 
   const [logs, setLogs] = useState<string[]>([]);
 
-  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
-  const [imageErrMsg, setImageErrMsg] = useState("No image available.");
+  const [Image, setImage] = useState<Image>(defaultImage);
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
@@ -22,9 +33,20 @@ function ManualControl() {
   };
 
   const loadImage = async () => {
+    setImage({ ...Image, status: "pending" });
     const imageData = await takeImage();
-    if (!imageData.error && imageData.data) setImagePreview(imageData.data);
-    else setImageErrMsg(imageData.message);
+    if (!imageData.error && imageData.data)
+      setImage({
+        ...Image,
+        status: "success",
+        image: imageData.data,
+      });
+    else
+      setImage({
+        ...Image,
+        status: "error",
+        errorMsg: imageData.message,
+      });
   };
 
   const moveRobot = (axis: "X" | "Y" | "Z", distance: number) => {
@@ -149,7 +171,12 @@ function ManualControl() {
 
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
-        <ImagePreview imagePreview={imagePreview} imageErrMsg={imageErrMsg} />
+        <ImagePreview
+          status={Image.status}
+          imagePreview={Image.image}
+          imageErrMsg={Image.errorMsg}
+          retry={loadImage}
+        />
       </div>
     </div>
   );

@@ -10,12 +10,12 @@ from farm_ng.core.event_client import EventClient
 from farm_ng.core.event_service_pb2 import EventServiceConfig
 from farm_ng.core.events_file_reader import proto_from_json_file
 
+# linear velocity in m/s and angular velocity is in rad/s
 LINEAR_VELOCITY = 0.1
-ACC = 0.05
+VELOCITY_INCREMENT = 0.05
 ANGULAR_VELOCITY = 0.05
-# DISTANCE = 0.30 # in m
 
-class Motors():
+class MotorControllerY():
     def __init__(self, file_path=from_root("brain_api/common/service_config.json")):
         service_config_path = Path(file_path)
         self.twist = Twist2d()
@@ -36,9 +36,9 @@ class Motors():
       distance_in_m = abs (distance / 100)
       time_required = (distance_in_m/LINEAR_VELOCITY) - 0.1
       if distance < 0:
-        speeds = [-ACC, -LINEAR_VELOCITY, -ACC, 0]
+        speeds = [-VELOCITY_INCREMENT, -LINEAR_VELOCITY, -VELOCITY_INCREMENT, 0]
       else:
-        speeds = [ACC, LINEAR_VELOCITY, ACC, 0]
+        speeds = [VELOCITY_INCREMENT, LINEAR_VELOCITY, VELOCITY_INCREMENT, 0]
 
       await self.move_motors(speeds, abs(time_required))
 

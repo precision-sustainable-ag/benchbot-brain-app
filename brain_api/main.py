@@ -3,11 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from from_root import from_root, from_here
-from common.motors import Motors
-import socket
+from common.motor_controller_y import MotorControllerY
+from common.motor_controller_xz import MotorControllerXZ
 import uvicorn
-import requests
-
+import logging
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 app.add_middleware(
@@ -18,53 +17,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-amiga_motors = Motors()
-UDP_IP = "10.95.76.21"
-UDP_PORT = 8888
-clear_core = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-clear_core.connect((UDP_IP, UDP_PORT))
+y_motor_control = MotorControllerY()
+xz_motor_control = MotorControllerXZ()
+if not xz_motor_control.conn_status:
+    logging.ERROR("Connection to ClearCore not successful!")
 
 
-@app.get("/move_yaxis/{dist}")
-async def move_yaxis(dist):
+@app.get("/move_y_axis/{dist}")
+async def move_y_axis(dist):
     print('Y: ' + dist)
-    await amiga_motors.move_y(float(dist))
+    await y_motor_control.move_y(float(dist))
 
 
 # x, and z distance in cm
 # +x is left, -x is right
 # +z is down, -z is up
-@app.get("/clearcore")
+@app.get("/move_xz_axis")
 def move_xz_axis(x, z):
-  # x axis -> 0.003175 cm per enocoder count
-  # z axis -> 0.00529167 cm per encoder count
-    x_steps_to_cm = 0.003175
-    z_steps_to_cm = 0.000529167
-
-    x_counts = int(x) // x_steps_to_cm
-    z_counts = int(z) // z_steps_to_cm
-
-    message = f"X:{x_counts} Z:{z_counts}"
-    msgbyte = bytes(message, 'ascii')
-    print(message)
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    return xz_motor_control.move_motors(x, z)
 
 
 @app.get("/home_x")
 def home_x():
-    message = f"X:999 Z:0"
-    msgbyte = bytes(message, 'ascii')
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    return xz_motor_control.home_x()
 
 
 @app.get("/home_z")
 def home_z():
-    message = f"X:0 Z:999"
-    msgbyte = bytes(message, 'ascii')
-    clear_core.send(msgbyte)
-    return(clear_core.recv(1024))
+    return xz_motor_control.home_z()
+
+
+@app.get("/udp_update")
+def update_udp_config(udp_ip, udp_port):
+    xz_motor_control.update_config(udp_ip, udp_port)
 
 
 if __name__ == "__main__":

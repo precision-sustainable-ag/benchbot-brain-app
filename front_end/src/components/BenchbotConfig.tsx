@@ -60,7 +60,7 @@ export default function BenchbotConfig() {
     appendLog("Taking image.");
     setImage({ ...Image, status: "pending" });
     const imageData = await takeImage();
-    console.log("imageData", imageData);
+    // console.log("imageData", imageData);
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
       setImage({
@@ -69,13 +69,24 @@ export default function BenchbotConfig() {
         image: imageData.data,
       });
     } else {
-      appendLog("Failed loading image.");
-      setImage({
-        ...Image,
-        status: "error",
-        errorMsg: imageData.message,
-      });
-      stopRef.current = true;
+      appendLog("Failed loading image, retrying...");
+      // retake image here
+      const retakeImageData = await takeImage();
+      if (!retakeImageData.error && retakeImageData.data) {
+        appendLog("Loading image success.");
+        setImage({
+          ...Image,
+          status: "success",
+          image: retakeImageData.data,
+        });
+      } else {
+        appendLog("Failed loading image. Skipped");
+        setImage({
+          ...Image,
+          status: "error",
+          errorMsg: retakeImageData.message,
+        });
+      }
     }
   };
 
@@ -312,6 +323,7 @@ export default function BenchbotConfig() {
             stopRef.current = false;
             startTraversal();
           }}
+          showRetry={false}
         />
       </div>
     </div>

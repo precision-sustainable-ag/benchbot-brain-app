@@ -5,6 +5,7 @@ interface ImagePreviewProps {
   imagePreview: Blob | null;
   imageErrMsg: string;
   retry: () => void;
+  showRetry?: boolean;
 }
 
 export default function ImagePreview({
@@ -12,6 +13,7 @@ export default function ImagePreview({
   imagePreview,
   imageErrMsg,
   retry,
+  showRetry = true,
 }: ImagePreviewProps) {
   return (
     <div style={{ width: "400px", paddingLeft: "20px" }}>
@@ -26,7 +28,7 @@ export default function ImagePreview({
       {status === "error" && (
         <div>
           <p style={{ color: "red" }}> Error: {imageErrMsg} </p>
-          <Button name="Retry" onClick={retry} />
+          {showRetry && <Button name="Retry" onClick={retry} />}
         </div>
       )}
     </div>

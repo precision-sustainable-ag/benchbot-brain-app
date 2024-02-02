@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Row from "../components/Row";
 import Button from "../components/Button";
 import { loadCameraConfig } from "../utils/configs";
 import { updateIPandPort } from "../utils/api";
+import Keyboard, { KeyboardReactInterface } from "react-simple-keyboard";
+import "react-simple-keyboard/build/css/index.css";
 
 export default function CameraConfig() {
   const [ipAddress, setIpAddress] = useState("127.0.0.1");
@@ -11,6 +13,9 @@ export default function CameraConfig() {
   const [ipAddressValidate, setIpAddressValidate] = useState(true);
   const [portValidate, setPortValidate] = useState(true);
   const [validateText, setValidateText] = useState("");
+  const [numpadSetText, setNumpadSetText] = useState<any>(null);
+
+  const numpadRef = useRef<KeyboardReactInterface>();
 
   const handleSave = async () => {
     const ipRegex = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
@@ -41,36 +46,58 @@ export default function CameraConfig() {
   }, []);
 
   return (
-    <div>
-      <h1 style={{ textAlign: "center" }}>Camera Config</h1>
-      <Row>
-        <span style={{ width: "300px" }}>IP Address: </span>
-        <input
-          value={ipAddress}
-          onChange={(e) => setIpAddress(e.target.value)}
-          style={{
-            fontSize: "2rem",
-            width: "300px",
-            borderColor: ipAddressValidate ? "" : "red",
+    <div style={{ display: "flex" }}>
+      <div style={{ width: "800px" }}>
+        <h5 style={{ textAlign: "center" }}>Camera Config</h5>
+        <Row>
+          <span style={{ width: "300px" }}>IP Address: </span>
+          <input
+            value={ipAddress}
+            onChange={(e) => setIpAddress(e.target.value)}
+            onFocus={() => {
+              numpadRef.current!.setInput(ipAddress);
+              setNumpadSetText(() => setIpAddress);
+            }}
+            style={{
+              fontSize: "2rem",
+              width: "300px",
+              borderColor: ipAddressValidate ? "" : "red",
+            }}
+          />
+        </Row>
+        <Row>
+          <span style={{ width: "300px" }}>Port: </span>
+          <input
+            value={port}
+            onChange={(e) => setPort(e.target.value)}
+            onFocus={() => {
+              numpadRef.current!.setInput(port);
+              setNumpadSetText(() => setPort);
+            }}
+            style={{
+              fontSize: "2rem",
+              width: "300px",
+              borderColor: portValidate ? "" : "red",
+            }}
+          />
+        </Row>
+        <Row>
+          <Button name="Save" onClick={handleSave} />
+          <span>{validateText}</span>
+        </Row>
+      </div>
+      <div style={{ width: "400px" }}>
+        <Keyboard
+          keyboardRef={(r) => (numpadRef.current = r)}
+          onChange={(input: string) => {
+            numpadSetText(input);
           }}
-        />
-      </Row>
-      <Row>
-        <span style={{ width: "300px" }}>Port: </span>
-        <input
-          value={port}
-          onChange={(e) => setPort(e.target.value)}
-          style={{
-            fontSize: "2rem",
-            width: "300px",
-            borderColor: portValidate ? "" : "red",
+          layout={{
+            default: ["1 2 3", "4 5 6", "7 8 9", "- 0 .", "{bksp}"],
           }}
+          theme={"hg-theme-default hg-layout-numeric numeric-theme"}
         />
-      </Row>
-      <Row>
-        <Button name="Save" onClick={handleSave} />
-        <span>{validateText}</span>
-      </Row>
+      </div>
     </div>
   );
 }

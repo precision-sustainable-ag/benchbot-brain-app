@@ -1,8 +1,6 @@
 const baseUrl = "http://localhost:8042";
 
-const takeImageUrl = "http://10.95.76.50:5000/image";
-
-const previewImageUrl = "http://10.95.76.50:5000/img_preview";
+const imageUrl = "http://10.95.76.50:5000";
 
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log
@@ -35,28 +33,48 @@ export const moveY = async (y: number) => {
 
 export const takeImage = async () => {
   const response = defaultResponse;
-  const url = takeImageUrl;
-  const res = await fetch(url);
-  // error handling
-  if (!res.ok) {
+  const url = imageUrl + "/image";
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      response.error = true;
+      response.message = await res.text();
+      return response;
+    } else {
+      response.error = false;
+      response.data = await res.blob();
+      console.log("response", response);
+      return response;
+    }
+  } catch (error) {
+    console.log("error", error);
     response.error = true;
-    response.message = await res.json();
+    if (error instanceof TypeError) {
+      response.message = error.message;
+      return response;
+    } else return response;
   }
-  return response;
 };
 
 export const getImagePreview = async () => {
   const response = defaultResponse;
-  const url = previewImageUrl;
-  const res = await fetch(url);
-  // error handling
-  if (!res.ok) {
-    response.error = true;
-    response.message = await res.json();
+  const url = imageUrl + "/image_latest";
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      response.error = true;
+      response.message = await res.text();
+      return response;
+    }
+    response.data = await res.blob();
     return response;
+  } catch (error) {
+    response.error = true;
+    if (error instanceof TypeError) {
+      response.message = error.message;
+      return response;
+    } else return response;
   }
-  response.data = await res.blob();
-  return response;
 };
 
 // FIXME: update home function api param for clearcore

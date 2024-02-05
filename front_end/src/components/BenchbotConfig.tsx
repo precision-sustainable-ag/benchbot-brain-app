@@ -8,6 +8,8 @@ import {
 } from "../utils/calculation";
 import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
 import Log from "./Log";
+import ImagePreview from "./ImagePreview";
+import { Image, defaultImage } from "./ManualControl";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 
 const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
@@ -41,6 +43,8 @@ export default function BenchbotConfig() {
   const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
 
+  const [Image, setImage] = useState<Image>(defaultImage);
+
   const stopRef = useRef(stop);
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
@@ -50,6 +54,65 @@ export default function BenchbotConfig() {
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
     setLogs((prev) => [...prev, currentTime + ": " + log]);
+  };
+
+  const loadImage = async () => {
+    appendLog("Taking image.");
+    setImage({ ...Image, status: "pending" });
+    const imageData = await takeImage();
+    // console.log("imageData", imageData);
+    if (!imageData.error && imageData.data) {
+      appendLog("Loading image success.");
+      setImage({
+        ...Image,
+        status: "success",
+        image: imageData.data,
+      });
+    } else {
+      appendLog("Failed loading image, retrying...");
+      // retake image here
+      const retakeImageData = await takeImage();
+      if (!retakeImageData.error && retakeImageData.data) {
+        appendLog("Loading image success.");
+        setImage({
+          ...Image,
+          status: "success",
+          image: retakeImageData.data,
+        });
+      } else {
+        appendLog("Failed loading image. Skipped");
+        setImage({
+          ...Image,
+          status: "error",
+          errorMsg: retakeImageData.message,
+        });
+      }
+    }
+  };
+
+  const startTraversal = () => {
+    stopRef.current = false;
+    setStop(false);
+    const res = loadBenchBotConfig();
+    if (!res) {
+      const { location, map, direction } = initBenchBotMap(benchBotConfig);
+      traverseBenchBot(benchBotConfig, { location, map, direction });
+    } else {
+      const {
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+        location,
+        map,
+        direction,
+      } = res;
+      appendLog("Start BenchBot traversal.");
+      traverseBenchBot(
+        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+        { location, map, direction }
+      );
+    }
   };
 
   const traverseBenchBot = async (
@@ -69,9 +132,18 @@ export default function BenchbotConfig() {
         // if this pot had visited, continue the loop
         if (map[row][pot] === 1) continue;
         await sleep(1000);
-        await takeImage();
+        await loadImage();
+        if (stopRef.current) {
+          appendLog("Traversal stopped.");
+          let location = [row, pot];
+          saveBenchBotConfig(
+            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+            { location, map, direction }
+          );
+          break;
+        }
         map[row][pot] = 1;
-        console.log(`visit pot at row ${row} pot ${pot}`);
+        appendLog(`visited pot at row ${row} pot ${pot}`);
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -80,15 +152,6 @@ export default function BenchbotConfig() {
         ) {
           appendLog(`move X: ${direction * potSpacing}`);
           await moveXandZ(direction * potSpacing, 0);
-        }
-
-        if (stopRef.current) {
-          let location = [row, pot];
-          saveBenchBotConfig(
-            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-            { location, map, direction }
-          );
-          break;
         }
       }
 
@@ -133,17 +196,18 @@ export default function BenchbotConfig() {
 
   // update stopRef
   useEffect(() => {
-    stopRef.current = stop;
-    // console.log("stopRef.current", stopRef.current);
+    // stopRef.current = stop;
   }, [stop]);
 
   const ValInput = ({
     name,
+    configName,
     value,
     setValue,
     unit,
   }: {
     name: string;
+    configName: string;
     value: number;
     setValue: (param: string, value: number | string) => void;
     unit?: string;
@@ -151,14 +215,16 @@ export default function BenchbotConfig() {
     return (
       <>
         <span style={{ width: "300px" }}>{name}</span>
-        <ControlButtonsMinus setValue={(num) => setValue(name, value + num)} />
+        <ControlButtonsMinus
+          setValue={(num) => setValue(configName, value + num)}
+        />
         <div>
           <input
             type="number"
             value={value}
             onChange={(e) =>
               setValue(
-                name,
+                configName,
                 e.target.value === "" ? 0 : parseInt(e.target.value)
               )
             }
@@ -167,7 +233,9 @@ export default function BenchbotConfig() {
           />
           {unit}
         </div>
-        <ControlButtonsPlus setValue={(num) => setValue(name, value + num)} />
+        <ControlButtonsPlus
+          setValue={(num) => setValue(configName, value + num)}
+        />
       </>
     );
   };
@@ -179,6 +247,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Pots per row:"}
+            configName={"potsPerRow"}
             value={benchBotConfig.potsPerRow}
             setValue={setBenchBotConfigByParam}
           />
@@ -186,6 +255,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Number of rows: "}
+            configName={"numberOfRows"}
             value={benchBotConfig.numberOfRows}
             setValue={setBenchBotConfigByParam}
           />
@@ -193,6 +263,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Row spacing: "}
+            configName={"rowSpacing"}
             value={benchBotConfig.rowSpacing}
             setValue={setBenchBotConfigByParam}
             unit="cm"
@@ -201,6 +272,7 @@ export default function BenchbotConfig() {
         <Row>
           <ValInput
             name={"Pot spacing: "}
+            configName={"potSpacing"}
             value={benchBotConfig.potSpacing}
             setValue={setBenchBotConfigByParam}
             unit="cm"
@@ -224,33 +296,10 @@ export default function BenchbotConfig() {
           </select>
         </Row>
         <Row styles={{ justifyContent: "space-around" }}>
-          <Button name="Save" onClick={() => initBenchBotMap(benchBotConfig)} />
+          <Button name="Init" onClick={() => initBenchBotMap(benchBotConfig)} />
           <Button
             name="Start"
-            onClick={() => {
-              setStop(false);
-              const res = loadBenchBotConfig();
-              if (!res) {
-                const { location, map, direction } =
-                  initBenchBotMap(benchBotConfig);
-                traverseBenchBot(benchBotConfig, { location, map, direction });
-              } else {
-                const {
-                  potsPerRow,
-                  numberOfRows,
-                  rowSpacing,
-                  potSpacing,
-                  location,
-                  map,
-                  direction,
-                } = res;
-                appendLog("Start BenchBot traversal.");
-                traverseBenchBot(
-                  { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-                  { location, map, direction }
-                );
-              }
-            }}
+            onClick={startTraversal}
             styles={{ color: "#61dac3" }}
           />
           <Button
@@ -258,6 +307,7 @@ export default function BenchbotConfig() {
             onClick={() => {
               appendLog("Paused BenchBot traversal.");
               setStop(true);
+              stopRef.current = true;
             }}
             styles={{ color: "#f65a5b" }}
           />
@@ -265,6 +315,16 @@ export default function BenchbotConfig() {
       </div>
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
+        <ImagePreview
+          status={Image.status}
+          imagePreview={Image.image}
+          imageErrMsg={Image.errorMsg}
+          retry={() => {
+            stopRef.current = false;
+            startTraversal();
+          }}
+          showRetry={false}
+        />
       </div>
     </div>
   );

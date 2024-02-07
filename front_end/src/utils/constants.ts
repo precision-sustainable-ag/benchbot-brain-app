@@ -2,6 +2,7 @@ import {
   SpeciesConfig,
   PotData,
   BenchBotConfig,
+  Image,
 } from "../interfaces/BenchBotTypes";
 
 export const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
@@ -22,4 +23,10 @@ export const defaultBenchBotConfig: BenchBotConfig = {
   numberOfRows: 0,
   rowSpacing: 0,
   potSpacing: 0,
+};
+
+export const defaultImage: Image = {
+  status: "error",
+  image: null,
+  errorMsg: "No image available",
 };

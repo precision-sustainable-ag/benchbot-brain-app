@@ -8,18 +8,8 @@ import {
 } from "../components/ControlButtons";
 import Log from "../components/Log";
 import ImagePreview from "../components/ImagePreview";
-
-export interface Image {
-  status: "pending" | "success" | "error";
-  image: Blob | null;
-  errorMsg: string;
-}
-
-export const defaultImage: Image = {
-  status: "error",
-  image: null,
-  errorMsg: "No image available",
-};
+import { Image } from "../interfaces/BenchBotTypes";
+import { defaultImage } from "../utils/constants";
 
 function ManualControl() {
   const [xValue, setXValue] = useState(0);

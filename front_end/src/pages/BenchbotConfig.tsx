@@ -9,10 +9,13 @@ import {
 } from "../components/ControlButtons";
 import Log from "../components/Log";
 import ImagePreview from "../components/ImagePreview";
-import { Image, defaultImage } from "./ManualControl";
-import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
+import {
+  BenchBotConfig,
+  BenchBotData,
+  Image,
+} from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
-import { defaultBenchBotConfig } from "../utils/constants";
+import { defaultBenchBotConfig, defaultImage } from "../utils/constants";
 
 export default function BenchbotConfig() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(

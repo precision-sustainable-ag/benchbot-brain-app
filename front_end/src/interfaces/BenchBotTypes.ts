@@ -21,3 +21,9 @@ export interface PotData {
   removed: boolean;
   visited: boolean;
 }
+
+export interface Image {
+  status: "pending" | "success" | "error";
+  image: Blob | null;
+  errorMsg: string;
+}

@@ -14,8 +14,9 @@ const Pot = ({ data }: PotProps) => {
       style={{
         fontSize: "0.75rem",
         width: "100px",
-        height: "100px",
+        height: "50px",
         border: "1px solid black",
+        textAlign: "center",
       }}
     >
       <p>{data.species}</p>

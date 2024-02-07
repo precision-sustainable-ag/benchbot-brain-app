@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import Row from "../components/Row";
-import { loadBenchBotConfig, saveSpeciesMap } from "../utils/configs";
+import {
+  loadBenchBotConfig,
+  loadSpeciesMap,
+  saveSpeciesMap,
+} from "../utils/configs";
 import {
   ControlButtonsMinus,
   ControlButtonsPlus,
 } from "../components/ControlButtons";
-import {
-  PotData,
-  SpeciesConfig,
-  defaultSpeciesConfig,
-  defaultPotData,
-} from "../interfaces/BenchBotTypes";
+import { PotData, SpeciesConfig } from "../interfaces/BenchBotTypes";
+import { defaultSpeciesConfig, defaultPotData } from "../utils/constants";
 import Button from "../components/Button";
 import PotMap from "../components/PotMap";
-
-const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
+import { defaultSpecies } from "../utils/constants";
 
 export default function SpeciesMap() {
   const [potsPerRow, setPotsPerRow] = useState(0);
@@ -47,9 +46,11 @@ export default function SpeciesMap() {
   useEffect(() => {
     const res = loadBenchBotConfig();
     if (!res) return;
-    const { potsPerRow, numberOfRows, rowSpacing, potSpacing } = res;
+    const { potsPerRow } = res;
     setPotsPerRow(potsPerRow);
-    console.log("loaded: ", potsPerRow, numberOfRows, rowSpacing, potSpacing);
+    const map = loadSpeciesMap();
+    if (!map) return;
+    setSpeciesMap(map);
   }, []);
 
   const ValInput = ({

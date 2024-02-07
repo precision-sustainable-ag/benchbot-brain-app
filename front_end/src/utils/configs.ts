@@ -69,8 +69,9 @@ export const saveCameraConfig = (cameraConfig: CameraConfig) => {
 export const loadSpeciesMap = () => {
   const data = localStorage.getItem(SpeciesMapKey);
   if (!data) return;
-  console.log("loaded Species Map", data);
-  return data;
+  const speciesMap = JSON.parse(data);
+  console.log("loaded Species Map", speciesMap);
+  return speciesMap;
 };
 
 export const saveSpeciesMap = (SpeciesMap: PotData[][]) => {

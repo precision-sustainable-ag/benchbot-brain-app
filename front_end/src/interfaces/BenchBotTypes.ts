@@ -16,19 +16,8 @@ export interface SpeciesConfig {
   species: string;
 }
 
-export const defaultSpeciesConfig: SpeciesConfig = {
-  numberOfRows: 0,
-  species: "",
-};
-
 export interface PotData {
   species: string;
   removed: boolean;
   visited: boolean;
 }
-
-export const defaultPotData: PotData = {
-  species: "",
-  removed: false,
-  visited: false,
-};

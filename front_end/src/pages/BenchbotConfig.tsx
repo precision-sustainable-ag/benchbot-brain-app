@@ -10,13 +10,7 @@ import {
 import Log from "../components/Log";
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
-
-const defaultBenchBotConfig = {
-  potsPerRow: 0,
-  numberOfRows: 0,
-  rowSpacing: 0,
-  potSpacing: 0,
-};
+import { defaultBenchBotConfig } from "../utils/constants";
 
 export default function BenchbotConfig() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(

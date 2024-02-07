@@ -5,10 +5,10 @@ interface PotMapProps {
 }
 
 interface PotProps {
-  name: string;
+  data: PotData;
 }
 
-const Pot = ({ name }: PotProps) => {
+const Pot = ({ data }: PotProps) => {
   return (
     <div
       style={{
@@ -18,7 +18,9 @@ const Pot = ({ name }: PotProps) => {
         border: "1px solid black",
       }}
     >
-      {name}
+      <p>{data.species}</p>
+      <p>{data.removed ? "removed" : ""}</p>
+      <p>{data.visited ? "visited" : ""}</p>
     </div>
   );
 };
@@ -42,7 +44,7 @@ export default function PotMap({ speciesMap }: PotMapProps) {
               style={{ display: "flex", gap: "10px", paddingBottom: "10px" }}
             >
               {row.map((pot, index) => {
-                return <Pot key={index} name={pot.species} />;
+                return <Pot key={index} data={pot} />;
               })}
             </div>
           ))}

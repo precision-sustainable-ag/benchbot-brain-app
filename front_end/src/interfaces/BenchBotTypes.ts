@@ -3,11 +3,21 @@ export interface BenchBotConfig {
   numberOfRows: number;
   rowSpacing: number;
   potSpacing: number;
-  species?: string;
 }
 
 export interface BenchBotData {
   location: number[];
   map: number[][];
   direction: number;
+}
+
+export interface SpeciesConfig {
+  numberOfRows: number;
+  species: string;
+}
+
+export interface PotConfig {
+  species: string;
+  removed: boolean;
+  visited: boolean;
 }

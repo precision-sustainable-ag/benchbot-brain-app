@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import ManualControl from "./pages/ManualControl";
 import BenchbotConfig from "./pages/BenchbotConfig";
 import CameraConfig from "./pages/CameraConfig";
+import SpeciesMap from "./pages/SpeciesMap";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
@@ -27,12 +28,18 @@ function App() {
               Camera config
             </Link>
           </button>
+          <button style={{ fontSize: "2rem" }}>
+            <Link to="/species-map" style={LinkStyle}>
+              Species Map
+            </Link>
+          </button>
         </nav>
 
         <Routes>
           <Route path="/" element={<ManualControl />} />
           <Route path="/benchbot-config" element={<BenchbotConfig />} />
           <Route path="/camera-config" element={<CameraConfig />} />
+          <Route path="/species-map" element={<SpeciesMap />} />
         </Routes>
       </div>
     </BrowserRouter>

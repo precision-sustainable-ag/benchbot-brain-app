@@ -11,14 +11,11 @@ import Log from "../components/Log";
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 
-const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
-
 const defaultBenchBotConfig = {
   potsPerRow: 0,
   numberOfRows: 0,
   rowSpacing: 0,
   potSpacing: 0,
-  species: "",
 };
 
 export default function BenchbotConfig() {
@@ -203,23 +200,7 @@ export default function BenchbotConfig() {
             unit="cm"
           />
         </Row>
-        <Row>
-          <span style={{ width: "400px" }}>Species: </span>
-          <select
-            value={benchBotConfig.species}
-            onChange={(e) =>
-              setBenchBotConfigByParam("species", e.target.value)
-            }
-            style={{ fontSize: "2rem", flex: 1 }}
-          >
-            <option value=""></option>
-            {defaultSpecies.map((species, i) => (
-              <option value={species} key={i}>
-                {species}
-              </option>
-            ))}
-          </select>
-        </Row>
+
         <Row styles={{ justifyContent: "space-around" }}>
           <Button name="Save" onClick={() => initBenchBotMap(benchBotConfig)} />
           <Button

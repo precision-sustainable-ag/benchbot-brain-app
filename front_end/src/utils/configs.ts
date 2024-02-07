@@ -1,7 +1,12 @@
-import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
+import {
+  BenchBotConfig,
+  BenchBotData,
+  PotData,
+} from "../interfaces/BenchBotTypes";
 
 const BenchBotConfigKey = "BenchBotConfig";
 const CameraConfigKey = "CameraConfig";
+const SpeciesMapKey = "SpeciesMap";
 
 interface CameraConfig {
   IP: string;
@@ -59,4 +64,16 @@ export const loadCameraConfig = () => {
 export const saveCameraConfig = (cameraConfig: CameraConfig) => {
   console.log("saved data", cameraConfig);
   localStorage.setItem(CameraConfigKey, JSON.stringify(cameraConfig));
+};
+
+export const loadSpeciesMap = () => {
+  const data = localStorage.getItem(SpeciesMapKey);
+  if (!data) return;
+  console.log("loaded Species Map", data);
+  return data;
+};
+
+export const saveSpeciesMap = (SpeciesMap: PotData[][]) => {
+  console.log("saved Species Map: ", SpeciesMap);
+  localStorage.setItem(SpeciesMapKey, JSON.stringify(SpeciesMap));
 };

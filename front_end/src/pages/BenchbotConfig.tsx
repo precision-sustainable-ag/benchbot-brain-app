@@ -8,6 +8,8 @@ import {
   ControlButtonsPlus,
 } from "../components/ControlButtons";
 import Log from "../components/Log";
+import ImagePreview from "../components/ImagePreview";
+import { Image, defaultImage } from "./ManualControl";
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 import { defaultBenchBotConfig } from "../utils/constants";
@@ -19,6 +21,8 @@ export default function BenchbotConfig() {
   const [logs, setLogs] = useState<string[]>([]);
   const [stop, setStop] = useState(false);
 
+  const [Image, setImage] = useState<Image>(defaultImage);
+
   const stopRef = useRef(stop);
 
   const setBenchBotConfigByParam = (param: string, value: number | string) => {
@@ -28,6 +32,65 @@ export default function BenchbotConfig() {
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
     setLogs((prev) => [...prev, currentTime + ": " + log]);
+  };
+
+  const loadImage = async () => {
+    appendLog("Taking image.");
+    setImage({ ...Image, status: "pending" });
+    const imageData = await takeImage();
+    // console.log("imageData", imageData);
+    if (!imageData.error && imageData.data) {
+      appendLog("Loading image success.");
+      setImage({
+        ...Image,
+        status: "success",
+        image: imageData.data,
+      });
+    } else {
+      appendLog("Failed loading image, retrying...");
+      // retake image here
+      const retakeImageData = await takeImage();
+      if (!retakeImageData.error && retakeImageData.data) {
+        appendLog("Loading image success.");
+        setImage({
+          ...Image,
+          status: "success",
+          image: retakeImageData.data,
+        });
+      } else {
+        appendLog("Failed loading image. Skipped");
+        setImage({
+          ...Image,
+          status: "error",
+          errorMsg: retakeImageData.message,
+        });
+      }
+    }
+  };
+
+  const startTraversal = () => {
+    stopRef.current = false;
+    setStop(false);
+    const res = loadBenchBotConfig();
+    if (!res) {
+      const { location, map, direction } = initBenchBotMap(benchBotConfig);
+      traverseBenchBot(benchBotConfig, { location, map, direction });
+    } else {
+      const {
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+        location,
+        map,
+        direction,
+      } = res;
+      appendLog("Start BenchBot traversal.");
+      traverseBenchBot(
+        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+        { location, map, direction }
+      );
+    }
   };
 
   const traverseBenchBot = async (
@@ -47,9 +110,18 @@ export default function BenchbotConfig() {
         // if this pot had visited, continue the loop
         if (map[row][pot] === 1) continue;
         await sleep(1000);
-        await takeImage();
+        await loadImage();
+        if (stopRef.current) {
+          appendLog("Traversal stopped.");
+          let location = [row, pot];
+          saveBenchBotConfig(
+            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+            { location, map, direction }
+          );
+          break;
+        }
         map[row][pot] = 1;
-        console.log(`visit pot at row ${row} pot ${pot}`);
+        appendLog(`visited pot at row ${row} pot ${pot}`);
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -58,15 +130,6 @@ export default function BenchbotConfig() {
         ) {
           appendLog(`move X: ${direction * potSpacing}`);
           await moveXandZ(direction * potSpacing, 0);
-        }
-
-        if (stopRef.current) {
-          let location = [row, pot];
-          saveBenchBotConfig(
-            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-            { location, map, direction }
-          );
-          break;
         }
       }
 
@@ -111,8 +174,7 @@ export default function BenchbotConfig() {
 
   // update stopRef
   useEffect(() => {
-    stopRef.current = stop;
-    // console.log("stopRef.current", stopRef.current);
+    // stopRef.current = stop;
   }, [stop]);
 
   const ValInput = ({
@@ -196,33 +258,10 @@ export default function BenchbotConfig() {
         </Row>
 
         <Row styles={{ justifyContent: "space-around" }}>
-          <Button name="Save" onClick={() => initBenchBotMap(benchBotConfig)} />
+          <Button name="Init" onClick={() => initBenchBotMap(benchBotConfig)} />
           <Button
             name="Start"
-            onClick={() => {
-              setStop(false);
-              const res = loadBenchBotConfig();
-              if (!res) {
-                const { location, map, direction } =
-                  initBenchBotMap(benchBotConfig);
-                traverseBenchBot(benchBotConfig, { location, map, direction });
-              } else {
-                const {
-                  potsPerRow,
-                  numberOfRows,
-                  rowSpacing,
-                  potSpacing,
-                  location,
-                  map,
-                  direction,
-                } = res;
-                appendLog("Start BenchBot traversal.");
-                traverseBenchBot(
-                  { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-                  { location, map, direction }
-                );
-              }
-            }}
+            onClick={startTraversal}
             styles={{ color: "#61dac3" }}
           />
           <Button
@@ -230,6 +269,7 @@ export default function BenchbotConfig() {
             onClick={() => {
               appendLog("Paused BenchBot traversal.");
               setStop(true);
+              stopRef.current = true;
             }}
             styles={{ color: "#f65a5b" }}
           />
@@ -237,6 +277,16 @@ export default function BenchbotConfig() {
       </div>
       <div>
         <Log logs={logs} clearLog={() => setLogs([])} />
+        <ImagePreview
+          status={Image.status}
+          imagePreview={Image.image}
+          imageErrMsg={Image.errorMsg}
+          retry={() => {
+            stopRef.current = false;
+            startTraversal();
+          }}
+          showRetry={false}
+        />
       </div>
     </div>
   );

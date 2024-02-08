@@ -99,10 +99,15 @@ export default function Traversal() {
         if (stopRef.current) {
           appendLog("Traversal stopped.");
           let location = [row, pot];
-          saveBenchBotConfig(
-            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-            { location, map, direction }
-          );
+          setBenchBotConfig({
+            ...benchBotConfig,
+            potsPerRow,
+            numberOfRows,
+            rowSpacing,
+            potSpacing,
+          });
+          setBenchBotData({ ...benchBotData, location, map, direction });
+          saveBenchBotConfig(benchBotConfig, benchBotData);
           break;
         }
         // visit pot
@@ -134,10 +139,15 @@ export default function Traversal() {
     if (!stopRef.current) {
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
-      saveBenchBotConfig(
-        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-        { location, map, direction }
-      );
+      setBenchBotConfig({
+        ...benchBotConfig,
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+      });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+      saveBenchBotConfig(benchBotConfig, benchBotData);
     }
   };
 

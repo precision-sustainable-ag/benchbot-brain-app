@@ -53,8 +53,18 @@ export default function SpeciesMap() {
     setSpeciesMap([]);
   };
 
+  // FIXME: temporary function to remove all visited stage of the map
+  const clearMap = () => {
+    const clearedMap = speciesMap.map((row) =>
+      row.map((pot) => ({ ...pot, visited: false }))
+    );
+    return clearedMap;
+  };
+
   const saveSpecies = () => {
-    initBenchBotConfig(benchBotConfig, speciesMap);
+    const clearedMap = clearMap();
+    setSpeciesMap(clearedMap);
+    initBenchBotConfig(benchBotConfig, clearedMap);
   };
 
   // load benchbot config from localstorage

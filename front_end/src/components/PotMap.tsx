@@ -2,13 +2,20 @@ import { PotData } from "../interfaces/BenchBotTypes";
 
 interface PotMapProps {
   speciesMap: PotData[][];
+  setSpeciesMap?: (speciesMap: PotData[][]) => void;
+  species: string[];
 }
 
 interface PotProps {
-  data: PotData;
+  speciesMap: PotData[][];
+  setSpeciesMap?: (speciesMap: PotData[][]) => void;
+  row: number;
+  col: number;
+  species: string[];
 }
 
-const Pot = ({ data }: PotProps) => {
+const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
+  const potData = speciesMap[row][col];
   return (
     <div
       style={{
@@ -19,14 +26,40 @@ const Pot = ({ data }: PotProps) => {
         textAlign: "center",
       }}
     >
-      <p>{data.species}</p>
-      <p>{data.removed ? "removed" : ""}</p>
-      <p>{data.visited ? "visited" : ""}</p>
+      <select
+        value={speciesMap[row][col].species}
+        onChange={(e) => {
+          if (setSpeciesMap !== undefined) {
+            let currMap = speciesMap;
+            currMap[row][col] = {
+              ...currMap[row][col],
+              species: e.target.value,
+            };
+            setSpeciesMap([...currMap]);
+          }
+        }}
+        disabled={setSpeciesMap === undefined}
+        style={{ fontSize: "1.25rem", width: "90px" }}
+      >
+        <option value={""}></option>
+        {species.map((s, i) => (
+          <option value={s} key={i}>
+            {s}
+          </option>
+        ))}
+      </select>
+      <p style={{ fontSize: "1.25rem", margin: "0" }}>
+        {potData.visited ? "visited" : ""}
+      </p>
     </div>
   );
 };
 
-export default function PotMap({ speciesMap }: PotMapProps) {
+export default function PotMap({
+  speciesMap,
+  setSpeciesMap,
+  species,
+}: PotMapProps) {
   return (
     <div
       style={{
@@ -39,13 +72,22 @@ export default function PotMap({ speciesMap }: PotMapProps) {
         "No data available"
       ) : (
         <>
-          {speciesMap.map((row, i) => (
+          {speciesMap.map((row, rowIndex) => (
             <div
-              key={i}
+              key={rowIndex}
               style={{ display: "flex", gap: "10px", paddingBottom: "10px" }}
             >
-              {row.map((pot, index) => {
-                return <Pot key={index} data={pot} />;
+              {row.map((_, colIndex) => {
+                return (
+                  <Pot
+                    key={colIndex}
+                    speciesMap={speciesMap}
+                    setSpeciesMap={setSpeciesMap}
+                    species={species}
+                    row={rowIndex}
+                    col={colIndex}
+                  />
+                );
               })}
             </div>
           ))}

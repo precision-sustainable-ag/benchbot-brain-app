@@ -195,7 +195,11 @@ export default function SpeciesMap() {
         </Row>
       </div>
       <div>
-        <PotMap speciesMap={speciesMap} />
+        <PotMap
+          speciesMap={speciesMap}
+          setSpeciesMap={setSpeciesMap}
+          species={defaultSpecies}
+        />
       </div>
     </div>
   );

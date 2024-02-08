@@ -14,6 +14,7 @@ import {
   defaultBenchBotConfig,
   defaultBenchBotData,
   defaultImage,
+  defaultSpecies,
 } from "../utils/constants";
 import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 
@@ -240,7 +241,7 @@ export default function Traversal() {
         />
       </div>
       <div>
-        <PotMap speciesMap={benchBotData.map} />
+        <PotMap speciesMap={benchBotData.map} species={defaultSpecies} />
         <Log logs={logs} clearLog={() => setLogs([])} />
       </div>
     </div>

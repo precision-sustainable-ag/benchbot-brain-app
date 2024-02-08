@@ -65,16 +65,3 @@ export const saveCameraConfig = (cameraConfig: CameraConfig) => {
   console.log("saved data", cameraConfig);
   localStorage.setItem(CameraConfigKey, JSON.stringify(cameraConfig));
 };
-
-export const loadSpeciesMap = () => {
-  const data = localStorage.getItem(SpeciesMapKey);
-  if (!data) return;
-  const speciesMap = JSON.parse(data);
-  console.log("loaded Species Map", speciesMap);
-  return speciesMap;
-};
-
-export const saveSpeciesMap = (SpeciesMap: PotData[][]) => {
-  console.log("saved Species Map: ", SpeciesMap);
-  localStorage.setItem(SpeciesMapKey, JSON.stringify(SpeciesMap));
-};

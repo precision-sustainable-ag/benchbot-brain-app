@@ -101,7 +101,7 @@ function ManualControl() {
           <Button name={"Home Z"} onClick={homeZ} />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="X"
             value={xValue}
@@ -110,7 +110,7 @@ function ManualControl() {
           />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="Y"
             value={yValue}
@@ -119,7 +119,7 @@ function ManualControl() {
           />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="Z"
             value={zValue}

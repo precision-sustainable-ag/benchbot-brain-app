@@ -4,26 +4,25 @@ import Button from "../components/Button";
 import PotMap from "../components/PotMap";
 import Log from "../components/Log";
 import ImagePreview from "../components/ImagePreview";
-import { initBenchBotMap } from "../utils/calculation";
 import {
   BenchBotConfig,
   BenchBotData,
-  PotData,
   Image,
 } from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
-import { defaultBenchBotConfig, defaultImage } from "../utils/constants";
 import {
-  loadBenchBotConfig,
-  loadSpeciesMap,
-  saveBenchBotConfig,
-} from "../utils/configs";
+  defaultBenchBotConfig,
+  defaultBenchBotData,
+  defaultImage,
+} from "../utils/constants";
+import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 
 export default function Traversal() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
-  const [speciesMap, setSpeciesMap] = useState<PotData[][]>([]);
+  const [benchBotData, setBenchBotData] =
+    useState<BenchBotData>(defaultBenchBotData);
 
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
@@ -71,37 +70,16 @@ export default function Traversal() {
 
   const startTraversal = () => {
     stopRef.current = false;
-    const res = loadBenchBotConfig();
-    if (!res) {
-      const { location, map, direction } = initBenchBotMap(benchBotConfig);
-      traverseBenchBot(benchBotConfig, { location, map, direction });
-    } else {
-      const {
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-        location,
-        map,
-        direction,
-      } = res;
-      appendLog("Start BenchBot traversal.");
-      // TODO: update numberOfRows
-      traverseBenchBot(
-        { potsPerRow, numberOfRows: speciesMap.length, rowSpacing, potSpacing },
-        { location, map, direction }
-      );
-    }
+    appendLog("Start BenchBot traversal.");
+    traverseBenchBot(benchBotConfig, benchBotData);
   };
 
   const setPotVisited = (row: number, col: number) => {
-    let currMap = speciesMap;
+    let currMap = benchBotData.map;
     currMap[row][col].visited = true;
-    console.log("currMap", currMap);
-    setSpeciesMap(currMap);
+    setBenchBotData({ ...benchBotData, map: currMap });
   };
 
-  // TODO: the map in benchbotdata have different rows, need to be aligned with the speciesMap
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
@@ -109,15 +87,13 @@ export default function Traversal() {
     // mock sleep function
     const sleep = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
-
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
-
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         // if this pot had visited, continue the loop
-        if (map[row][pot] === 1) continue;
+        if (map[row][pot].visited) continue;
         await sleep(1000);
         await loadImage();
         if (stopRef.current) {
@@ -130,9 +106,9 @@ export default function Traversal() {
           break;
         }
         // visit pot
-        map[row][pot] = 1;
+        // map[row][pot].visited = true;
         setPotVisited(row, pot);
-        appendLog(`visited pot at row ${row} pot ${pot}`);
+        appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -143,16 +119,13 @@ export default function Traversal() {
           await moveXandZ(direction * potSpacing, 0);
         }
       }
-
       // break outside loop if stop triggered
       if (stopRef.current) break;
-
       if (row !== numberOfRows - 1) {
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
         await moveY(rowSpacing);
       }
-
       // set overflowed postPerRow back
       if (pot === potsPerRow) pot -= 1;
       if (pot === -1) pot += 1;
@@ -171,16 +144,29 @@ export default function Traversal() {
   useEffect(() => {
     const res = loadBenchBotConfig();
     if (!res) return;
-    setBenchBotConfig(res);
-    const map = loadSpeciesMap();
-    if (!map) return;
-    setSpeciesMap(map);
+    const {
+      potsPerRow,
+      numberOfRows,
+      rowSpacing,
+      potSpacing,
+      location,
+      map,
+      direction,
+    } = res;
+    setBenchBotConfig({
+      ...benchBotConfig,
+      potsPerRow,
+      numberOfRows,
+      rowSpacing,
+      potSpacing,
+    });
+    setBenchBotData({ ...benchBotData, location, map, direction });
   }, []);
 
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: "400px" }}>
-        <h5 style={{ textAlign: "center", margin: "1rem" }}>Species Config</h5>
+        <h5 style={{ textAlign: "center", margin: "1rem" }}>Traversal</h5>
         <Row>
           <span style={{ width: "300px" }}>Pots Per Row: </span>
           <input
@@ -189,16 +175,14 @@ export default function Traversal() {
             style={{ fontSize: "2rem", flex: 1, width: "150px" }}
           />
         </Row>
-
         <Row>
           <span style={{ width: "300px" }}>Total Rows: </span>
           <input
-            value={speciesMap.length}
+            value={benchBotConfig.numberOfRows}
             disabled
             style={{ fontSize: "2rem", flex: 1, width: "150px" }}
           />
         </Row>
-
         <Row>
           <span style={{ width: "300px" }}>Row Spacing: </span>
           <input
@@ -207,7 +191,6 @@ export default function Traversal() {
             style={{ fontSize: "2rem", flex: 1, width: "150px" }}
           />
         </Row>
-
         <Row>
           <span style={{ width: "300px" }}>Pot Spacing: </span>
           <input
@@ -247,7 +230,7 @@ export default function Traversal() {
         />
       </div>
       <div>
-        <PotMap speciesMap={speciesMap} />
+        <PotMap speciesMap={benchBotData.map} />
         <Log logs={logs} clearLog={() => setLogs([])} />
       </div>
     </div>

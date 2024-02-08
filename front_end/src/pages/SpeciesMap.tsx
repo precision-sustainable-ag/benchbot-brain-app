@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
 import Row from "../components/Row";
-import {
-  loadBenchBotConfig,
-  loadSpeciesMap,
-  saveSpeciesMap,
-} from "../utils/configs";
+import { loadBenchBotConfig } from "../utils/configs";
 import {
   ControlButtonsMinus,
   ControlButtonsPlus,
 } from "../components/ControlButtons";
-import { PotData, SpeciesConfig } from "../interfaces/BenchBotTypes";
-import { defaultSpeciesConfig, defaultPotData } from "../utils/constants";
+import {
+  SpeciesConfig,
+  BenchBotConfig,
+  PotData,
+} from "../interfaces/BenchBotTypes";
+import {
+  defaultSpeciesConfig,
+  defaultPotData,
+  defaultBenchBotConfig,
+} from "../utils/constants";
 import Button from "../components/Button";
 import PotMap from "../components/PotMap";
 import { defaultSpecies } from "../utils/constants";
+import { initBenchBotConfig } from "../utils/calculation";
 
 export default function SpeciesMap() {
-  const [potsPerRow, setPotsPerRow] = useState(0);
+  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
+    defaultBenchBotConfig
+  );
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
     ...defaultSpeciesConfig,
     species: defaultSpecies[0],
@@ -26,10 +33,14 @@ export default function SpeciesMap() {
   const setSpeciesConfigByParam = (param: string, value: number | string) => {
     setSpeciesConfig({ ...speciesConfig, [param]: value });
   };
+  const setBenchBotConfigByParam = (param: string, value: number | string) => {
+    setBenchBotConfig({ ...benchBotConfig, [param]: value });
+  };
 
   const addSpecies = () => {
     const { species, numberOfRows } = speciesConfig;
     const Pot = { ...defaultPotData, species };
+    const { potsPerRow } = benchBotConfig;
     const speciesArray = new Array(numberOfRows).fill(
       new Array(potsPerRow).fill(Pot)
     );
@@ -42,14 +53,21 @@ export default function SpeciesMap() {
     setSpeciesMap([]);
   };
 
+  const saveSpecies = () => {
+    initBenchBotConfig(benchBotConfig, speciesMap);
+  };
+
   // load benchbot config from localstorage
   useEffect(() => {
     const res = loadBenchBotConfig();
     if (!res) return;
-    const { potsPerRow } = res;
-    setPotsPerRow(potsPerRow);
-    const map = loadSpeciesMap();
-    if (!map) return;
+    const { potsPerRow, rowSpacing, potSpacing, map } = res;
+    setBenchBotConfig({
+      ...benchBotConfig,
+      potsPerRow,
+      rowSpacing,
+      potSpacing,
+    });
     setSpeciesMap(map);
   }, []);
 
@@ -59,12 +77,14 @@ export default function SpeciesMap() {
     value,
     setValue,
     unit,
+    disabled = false,
   }: {
     name: string;
     configName: string;
     value: number;
     setValue: (param: string, value: number | string) => void;
     unit?: string;
+    disabled?: boolean;
   }) => {
     return (
       <>
@@ -72,7 +92,7 @@ export default function SpeciesMap() {
         <ControlButtonsMinus
           setValue={(num) => setValue(configName, value + num)}
         />
-        <div>
+        <div style={{ display: "flex", alignItems: "baseline" }}>
           <input
             type="number"
             value={value}
@@ -82,10 +102,11 @@ export default function SpeciesMap() {
                 e.target.value === "" ? 0 : parseInt(e.target.value)
               )
             }
+            disabled={disabled}
             size={2}
             style={{ fontSize: "2rem", flex: 1, width: "50px" }}
           />
-          {unit}
+          <span style={{ fontSize: "1rem" }}>{unit}</span>
         </div>
         <ControlButtonsPlus
           setValue={(num) => setValue(configName, value + num)}
@@ -96,18 +117,44 @@ export default function SpeciesMap() {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ width: "400px" }}>
+      <div style={{ width: "500px" }}>
         <h5 style={{ textAlign: "center", margin: "1rem" }}>Species Config</h5>
+        <h6 style={{ margin: "0" }}>Map Setting: </h6>
         <Row>
-          <span style={{ width: "300px" }}>Pots Per Row: </span>
-          <input
-            value={potsPerRow}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
+          <ValInput
+            name={"Pots per row:"}
+            configName={"potsPerRow"}
+            value={benchBotConfig.potsPerRow}
+            setValue={setBenchBotConfigByParam}
+            disabled={speciesMap.length > 0}
           />
         </Row>
 
-        <Row styles={{ gap: "0.2rem" }}>
+        <Row>
+          <ValInput
+            name={"Row spacing: "}
+            configName={"rowSpacing"}
+            value={benchBotConfig.rowSpacing}
+            setValue={setBenchBotConfigByParam}
+            unit="cm"
+            disabled={speciesMap.length > 0}
+          />
+        </Row>
+
+        <Row>
+          <ValInput
+            name={"Pot spacing: "}
+            configName={"potSpacing"}
+            value={benchBotConfig.potSpacing}
+            setValue={setBenchBotConfigByParam}
+            unit="cm"
+            disabled={speciesMap.length > 0}
+          />
+        </Row>
+
+        <h6 style={{ margin: "1rem 0 0 0" }}>Add Species: </h6>
+
+        <Row>
           <ValInput
             name={"Rows: "}
             configName={"numberOfRows"}
@@ -131,15 +178,11 @@ export default function SpeciesMap() {
           </select>
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <Button name={"Add"} onClick={addSpecies} />
           <Button name={"Reset"} onClick={resetSpecies} />
+          <Button name={"Save"} onClick={saveSpecies} />
         </Row>
-        <Button
-          name={"Save"}
-          onClick={() => saveSpeciesMap(speciesMap)}
-          styles={{ width: "400px" }}
-        />
       </div>
       <div>
         <PotMap speciesMap={speciesMap} />

@@ -7,7 +7,7 @@ export interface BenchBotConfig {
 
 export interface BenchBotData {
   location: number[];
-  map: number[][];
+  map: PotData[][];
   direction: number;
 }
 

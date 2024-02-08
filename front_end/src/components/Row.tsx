@@ -9,10 +9,9 @@ const Row = ({ children, styles }: RowProps) => {
   return (
     <div
       style={{
-        padding: "10px 0",
+        padding: "5px 0",
         display: "flex",
         alignItems: "center",
-        gap: "1rem",
         ...styles,
       }}
     >

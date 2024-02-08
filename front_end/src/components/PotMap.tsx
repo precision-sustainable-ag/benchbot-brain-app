@@ -32,7 +32,7 @@ export default function PotMap({ speciesMap }: PotMapProps) {
       style={{
         border: "1px solid black",
         padding: "10px",
-        margin: "50px 50px",
+        margin: "20px 20px",
       }}
     >
       {speciesMap.length === 0 ? (

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Row from "../components/Row";
 import Button from "../components/Button";
-import { initBenchBotMap } from "../utils/calculation";
+// import { initBenchBotMap } from "../utils/calculation";
 import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 import {
   ControlButtonsMinus,
@@ -71,94 +71,94 @@ export default function BenchbotConfig() {
     }
   };
 
-  const startTraversal = () => {
-    stopRef.current = false;
-    setStop(false);
-    const res = loadBenchBotConfig();
-    if (!res) {
-      const { location, map, direction } = initBenchBotMap(benchBotConfig);
-      traverseBenchBot(benchBotConfig, { location, map, direction });
-    } else {
-      const {
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-        location,
-        map,
-        direction,
-      } = res;
-      appendLog("Start BenchBot traversal.");
-      traverseBenchBot(
-        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-        { location, map, direction }
-      );
-    }
-  };
+  // const startTraversal = () => {
+  //   stopRef.current = false;
+  //   setStop(false);
+  //   const res = loadBenchBotConfig();
+  //   if (!res) {
+  //     const { location, map, direction } = initBenchBotMap(benchBotConfig);
+  //     traverseBenchBot(benchBotConfig, { location, map, direction });
+  //   } else {
+  //     const {
+  //       potsPerRow,
+  //       numberOfRows,
+  //       rowSpacing,
+  //       potSpacing,
+  //       location,
+  //       map,
+  //       direction,
+  //     } = res;
+  //     appendLog("Start BenchBot traversal.");
+  //     traverseBenchBot(
+  //       { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+  //       { location, map, direction }
+  //     );
+  //   }
+  // };
 
-  const traverseBenchBot = async (
-    config: BenchBotConfig,
-    data: BenchBotData
-  ) => {
-    // mock sleep function
-    const sleep = (delay: number) =>
-      new Promise((resolve) => setTimeout(resolve, delay));
+  // const traverseBenchBot = async (
+  //   config: BenchBotConfig,
+  //   data: BenchBotData
+  // ) => {
+  //   // mock sleep function
+  //   const sleep = (delay: number) =>
+  //     new Promise((resolve) => setTimeout(resolve, delay));
 
-    let { location, map, direction } = data;
-    let [row, pot] = location;
-    let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+  //   let { location, map, direction } = data;
+  //   let [row, pot] = location;
+  //   let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
 
-    for (; row < numberOfRows; row += 1) {
-      for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
-        // if this pot had visited, continue the loop
-        if (map[row][pot] === 1) continue;
-        await sleep(1000);
-        await loadImage();
-        if (stopRef.current) {
-          appendLog("Traversal stopped.");
-          let location = [row, pot];
-          saveBenchBotConfig(
-            { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-            { location, map, direction }
-          );
-          break;
-        }
-        map[row][pot] = 1;
-        appendLog(`visited pot at row ${row} pot ${pot}`);
-        if (
-          !(
-            (pot === 0 && direction === -1) ||
-            (pot === potsPerRow - 1 && direction === 1)
-          )
-        ) {
-          appendLog(`move X: ${direction * potSpacing}`);
-          await moveXandZ(direction * potSpacing, 0);
-        }
-      }
+  //   for (; row < numberOfRows; row += 1) {
+  //     for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
+  //       // if this pot had visited, continue the loop
+  //       if (map[row][pot] === 1) continue;
+  //       await sleep(1000);
+  //       await loadImage();
+  //       if (stopRef.current) {
+  //         appendLog("Traversal stopped.");
+  //         let location = [row, pot];
+  //         saveBenchBotConfig(
+  //           { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+  //           { location, map, direction }
+  //         );
+  //         break;
+  //       }
+  //       map[row][pot] = 1;
+  //       appendLog(`visited pot at row ${row} pot ${pot}`);
+  //       if (
+  //         !(
+  //           (pot === 0 && direction === -1) ||
+  //           (pot === potsPerRow - 1 && direction === 1)
+  //         )
+  //       ) {
+  //         appendLog(`move X: ${direction * potSpacing}`);
+  //         await moveXandZ(direction * potSpacing, 0);
+  //       }
+  //     }
 
-      // break outside loop if stop triggered
-      if (stopRef.current) break;
+  //     // break outside loop if stop triggered
+  //     if (stopRef.current) break;
 
-      if (row !== numberOfRows - 1) {
-        await sleep(1000);
-        appendLog(`move Y: ${rowSpacing / 100}`);
-        await moveY(rowSpacing);
-      }
+  //     if (row !== numberOfRows - 1) {
+  //       await sleep(1000);
+  //       appendLog(`move Y: ${rowSpacing / 100}`);
+  //       await moveY(rowSpacing);
+  //     }
 
-      // set overflowed postPerRow back
-      if (pot === potsPerRow) pot -= 1;
-      if (pot === -1) pot += 1;
-      direction *= -1;
-    }
-    if (!stopRef.current) {
-      appendLog("BenchBot traversal finished.");
-      let location = [row, pot];
-      saveBenchBotConfig(
-        { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-        { location, map, direction }
-      );
-    }
-  };
+  //     // set overflowed postPerRow back
+  //     if (pot === potsPerRow) pot -= 1;
+  //     if (pot === -1) pot += 1;
+  //     direction *= -1;
+  //   }
+  //   if (!stopRef.current) {
+  //     appendLog("BenchBot traversal finished.");
+  //     let location = [row, pot];
+  //     saveBenchBotConfig(
+  //       { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+  //       { location, map, direction }
+  //     );
+  //   }
+  // };
 
   // load benchbot config from localstorage
   useEffect(() => {
@@ -261,10 +261,10 @@ export default function BenchbotConfig() {
         </Row>
 
         <Row styles={{ justifyContent: "space-around" }}>
-          <Button name="Init" onClick={() => initBenchBotMap(benchBotConfig)} />
+          <Button name="Init" onClick={() => {}} />
           <Button
             name="Start"
-            onClick={startTraversal}
+            onClick={() => {}}
             styles={{ color: "#61dac3" }}
           />
           <Button
@@ -286,7 +286,6 @@ export default function BenchbotConfig() {
           imageErrMsg={Image.errorMsg}
           retry={() => {
             stopRef.current = false;
-            startTraversal();
           }}
           showRetry={false}
         />

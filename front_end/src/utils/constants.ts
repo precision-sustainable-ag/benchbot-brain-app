@@ -17,6 +17,7 @@ export const defaultPotData: PotData = {
   species: "",
   removed: false,
   visited: false,
+  status: "unVisited",
 };
 
 export const defaultBenchBotConfig: BenchBotConfig = {

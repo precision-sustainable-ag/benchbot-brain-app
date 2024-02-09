@@ -81,6 +81,28 @@ export default function Traversal() {
     setBenchBotData({ ...benchBotData, map: currMap });
   };
 
+  const findNext = (row: number, col: number, direction: number) => {
+    if (benchBotData.map.length === 0) return [0, 0];
+    let totalCol = benchBotData.map[0].length;
+    if (col === 0 && row % 2 === 1) {
+      return [row + 1, col];
+    } else if (col === totalCol - 1 && row % 2 === 0) {
+      return [row + 1, col];
+    } else return [row, col + direction];
+  };
+
+  const setStatus = (
+    row: number,
+    col: number,
+    status: "visiting" | "nextVisit" | "visited"
+  ) => {
+    if (row < benchBotData.map.length) {
+      let currMap = benchBotData.map;
+      currMap[row][col].status = status;
+      setBenchBotData({ ...benchBotData, map: currMap });
+    }
+  };
+
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
@@ -93,28 +115,40 @@ export default function Traversal() {
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
-        // if this pot had visited, continue the loop
-        if (map[row][pot].visited) continue;
-        await sleep(1000);
-        await loadImage();
-        if (stopRef.current) {
-          appendLog("Traversal stopped.");
-          let location = [row, pot];
-          setBenchBotConfig({
-            ...benchBotConfig,
-            potsPerRow,
-            numberOfRows,
-            rowSpacing,
-            potSpacing,
-          });
-          setBenchBotData({ ...benchBotData, location, map, direction });
-          saveBenchBotConfig(benchBotConfig, benchBotData);
-          break;
+        setStatus(row, pot, "visiting");
+        const [nextRow, nextPot] = findNext(row, pot, direction);
+        setStatus(nextRow, nextPot, "nextVisit");
+        // if this pot had visited or removed, continue the loop
+        if (map[row][pot].visited) {
+          setStatus(row, pot, "visited");
+          continue;
         }
-        // visit pot
-        // map[row][pot].visited = true;
-        setPotVisited(row, pot);
-        appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
+        if (map[row][pot].removed) {
+          appendLog(`skipped pot at row ${row + 1} pot ${pot + 1}`);
+        } else {
+          await sleep(1000);
+          await loadImage();
+          if (stopRef.current) {
+            appendLog("Traversal stopped.");
+            let location = [row, pot];
+            setBenchBotConfig({
+              ...benchBotConfig,
+              potsPerRow,
+              numberOfRows,
+              rowSpacing,
+              potSpacing,
+            });
+            setBenchBotData({ ...benchBotData, location, map, direction });
+            saveBenchBotConfig(benchBotConfig, benchBotData);
+            break;
+          }
+          // visit pot
+          // map[row][pot].visited = true;
+          setPotVisited(row, pot);
+          appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
+        }
+        setStatus(row, pot, "visited");
+
         if (
           !(
             (pot === 0 && direction === -1) ||

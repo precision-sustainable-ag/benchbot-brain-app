@@ -56,7 +56,11 @@ export default function SpeciesMap() {
   // FIXME: temporary function to remove all visited stage of the map
   const clearMap = () => {
     const clearedMap = speciesMap.map((row) =>
-      row.map((pot) => ({ ...pot, visited: false }))
+      row.map((pot) => ({
+        ...pot,
+        visited: false,
+        status: "unVisited" as "unVisited",
+      }))
     );
     return clearedMap;
   };

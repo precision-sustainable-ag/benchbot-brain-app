@@ -16,6 +16,18 @@ interface PotProps {
 
 const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
   const potData = speciesMap[row][col];
+  const bgColor = () => {
+    switch (potData.status) {
+      case "visited":
+        return "silver";
+      case "visiting":
+        return "yellowgreen";
+      case "nextVisit":
+        return "salmon";
+      default:
+        return "";
+    }
+  };
   return (
     <div
       style={{
@@ -24,6 +36,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
         height: "50px",
         border: "1px solid black",
         textAlign: "center",
+        backgroundColor: bgColor(),
       }}
     >
       <select
@@ -34,6 +47,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
             currMap[row][col] = {
               ...currMap[row][col],
               species: e.target.value,
+              removed: e.target.value === "",
             };
             setSpeciesMap([...currMap]);
           }

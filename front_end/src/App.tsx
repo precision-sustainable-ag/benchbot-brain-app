@@ -19,11 +19,11 @@ function App() {
               Manual Control
             </Link>
           </button>
-          <button style={{ fontSize: "2rem" }}>
+          {/* <button style={{ fontSize: "2rem" }}>
             <Link to="/benchbot-config" style={LinkStyle}>
               Benchbot config
             </Link>
-          </button>
+          </button> */}
           <button style={{ fontSize: "2rem" }}>
             <Link to="/camera-config" style={LinkStyle}>
               Camera config

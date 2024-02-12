@@ -23,7 +23,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
       case "visiting":
         return "yellowgreen";
       case "nextVisit":
-        return "salmon";
+        return "lightyellow";
       default:
         return "";
     }
@@ -94,7 +94,7 @@ export default function PotMap({
               {row.map((_, colIndex) => {
                 return (
                   <Pot
-                    key={colIndex}
+                    key={`${rowIndex},${colIndex}`}
                     speciesMap={speciesMap}
                     setSpeciesMap={setSpeciesMap}
                     species={species}

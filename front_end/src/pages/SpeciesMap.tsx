@@ -41,9 +41,10 @@ export default function SpeciesMap() {
     const { species, numberOfRows } = speciesConfig;
     const Pot = { ...defaultPotData, species };
     const { potsPerRow } = benchBotConfig;
-    const speciesArray = new Array(numberOfRows).fill(
-      new Array(potsPerRow).fill(Pot)
-    );
+    const speciesArray = new Array(numberOfRows);
+    for (let i = 0; i < numberOfRows; i++) {
+      speciesArray[i] = new Array(potsPerRow).fill(Pot);
+    }
     setSpeciesMap([...speciesMap, ...speciesArray]);
   };
 

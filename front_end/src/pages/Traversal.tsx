@@ -126,7 +126,6 @@ export default function Traversal() {
         if (map[row][pot].removed) {
           appendLog(`skipped pot at row ${row + 1} pot ${pot + 1}`);
         } else {
-          await sleep(1000);
           await loadImage();
           if (stopRef.current) {
             appendLog("Traversal stopped.");
@@ -156,6 +155,7 @@ export default function Traversal() {
           )
         ) {
           appendLog(`move X: ${direction * potSpacing}`);
+          await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
         }
       }

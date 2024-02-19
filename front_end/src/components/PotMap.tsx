@@ -74,6 +74,8 @@ export default function PotMap({
   setSpeciesMap,
   species,
 }: PotMapProps) {
+  const totalRows = speciesMap.length;
+  const totalCols = speciesMap[0] === undefined ? 0 : speciesMap[0].length;
   return (
     <div
       style={{
@@ -98,8 +100,8 @@ export default function PotMap({
                     speciesMap={speciesMap}
                     setSpeciesMap={setSpeciesMap}
                     species={species}
-                    row={rowIndex}
-                    col={colIndex}
+                    row={totalRows - 1 - rowIndex}
+                    col={totalCols - 1 - colIndex}
                   />
                 );
               })}

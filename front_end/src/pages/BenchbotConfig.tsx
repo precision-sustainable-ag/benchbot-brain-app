@@ -1,32 +1,19 @@
 import { useEffect, useState, useRef } from "react";
-import Row from "./Row";
-import Button from "./Button";
+import Row from "../components/Row";
+import Button from "../components/Button";
+import { initBenchBotMap } from "../utils/calculation";
+import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 import {
-  initBenchBotMap,
-  loadBenchBotConfig,
-  saveBenchBotConfig,
-} from "../utils/calculation";
-import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
-import Log from "./Log";
-import ImagePreview from "./ImagePreview";
+  ControlButtonsMinus,
+  ControlButtonsPlus,
+} from "../components/ControlButtons";
+import Log from "../components/Log";
+import ImagePreview from "../components/ImagePreview";
 import { Image, defaultImage } from "./ManualControl";
+import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 import { moveXandZ, moveY, takeImage } from "../utils/api";
 
 const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
-
-export interface BenchBotConfig {
-  potsPerRow: number;
-  numberOfRows: number;
-  rowSpacing: number;
-  potSpacing: number;
-  species?: string;
-}
-
-export interface BenchBotData {
-  location: number[];
-  map: number[][];
-  direction: number;
-}
 
 const defaultBenchBotConfig = {
   potsPerRow: 0,

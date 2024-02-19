@@ -89,3 +89,14 @@ export const homeZ = async () => {
   const res = await (await fetch(url)).json();
   console.log(res);
 };
+
+export const updateIPandPort = async (ip: string, port: string) => {
+  const url = baseUrl + `/udp_update?udp_ip=${ip}&udp_port=${port}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errMsg = await res.text();
+    console.log(errMsg);
+  }
+  const data = await res.json();
+  console.log(data);
+};

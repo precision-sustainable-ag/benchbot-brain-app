@@ -1,10 +1,13 @@
 import { useState } from "react";
-import Button from "./Button";
-import Row from "./Row";
+import Button from "../components/Button";
+import Row from "../components/Row";
 import { homeX, homeZ, moveXandZ, moveY, takeImage } from "../utils/api";
-import { ControlButtonsMinus, ControlButtonsPlus } from "./ControlButtons";
-import Log from "./Log";
-import ImagePreview from "./ImagePreview";
+import {
+  ControlButtonsMinus,
+  ControlButtonsPlus,
+} from "../components/ControlButtons";
+import Log from "../components/Log";
+import ImagePreview from "../components/ImagePreview";
 
 export interface Image {
   status: "pending" | "success" | "error";

@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import ManualControl from "./pages/ManualControl";
-import BenchbotConfig from "./pages/BenchbotConfig";
 import CameraConfig from "./pages/CameraConfig";
 import SpeciesMap from "./pages/SpeciesMap";
 import Traversal from "./pages/Traversal";
@@ -43,7 +42,6 @@ function App() {
 
         <Routes>
           <Route path="/" element={<ManualControl />} />
-          <Route path="/benchbot-config" element={<BenchbotConfig />} />
           <Route path="/camera-config" element={<CameraConfig />} />
           <Route path="/species-map" element={<SpeciesMap />} />
           <Route path="/traversal" element={<Traversal />} />

@@ -48,8 +48,6 @@ export default function SpeciesMap() {
     setSpeciesMap([...speciesMap, ...speciesArray]);
   };
 
-  console.log("speciesMap", speciesMap);
-
   const resetSpecies = () => {
     setSpeciesMap([]);
   };

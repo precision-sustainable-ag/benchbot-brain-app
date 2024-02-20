@@ -39,7 +39,6 @@ export default function Traversal() {
     appendLog("Taking image.");
     setImage({ ...Image, status: "pending" });
     const imageData = await takeImage();
-    // console.log("imageData", imageData);
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
       setImage({
@@ -142,7 +141,6 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          // map[row][pot].visited = true;
           setPotVisited(row, pot);
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }

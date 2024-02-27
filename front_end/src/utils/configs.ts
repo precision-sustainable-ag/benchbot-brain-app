@@ -1,7 +1,12 @@
-import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
+import {
+  BenchBotConfig,
+  BenchBotData,
+  PotData,
+} from "../interfaces/BenchBotTypes";
 
 const BenchBotConfigKey = "BenchBotConfig";
 const CameraConfigKey = "CameraConfig";
+const SpeciesMapKey = "SpeciesMap";
 
 interface CameraConfig {
   IP: string;

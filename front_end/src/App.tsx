@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import ManualControl from "./pages/ManualControl";
-import BenchbotConfig from "./pages/BenchbotConfig";
 import CameraConfig from "./pages/CameraConfig";
+import SpeciesMap from "./pages/SpeciesMap";
+import Traversal from "./pages/Traversal";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
@@ -18,21 +19,27 @@ function App() {
             </Link>
           </button>
           <button style={{ fontSize: "2rem" }}>
-            <Link to="/benchbot-config" style={LinkStyle}>
-              Benchbot config
+            <Link to="/camera-config" style={LinkStyle}>
+              Camera config
             </Link>
           </button>
           <button style={{ fontSize: "2rem" }}>
-            <Link to="/camera-config" style={LinkStyle}>
-              Camera config
+            <Link to="/species-map" style={LinkStyle}>
+              Species Map
+            </Link>
+          </button>
+          <button style={{ fontSize: "2rem" }}>
+            <Link to="/traversal" style={LinkStyle}>
+              Traversal
             </Link>
           </button>
         </nav>
 
         <Routes>
           <Route path="/" element={<ManualControl />} />
-          <Route path="/benchbot-config" element={<BenchbotConfig />} />
           <Route path="/camera-config" element={<CameraConfig />} />
+          <Route path="/species-map" element={<SpeciesMap />} />
+          <Route path="/traversal" element={<Traversal />} />
         </Routes>
       </div>
     </BrowserRouter>

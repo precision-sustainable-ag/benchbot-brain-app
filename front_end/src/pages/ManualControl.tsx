@@ -8,18 +8,8 @@ import {
 } from "../components/ControlButtons";
 import Log from "../components/Log";
 import ImagePreview from "../components/ImagePreview";
-
-export interface Image {
-  status: "pending" | "success" | "error";
-  image: Blob | null;
-  errorMsg: string;
-}
-
-export const defaultImage: Image = {
-  status: "error",
-  image: null,
-  errorMsg: "No image available",
-};
+import { Image } from "../interfaces/BenchBotTypes";
+import { defaultImage } from "../utils/constants";
 
 function ManualControl() {
   const [xValue, setXValue] = useState(0);
@@ -111,7 +101,7 @@ function ManualControl() {
           <Button name={"Home Z"} onClick={homeZ} />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="X"
             value={xValue}
@@ -120,7 +110,7 @@ function ManualControl() {
           />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="Y"
             value={yValue}
@@ -129,7 +119,7 @@ function ManualControl() {
           />
         </Row>
 
-        <Row>
+        <Row styles={{ gap: "1rem" }}>
           <AxisControl
             axis="Z"
             value={zValue}

@@ -70,7 +70,7 @@ class PathBuilder():
     # Build a straight path track, from the current pose of the robot
     async def build_path(self, track_length: float, track_resolution: float) -> Track:
         # get current pose of the robot in the world frame from the state estimation filter
-        world_pose_robot: Pose3F64 = await self.get_pose(self.clients)
+        world_pose_robot: Pose3F64 = await self.get_pose()
         # list to store the track waypoints
         track_waypoints: list[Pose3F64] = []
         # Add current pose of the robot as the first goal

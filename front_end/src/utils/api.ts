@@ -18,7 +18,7 @@ const defaultResponse: apiResponse = {
 
 export const moveXandZ = async (x: number, z: number) => {
   console.log("move x", x, "move z", z);
-  const url = baseUrl + `/clearcore?x=${x}&z=${z}`;
+  const url = baseUrl + `/move_xz_axis?x=${x}&z=${z}`;
   const res = await (await fetch(url)).json();
   console.log(res);
 };
@@ -26,7 +26,7 @@ export const moveXandZ = async (x: number, z: number) => {
 export const moveY = async (y: number) => {
   // param is in meter scale
   console.log("move y", y);
-  const url = baseUrl + `/move_yaxis/${y}`;
+  const url = baseUrl + `/move_y_axis/${y}`;
   const res = await (await fetch(url)).json();
   console.log(res);
 };

@@ -3,10 +3,15 @@ from flask_cors import CORS
 from resources.camera_controller import CameraController
 from datetime import date
 import logging
+from from_root import from_here
+from pathlib import Path
 
 
-# setup the logging file and logging configurations
-logfile = f"{date.today()}_server_log.log"
+# setup the logging directory, file and logging configurations
+log_dir = from_here("logs")
+Path(log_dir).mkdir(parents=True, exist_ok=True)
+log_file_path = log_dir / f"{date.today()}_server.log"
+logfile = str(log_file_path)
 logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
 STATE = 'NC'

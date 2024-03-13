@@ -17,7 +17,8 @@ class CameraController():
         # setup directory to save images
         self.location = state
         parent_dir = "mini_computer_api"
-        imgDir = f"Loc_{self.location}_{date.today()}"
+        # imgDir = f"images/{self.location}/{date.today()}"
+        imgDir = f"images/{self.location}_{date.today()}"
         self.dirName = from_root(parent_dir, imgDir)
         Path(self.dirName).mkdir(parents=True, exist_ok=True)
 
@@ -56,7 +57,7 @@ class CameraController():
         while True:
             for file_name in os.listdir('.'):
                 # if image file is found
-                if file_name.startswith(self.location):
+                if file_name.startswith(self.location) and os.path.isfile(file_name):
                     if file_name.endswith('.JPG'):
                         new_name = new_filename + ".JPG"
                         to_remove = "JPEG"

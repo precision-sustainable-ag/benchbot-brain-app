@@ -31,7 +31,7 @@ export default function SpeciesMap() {
     species: defaultSpecies[0],
   });
   const [speciesMap, setSpeciesMap] = useState<PotData[][]>([]);
-  const [helperText, setHelperText] = useState('');
+  const [helperText, setHelperText] = useState("");
 
   // function for updating configs
   const setSpeciesConfigByParam = (param: string, value: number | string) => {
@@ -41,7 +41,7 @@ export default function SpeciesMap() {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
   };
 
-  // function to add rows for one species 
+  // function to add rows for one species
   const addSpecies = () => {
     const { species, numberOfRows } = speciesConfig;
     const Pot = { ...defaultPotData, species };
@@ -59,7 +59,7 @@ export default function SpeciesMap() {
     setSpeciesMap([]);
     setBenchBotConfig(defaultBenchBotConfig);
     setSpeciesConfig(defaultSpeciesConfig);
-    setHelperText('Reset species map.');
+    setHelperText("Reset species map.");
   };
 
   // FIXME: temporary function to remove all visited stage of the map
@@ -79,7 +79,7 @@ export default function SpeciesMap() {
     const clearedMap = setMapUnvisited();
     setSpeciesMap(clearedMap);
     initBenchBotConfig(benchBotConfig, clearedMap);
-    setHelperText('Species map saved!');
+    setHelperText("Species map saved!");
   };
 
   // load benchbot config from localstorage
@@ -181,15 +181,6 @@ export default function SpeciesMap() {
         <h6 style={{ margin: "1rem 0 0 0" }}>Add Species: </h6>
 
         <Row>
-          <ValInput
-            name={"Rows: "}
-            configName={"numberOfRows"}
-            value={speciesConfig.numberOfRows}
-            setValue={setSpeciesConfigByParam}
-          />
-        </Row>
-
-        <Row>
           <span style={{ width: "400px" }}>Species: </span>
           <select
             value={speciesConfig.species}
@@ -202,6 +193,15 @@ export default function SpeciesMap() {
               </option>
             ))}
           </select>
+        </Row>
+
+        <Row>
+          <ValInput
+            name={"Rows: "}
+            configName={"numberOfRows"}
+            value={speciesConfig.numberOfRows}
+            setValue={setSpeciesConfigByParam}
+          />
         </Row>
 
         <Row styles={{ gap: "1rem" }}>

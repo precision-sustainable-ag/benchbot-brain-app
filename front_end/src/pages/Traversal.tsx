@@ -35,35 +35,35 @@ export default function Traversal() {
     setLogs((prev) => [...prev, currentTime + ": " + log]);
   };
 
-  const loadImage = async () => {
+  const loadImage = async (): Promise<Image> => {
     appendLog("Taking image.");
     setImage({ ...Image, status: "pending" });
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
-      setImage({
+      return {
         ...Image,
         status: "success",
         image: imageData.data,
-      });
+      };
     } else {
       appendLog("Failed loading image, retrying...");
       // retake image here
       const retakeImageData = await takeImage();
       if (!retakeImageData.error && retakeImageData.data) {
         appendLog("Loading image success.");
-        setImage({
+        return {
           ...Image,
           status: "success",
           image: retakeImageData.data,
-        });
+        };
       } else {
         appendLog("Failed loading image. Skipped");
-        setImage({
+        return {
           ...Image,
           status: "error",
           errorMsg: retakeImageData.message,
-        });
+        };
       }
     }
   };
@@ -72,12 +72,6 @@ export default function Traversal() {
     stopRef.current = false;
     appendLog("Start BenchBot traversal.");
     traverseBenchBot(benchBotConfig, benchBotData);
-  };
-
-  const setPotVisited = (row: number, col: number) => {
-    let currMap = benchBotData.map;
-    currMap[row][col].visited = true;
-    setBenchBotData({ ...benchBotData, map: currMap });
   };
 
   const findNext = (row: number, col: number, direction: number) => {
@@ -93,7 +87,7 @@ export default function Traversal() {
   const setStatus = (
     row: number,
     col: number,
-    status: "visiting" | "nextVisit" | "visited"
+    status: "unVisited" | "visiting" | "nextVisit" | "visited" | "failed"
   ) => {
     if (row < benchBotData.map.length) {
       let currMap = benchBotData.map;
@@ -125,7 +119,12 @@ export default function Traversal() {
         if (map[row][pot].removed) {
           appendLog(`skipped pot at row ${row + 1} pot ${pot + 1}`);
         } else {
-          await loadImage();
+          const image = await loadImage();
+          setImage(image);
+          if (image.status === "error") {
+            setStatus(row, pot, "failed");
+            continue;
+          }
           if (stopRef.current) {
             appendLog("Traversal stopped.");
             let location = [row, pot];
@@ -141,7 +140,7 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          setPotVisited(row, pot);
+          setStatus(row, pot, "visited");
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }
         setStatus(row, pot, "visited");
@@ -184,6 +183,7 @@ export default function Traversal() {
     }
   };
 
+  // load config from localStorage
   useEffect(() => {
     const res = loadBenchBotConfig();
     if (!res) return;

@@ -187,6 +187,7 @@ export default function SpeciesMap() {
             onChange={(e) => setSpeciesConfigByParam("species", e.target.value)}
             style={{ fontSize: "2rem", flex: 1 }}
           >
+            <option value={"none"}>none</option>
             {defaultSpecies.map((species, i) => (
               <option value={species} key={i}>
                 {species}

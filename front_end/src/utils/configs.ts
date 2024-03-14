@@ -26,10 +26,10 @@ export const loadBenchBotConfig = () => {
     direction,
   } = JSON.parse(data);
 
-  // console.log("loaded data", {
-  //   config: { potsPerRow, numberOfRows, rowSpacing, potSpacing },
-  //   data: { location, map, direction },
-  // });
+  console.log("loaded data", {
+    config: { potsPerRow, numberOfRows, rowSpacing, potSpacing },
+    data: { location, map, direction },
+  });
 
   return {
     potsPerRow,

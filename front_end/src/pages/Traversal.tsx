@@ -112,8 +112,8 @@ export default function Traversal() {
         const [nextRow, nextPot] = findNext(row, pot, direction);
         setStatus(nextRow, nextPot, "nextVisit");
         // if this pot had visited or removed, continue the loop
-        if (map[row][pot].visited) {
-          setStatus(row, pot, "visited");
+        if (map[row][pot].status === "visited") {
+          // setStatus(row, pot, "visited");
           continue;
         }
         if (map[row][pot].removed) {
@@ -136,7 +136,13 @@ export default function Traversal() {
               potSpacing,
             });
             setBenchBotData({ ...benchBotData, location, map, direction });
-            saveBenchBotConfig(benchBotConfig, benchBotData);
+            // FIXME: temporary solution for benchbotdata would not updated here
+            saveBenchBotConfig(benchBotConfig, {
+              ...benchBotData,
+              location,
+              map,
+              direction,
+            });
             break;
           }
           // visit pot

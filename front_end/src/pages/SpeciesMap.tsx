@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Row from "../components/Row";
 import { loadBenchBotConfig } from "../utils/configs";
 import {
-  ControlButtonsMinus,
+  // ControlButtonsMinus,
   ControlButtonsPlus,
 } from "../components/ControlButtons";
 import {
@@ -115,9 +115,6 @@ export default function SpeciesMap() {
     return (
       <>
         <span style={{ width: "250px" }}>{name}</span>
-        <ControlButtonsMinus
-          setValue={(num) => setValue(configName, value + num)}
-        />
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <input
             type="number"

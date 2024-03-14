@@ -123,7 +123,7 @@ export default function Traversal() {
           setImage(image);
           if (image.status === "error") {
             setStatus(row, pot, "failed");
-            continue;
+            // continue;
           }
           if (stopRef.current) {
             appendLog("Traversal stopped.");
@@ -146,10 +146,10 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          setStatus(row, pot, "visited");
+          if(benchBotData.map[row][pot].status !== 'failed') setStatus(row, pot, "visited");
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }
-        setStatus(row, pot, "visited");
+        if(benchBotData.map[row][pot].status !== 'failed') setStatus(row, pot, "visited");
 
         if (
           !(

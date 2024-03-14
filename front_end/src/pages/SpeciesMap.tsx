@@ -21,15 +21,19 @@ import { defaultSpecies } from "../utils/constants";
 import { initBenchBotConfig } from "../utils/calculation";
 
 export default function SpeciesMap() {
+  // config for map properties
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
+  // config for current species
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
     ...defaultSpeciesConfig,
     species: defaultSpecies[0],
   });
   const [speciesMap, setSpeciesMap] = useState<PotData[][]>([]);
+  const [helperText, setHelperText] = useState("");
 
+  // function for updating configs
   const setSpeciesConfigByParam = (param: string, value: number | string) => {
     setSpeciesConfig({ ...speciesConfig, [param]: value });
   };
@@ -37,6 +41,7 @@ export default function SpeciesMap() {
     setBenchBotConfig({ ...benchBotConfig, [param]: value });
   };
 
+  // function to add rows for one species
   const addSpecies = () => {
     const { species, numberOfRows } = speciesConfig;
     const Pot = { ...defaultPotData, species };
@@ -46,14 +51,19 @@ export default function SpeciesMap() {
       speciesArray[i] = new Array(potsPerRow).fill(Pot);
     }
     setSpeciesMap([...speciesMap, ...speciesArray]);
+    setHelperText(`Added ${numberOfRows} rows of ${species}.`);
   };
 
+  // reset the map and configs
   const resetSpecies = () => {
     setSpeciesMap([]);
+    setBenchBotConfig(defaultBenchBotConfig);
+    setSpeciesConfig(defaultSpeciesConfig);
+    setHelperText("Reset species map.");
   };
 
   // FIXME: temporary function to remove all visited stage of the map
-  const clearMap = () => {
+  const setMapUnvisited = () => {
     const clearedMap = speciesMap.map((row) =>
       row.map((pot) => ({
         ...pot,
@@ -64,10 +74,12 @@ export default function SpeciesMap() {
     return clearedMap;
   };
 
+  // save current map to localstorage
   const saveSpecies = () => {
-    const clearedMap = clearMap();
+    const clearedMap = setMapUnvisited();
     setSpeciesMap(clearedMap);
     initBenchBotConfig(benchBotConfig, clearedMap);
+    setHelperText("Species map saved!");
   };
 
   // load benchbot config from localstorage
@@ -84,6 +96,7 @@ export default function SpeciesMap() {
     setSpeciesMap(map);
   }, []);
 
+  // custom component for a single textbox and control buttons around it
   const ValInput = ({
     name,
     configName,
@@ -168,21 +181,13 @@ export default function SpeciesMap() {
         <h6 style={{ margin: "1rem 0 0 0" }}>Add Species: </h6>
 
         <Row>
-          <ValInput
-            name={"Rows: "}
-            configName={"numberOfRows"}
-            value={speciesConfig.numberOfRows}
-            setValue={setSpeciesConfigByParam}
-          />
-        </Row>
-
-        <Row>
           <span style={{ width: "400px" }}>Species: </span>
           <select
             value={speciesConfig.species}
             onChange={(e) => setSpeciesConfigByParam("species", e.target.value)}
             style={{ fontSize: "2rem", flex: 1 }}
           >
+            <option value={"none"}>none</option>
             {defaultSpecies.map((species, i) => (
               <option value={species} key={i}>
                 {species}
@@ -191,10 +196,22 @@ export default function SpeciesMap() {
           </select>
         </Row>
 
+        <Row>
+          <ValInput
+            name={"Rows: "}
+            configName={"numberOfRows"}
+            value={speciesConfig.numberOfRows}
+            setValue={setSpeciesConfigByParam}
+          />
+        </Row>
+
         <Row styles={{ gap: "1rem" }}>
-          <Button name={"Add"} onClick={addSpecies} />
+          <Button name={"Add Species"} onClick={addSpecies} />
           <Button name={"Reset"} onClick={resetSpecies} />
           <Button name={"Save"} onClick={saveSpecies} />
+        </Row>
+        <Row>
+          <div>{helperText}</div>
         </Row>
       </div>
       <div>

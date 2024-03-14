@@ -24,6 +24,8 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
         return "yellowgreen";
       case "nextVisit":
         return "lightyellow";
+      case "failed":
+        return "salmon";
       default:
         return "";
     }
@@ -47,7 +49,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
             currMap[row][col] = {
               ...currMap[row][col],
               species: e.target.value,
-              removed: e.target.value === "",
+              removed: e.target.value === "none",
             };
             setSpeciesMap([...currMap]);
           }
@@ -55,7 +57,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
         disabled={setSpeciesMap === undefined}
         style={{ fontSize: "1.25rem", width: "90px" }}
       >
-        <option value={""}></option>
+        <option value={"none"}>none</option>
         {species.map((s, i) => (
           <option value={s} key={i}>
             {s}
@@ -63,7 +65,8 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
         ))}
       </select>
       <p style={{ fontSize: "1.25rem", margin: "0" }}>
-        {potData.visited ? "visited" : ""}
+        {potData.status === "visited" ? "visited" : ""}
+        {potData.status === "failed" ? "failed" : ""}
       </p>
     </div>
   );

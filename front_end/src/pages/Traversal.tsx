@@ -96,8 +96,6 @@ export default function Traversal() {
     }
   };
 
-  // FIXME: add a callback for useEffct to stop the traversal
-
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
@@ -125,7 +123,6 @@ export default function Traversal() {
           setImage(image);
           if (image.status === "error") {
             setStatus(row, pot, "failed");
-            // continue;
           }
           if (stopRef.current) {
             appendLog("Traversal stopped.");
@@ -148,12 +145,14 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          if (benchBotData.map[row][pot].status !== "failed")
+          if (benchBotData.map[row][pot].status !== "failed") {
             setStatus(row, pot, "visited");
+          }
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }
-        if (benchBotData.map[row][pot].status !== "failed")
+        if (benchBotData.map[row][pot].status !== "failed") {
           setStatus(row, pot, "visited");
+        }
 
         if (
           !(
@@ -215,6 +214,14 @@ export default function Traversal() {
     });
     setBenchBotData({ ...benchBotData, location, map, direction });
   }, []);
+
+  // stop traversal when leave the page
+  useEffect(
+    () => () => {
+      stopRef.current = true;
+    },
+    []
+  );
 
   return (
     <div>

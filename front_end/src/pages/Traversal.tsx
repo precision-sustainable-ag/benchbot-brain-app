@@ -37,7 +37,7 @@ export default function Traversal() {
 
   const loadImage = async (): Promise<Image> => {
     appendLog("Taking image.");
-    setImage({ ...Image, status: "pending" });
+    setImage((prev) => ({ ...prev, status: "pending" }));
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");

@@ -10,11 +10,16 @@ interface ButtonProps {
   name: string;
   onClick: () => void;
   styles?: CSSProperties;
+  disabled?: boolean;
 }
 
-function Button({ name, onClick, styles }: ButtonProps) {
+function Button({ name, onClick, styles, disabled }: ButtonProps) {
   return (
-    <button onClick={onClick} style={{ ...buttonStyle, ...styles }}>
+    <button
+      onClick={onClick}
+      style={{ ...buttonStyle, ...styles }}
+      disabled={disabled}
+    >
       {name}
     </button>
   );

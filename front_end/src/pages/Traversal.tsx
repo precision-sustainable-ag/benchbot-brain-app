@@ -96,6 +96,8 @@ export default function Traversal() {
     }
   };
 
+  // FIXME: add a callback for useEffct to stop the traversal
+
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
@@ -146,10 +148,12 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          if(benchBotData.map[row][pot].status !== 'failed') setStatus(row, pot, "visited");
+          if (benchBotData.map[row][pot].status !== "failed")
+            setStatus(row, pot, "visited");
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }
-        if(benchBotData.map[row][pot].status !== 'failed') setStatus(row, pot, "visited");
+        if (benchBotData.map[row][pot].status !== "failed")
+          setStatus(row, pot, "visited");
 
         if (
           !(

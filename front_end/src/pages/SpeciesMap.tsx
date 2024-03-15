@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Row from "../components/Row";
 import { loadBenchBotConfig } from "../utils/configs";
 import {
-  // ControlButtonsMinus,
+  ControlButtonsMinus,
   ControlButtonsPlus,
 } from "../components/ControlButtons";
 import {
@@ -115,6 +115,13 @@ export default function SpeciesMap() {
     return (
       <>
         <span style={{ width: "250px" }}>{name}</span>
+        <ControlButtonsMinus
+          setValue={(num) => {
+            if (value + num < 0) setValue(configName, 0);
+            else setValue(configName, value + num);
+          }}
+          disabled={disabled}
+        />
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <input
             type="number"
@@ -133,6 +140,7 @@ export default function SpeciesMap() {
         </div>
         <ControlButtonsPlus
           setValue={(num) => setValue(configName, value + num)}
+          disabled={disabled}
         />
       </>
     );

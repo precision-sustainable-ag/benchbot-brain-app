@@ -62,10 +62,12 @@ function ManualControl() {
   }) => {
     return (
       <>
-        <ControlButtonsMinus setValue={(num) => {
-          if (value + num < 0) setAxisValue(0);
-          else setAxisValue(value + num);
-          }} />
+        <ControlButtonsMinus
+          setValue={(num) => {
+            if (value + num < 0) setAxisValue(0);
+            else setAxisValue(value + num);
+          }}
+        />
         <div>
           <input
             value={value}

@@ -21,10 +21,33 @@ def add_from_json_file(expected_list, json_file_path):
     for config in config_list.configs:
         if config.name in expected_list:
             client_list[config.name] = EventClient(config)
+        # if config.subscriptions:
+        #     print(config.subscriptions[0])
     for config in expected_list:
         if config not in client_list:
             raise RuntimeError(f"No {config} service config in {json_file_path}")
+    # print(client_list)
+    # for event, message in EventClient(config):
+    #     print(event, message)
+    # exit(0)
     return client_list
+
+# def add_subscriber_from_json(json_file_path):
+#     config_list = proto_from_json_file(json_file_path, EventServiceConfigList())
+#     config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
+
+#     message: TrackFollowerState
+    # async for event, message in EventClient(config).subscribe(config.subscriptions[0], decode=True):
+        
+    # client_list: dict[str, EventClient] = {}
+    #     for config in config_list.configs:
+    #         if config.name in expected_list:
+    #             client_list[config.name] = EventClient(config)
+    #     for config in expected_list:
+    #         if config not in client_list:
+    #             raise RuntimeError(f"No {config} service config in {json_file_path}")
+    #     return client_list
+
 
 
 ''' Class for creating a straight path'''
@@ -82,7 +105,7 @@ class PathBuilder():
         # Return the list of waypoints as a Track proto message and save the track in json file
         constructed_path: Track = self.format_track(track_waypoints)
         output_dir = from_root("brain_api/common")
-        if not proto_to_json_file("robot_track.json", constructed_path):
+        if not proto_to_json_file("track_2.json", constructed_path):
             raise RuntimeError(f"Failed to write Track to {output_dir}")
         print(f"Saved track of length {len(constructed_path.waypoints)} to {output_dir}")
 

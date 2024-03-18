@@ -3,7 +3,16 @@
       {
         "name": "track_follower",
         "port": 20101,
-        "host": "localhost"
+        "host": "localhost",
+        "subscriptions": [
+          {
+              "uri": {
+              "path": "/state",
+              "query": "service_name=track_follower"
+              },
+              "every_n": 1
+          }
+        ]
       },
       {
         "name": "filter",
@@ -11,4 +20,4 @@
         "host": "localhost"
       }
     ]
-  }
+}

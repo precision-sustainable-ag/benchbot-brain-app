@@ -46,10 +46,9 @@ class MotorController_Y():
         await asyncio.sleep(1.0)
         message: TrackFollowerState
         with open(logfile, "a") as l_file:
-            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"))):
+            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=20)):
                 l_file.write(str(message))
                 print("###################\n", message.progress)
-                await asyncio.sleep(1)
 
     # Start the trackfollower service to have the robot following the path
     async def start_track(self, track_file: str) -> None:

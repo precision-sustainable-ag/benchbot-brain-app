@@ -57,22 +57,33 @@ class MotorController_Y():
         start_time = time.time()
         distance_gap = 0.3
         last_distance_mark = None
+        track_paused = False
         with open(logfile, "a") as l_file:
             async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=1)):
                 track_progress = message.progress
                 if not last_distance_mark:
                     last_distance_mark = track_progress.distance_total
+                    print("Distance Mark:", last_distance_mark)
                 if last_distance_mark-track_progress.distance_remaining >= distance_gap:
-                    self.pause_track()
+                    await self.pause_track()
                     last_distance_mark = track_progress.distance_remaining
+                    print("Pause at:", last_distance_mark)
                     start_time = time.time()
-                if message.status.track_status == 'TRACK_PAUSED':
+                    track_paused = True
+                    
+                # if message.status.track_status == 'TRACK_PAUSED':
+                if track_paused:
                     if time.time()-start_time > 2:
-                        self.resume_track()
+                        temp_var = message.status.track_status
+                        print(temp_var, type(temp_var))
+                        await self.resume_track()
+                        print("Resume at:", time.time())
+                        track_paused = False
+                        
                         # TrackStatusEnum.TRACK_PAUSED
                 
                 l_file.write(str(message))
-                print("###################\n", message.progress)
+                # print("###################\n", message.progress)
 
     # Start the trackfollower service to have the robot following the path
     async def start_track(self, track_file: str) -> None:

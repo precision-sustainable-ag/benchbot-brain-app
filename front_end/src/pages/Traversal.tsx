@@ -37,7 +37,7 @@ export default function Traversal() {
 
   const loadImage = async (): Promise<Image> => {
     appendLog("Taking image.");
-    setImage({ ...Image, status: "pending" });
+    setImage((prev) => ({ ...prev, status: "pending" }));
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
@@ -123,7 +123,6 @@ export default function Traversal() {
           setImage(image);
           if (image.status === "error") {
             setStatus(row, pot, "failed");
-            continue;
           }
           if (stopRef.current) {
             appendLog("Traversal stopped.");
@@ -146,10 +145,14 @@ export default function Traversal() {
             break;
           }
           // visit pot
-          setStatus(row, pot, "visited");
+          if (benchBotData.map[row][pot].status !== "failed") {
+            setStatus(row, pot, "visited");
+          }
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
         }
-        setStatus(row, pot, "visited");
+        if (benchBotData.map[row][pot].status !== "failed") {
+          setStatus(row, pot, "visited");
+        }
 
         if (
           !(
@@ -212,75 +215,46 @@ export default function Traversal() {
     setBenchBotData({ ...benchBotData, location, map, direction });
   }, []);
 
+  // stop traversal when leave the page
+  useEffect(
+    () => () => {
+      stopRef.current = true;
+    },
+    []
+  );
+
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: "400px" }}>
-        <h5 style={{ textAlign: "center", margin: "1rem" }}>Traversal</h5>
-        <Row>
-          <span style={{ width: "300px" }}>Pots Per Row: </span>
-          <input
-            value={benchBotConfig.potsPerRow}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Total Rows: </span>
-          <input
-            value={benchBotConfig.numberOfRows}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Row Spacing: </span>
-          <input
-            value={benchBotConfig.rowSpacing}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Pot Spacing: </span>
-          <input
-            value={benchBotConfig.potSpacing}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-
-        <Row>
-          <Button
-            name={"Start"}
-            onClick={startTraversal}
-            styles={{ width: "400px", color: "#61dac3" }}
-          />
-        </Row>
-        <Row>
-          <Button
-            name={"Pause"}
-            onClick={() => {
-              appendLog("Paused BenchBot traversal.");
-              stopRef.current = true;
-            }}
-            styles={{ width: "400px", color: "#f65a5b" }}
-          />
-        </Row>
-
-        <ImagePreview
-          status={Image.status}
-          imagePreview={Image.image}
-          imageErrMsg={Image.errorMsg}
-          retry={() => {
-            stopRef.current = false;
-            startTraversal();
-          }}
-          showRetry={false}
+    <div>
+      <Row>
+        <Button
+          name={"Start"}
+          onClick={startTraversal}
+          styles={{ width: "400px", color: "#61dac3", marginLeft: "50px" }}
         />
-      </div>
-      <div>
+        <Button
+          name={"Pause"}
+          onClick={() => {
+            appendLog("Paused BenchBot traversal.");
+            stopRef.current = true;
+          }}
+          styles={{ width: "400px", color: "#f65a5b", marginLeft: "50px" }}
+        />
+      </Row>
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        <div>
+          <Log logs={logs} clearLog={() => setLogs([])} />
+          <ImagePreview
+            status={Image.status}
+            imagePreview={Image.image}
+            imageErrMsg={Image.errorMsg}
+            retry={() => {
+              stopRef.current = false;
+              startTraversal();
+            }}
+            showRetry={false}
+          />
+        </div>
         <PotMap speciesMap={benchBotData.map} species={defaultSpecies} />
-        <Log logs={logs} clearLog={() => setLogs([])} />
       </div>
     </div>
   );

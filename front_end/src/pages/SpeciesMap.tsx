@@ -32,6 +32,7 @@ export default function SpeciesMap() {
   });
   const [speciesMap, setSpeciesMap] = useState<PotData[][]>([]);
   const [helperText, setHelperText] = useState("");
+  const [operations, setOperations] = useState<number[]>([]);
 
   // function for updating configs
   const setSpeciesConfigByParam = (param: string, value: number | string) => {
@@ -51,7 +52,19 @@ export default function SpeciesMap() {
       speciesArray[i] = new Array(potsPerRow).fill(Pot);
     }
     setSpeciesMap([...speciesMap, ...speciesArray]);
+    // add operation
+    setOperations([...operations, numberOfRows]);
     setHelperText(`Added ${numberOfRows} rows of ${species}.`);
+  };
+
+  // function to undo last operation
+  const undo = () => {
+    const removeRowNumber = operations.pop();
+    if (removeRowNumber === undefined) return;
+    // remove last operation from map
+    setSpeciesMap([...speciesMap.slice(0, -removeRowNumber)]);
+    setOperations([...operations]);
+    setHelperText("Undo last operation.");
   };
 
   // reset the map and configs
@@ -116,7 +129,11 @@ export default function SpeciesMap() {
       <>
         <span style={{ width: "250px" }}>{name}</span>
         <ControlButtonsMinus
-          setValue={(num) => setValue(configName, value + num)}
+          setValue={(num) => {
+            if (value + num < 0) setValue(configName, 0);
+            else setValue(configName, value + num);
+          }}
+          disabled={disabled}
         />
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <input
@@ -136,6 +153,7 @@ export default function SpeciesMap() {
         </div>
         <ControlButtonsPlus
           setValue={(num) => setValue(configName, value + num)}
+          disabled={disabled}
         />
       </>
     );
@@ -207,6 +225,13 @@ export default function SpeciesMap() {
 
         <Row styles={{ gap: "1rem" }}>
           <Button name={"Add Species"} onClick={addSpecies} />
+          <Button
+            name={"Undo"}
+            onClick={undo}
+            disabled={operations.length === 0}
+          />
+        </Row>
+        <Row styles={{ gap: "1rem" }}>
           <Button name={"Reset"} onClick={resetSpecies} />
           <Button name={"Save"} onClick={saveSpecies} />
         </Row>

@@ -29,7 +29,7 @@ class MotorControllerY():
         await asyncio.sleep(0.05)
 
     async def move_y(self, distance) -> None:
-        distance_in_m = abs (distance / 100)
+        distance_in_m = abs(distance/100)
         direction_flag = True
         if distance < 0:
             direction_flag = False
@@ -38,16 +38,26 @@ class MotorControllerY():
            await self.set_motor_velocity(v)
 
 
+'''
+create an array that contains values from 0 to 'max' with increments defined by 'step'
+'''
 def get_up_slope(step, max):
     arr = np.arange(max, 0, -step)
     flipped = np.flip(arr)
     return np.around(flipped, decimals=2)
 
 
+'''
+create an array containing velocity values needed to traverse a certain distance
+arguments:  dist_m -> total distance to be covered (in m)
+            max_v -> maximum velocity
+            step_v -> increments in velocity
+            direction -> direction of movement, either positive(forward) or negative(backward)
+'''
 def get_velocity_graph(dist_m, max_v, step_v, direction):
-    # create a semi-smooth upslope for velocity
+    # create a semi-smooth upslope for velocity (acceleration)
     up_slope = get_up_slope(step_v, max_v)
-    # create a velocity graph to traverse expected distance
+    # create a velocity graph to traverse expected distance ([acceleration, constanst max velocity, deacceleration])
     ret_val = make_v_graph(dist_m, up_slope)
     # negate velocity values if direction is backwards
     if not direction:
@@ -55,20 +65,29 @@ def get_velocity_graph(dist_m, max_v, step_v, direction):
     return ret_val
 
 
+'''
+create an array of velocity values to cover desired distance
+arguments:  dist -> total distance to be covered (in m), e.g. 1
+            v_slope -> array of velocity going up till max value with fix increments, defining acceleration
+                        e.g. [0, 0.05, 0.1], values are in m/s
+'''
 def make_v_graph(dist, v_slope):
     dist_travelled = 0
     half_flag = False
     v_list = []
-    # create velocity list till first half distance
+    # create velocity list till half distance
     for i in v_slope:
         if i != max(v_slope):
+            # add each incremental velocity 5 times to the graph
             for j in range(5):
                 v_list.append(i)
                 dist_travelled += i*0.05
+                # break out from loop if half distance is covered
                 if dist_travelled >= (dist/2):
                     half_flag = True
                     break
         else:
+            # add max velocity values till half distance is covered
             while True:
                 v_list.append(i)
                 dist_travelled += i*0.05
@@ -76,7 +95,7 @@ def make_v_graph(dist, v_slope):
                     half_flag = True
                     break
         if half_flag:    break
-    # reverse list and append as the second half
+    # reverse the list and append as the second half, to account for deacceleration as well
     temp_list = v_list.copy()
     temp_list.reverse()
     for i in temp_list: dist_travelled += i*0.05

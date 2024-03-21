@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 from datetime import datetime
+import time
 from from_root import from_root, from_here
 from path_builder import add_from_json_file, PathBuilder
 
@@ -41,12 +42,35 @@ class MotorController_Y():
     async def start(self) -> None:
         await self.clients["track_follower"].request_reply("/start", Empty())
 
+    # Request to pause the track follower
+    async def pause_track(self) -> None:
+        await self.clients["track_follower"].request_reply("/pause", Empty())
+
+    # Request to resume the track follower
+    async def resume_track(self) -> None:
+        await self.clients["track_follower"].request_reply("/resume", Empty())
+
     # stream the track_follower state
     async def stream_status(self) -> None:
         await asyncio.sleep(1.0)
         message: TrackFollowerState
+        start_time = time.time()
+        distance_gap = 0.3
+        last_distance_mark = None
         with open(logfile, "a") as l_file:
-            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=20)):
+            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=1)):
+                track_progress = message.progress
+                if not last_distance_mark:
+                    last_distance_mark = track_progress.distance_total
+                if last_distance_mark-track_progress.distance_remaining >= distance_gap:
+                    self.pause_track()
+                    last_distance_mark = track_progress.distance_remaining
+                    start_time = time.time()
+                if message.status.track_status == 'TRACK_PAUSED':
+                    if time.time()-start_time > 2:
+                        self.resume_track()
+                        # TrackStatusEnum.TRACK_PAUSED
+                
                 l_file.write(str(message))
                 print("###################\n", message.progress)
 

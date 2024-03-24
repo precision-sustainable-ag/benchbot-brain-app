@@ -73,32 +73,34 @@ arguments:  dist -> total distance to be covered (in m), e.g. 1
 '''
 def make_v_graph(dist, v_slope):
     dist_travelled = 0
-    half_flag = False
+    half_dist_flag = False
+    vel_step_duration = 5
+    time_duration = 0.05
     v_list = []
     # create velocity list till half distance
     for i in v_slope:
         if i != max(v_slope):
-            # add each incremental velocity 5 times to the graph
-            for j in range(5):
+            # add each incremental velocity particular number of times to the graph
+            for j in range(vel_step_duration):
                 v_list.append(i)
-                dist_travelled += i*0.05
+                dist_travelled += i*time_duration
                 # break out from loop if half distance is covered
                 if dist_travelled >= (dist/2):
-                    half_flag = True
+                    half_dist_flag = True
                     break
         else:
             # add max velocity values till half distance is covered
             while True:
                 v_list.append(i)
-                dist_travelled += i*0.05
+                dist_travelled += i*time_duration
                 if dist_travelled >= (dist/2):
-                    half_flag = True
+                    half_dist_flag = True
                     break
-        if half_flag:    break
+        if half_dist_flag:    break
     # reverse the list and append as the second half, to account for deacceleration as well
     temp_list = v_list.copy()
     temp_list.reverse()
-    for i in temp_list: dist_travelled += i*0.05
+    for i in temp_list: dist_travelled += i*time_duration
     v_list.extend(temp_list)
     # print(f"Total distance moved: {np.around(dist_travelled*100, decimals=2)} cm")
     return v_list

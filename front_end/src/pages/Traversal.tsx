@@ -18,7 +18,15 @@ import {
 } from "../utils/constants";
 import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 
-export default function Traversal() {
+interface TraversalProps {
+  setOpen: (open: boolean) => void;
+  setSnackBarContent: (content: string) => void;
+}
+
+export default function Traversal({
+  setOpen,
+  setSnackBarContent,
+}: TraversalProps) {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
@@ -215,10 +223,14 @@ export default function Traversal() {
     setBenchBotData({ ...benchBotData, location, map, direction });
   }, []);
 
-  // stop traversal when leave the page
+  // stop traversal when leave the page, set snackbar content
   useEffect(
     () => () => {
-      stopRef.current = true;
+      if (stopRef.current !== true) {
+        stopRef.current = true;
+        setOpen(true);
+        setSnackBarContent("Traversal paused.");
+      }
     },
     []
   );
@@ -227,7 +239,7 @@ export default function Traversal() {
     <div>
       <Row>
         <Button
-          name={"Start"}
+          name={stopRef.current === true ? "Resume" : "Start"}
           onClick={startTraversal}
           styles={{ width: "400px", color: "#61dac3", marginLeft: "50px" }}
         />

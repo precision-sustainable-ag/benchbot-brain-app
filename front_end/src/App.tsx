@@ -53,7 +53,12 @@ function App() {
             }
           />
         </Routes>
-        <SnackBar open={open} setOpen={setOpen} text={snackBarContent} />
+        <SnackBar
+          open={open}
+          setOpen={setOpen}
+          text={snackBarContent}
+          setText={setSnackBarContent}
+        />
         <button onClick={() => setOpen(true)}>show</button>
       </div>
     </BrowserRouter>

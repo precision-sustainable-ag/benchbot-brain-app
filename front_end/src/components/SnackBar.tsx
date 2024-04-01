@@ -2,6 +2,7 @@ interface SnackBarProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   text: string;
+  setText: (text: string) => void;
 }
 
 const SnackBarStyles = {
@@ -17,14 +18,22 @@ const SnackBarStyles = {
   alignItems: "center",
 };
 
-export default function SnackBar({ open, setOpen, text }: SnackBarProps) {
+export default function SnackBar({
+  open,
+  setOpen,
+  text,
+  setText,
+}: SnackBarProps) {
   const style = open ? { ...SnackBarStyles, opacity: 1 } : { opacity: 0 };
 
   return (
     <div style={style}>
       <span style={{ fontSize: "1rem", paddingRight: "1rem" }}>{text}</span>
       <button
-        onClick={() => setOpen(false)}
+        onClick={() => {
+          setOpen(false);
+          setText("");
+        }}
         style={{
           border: "none",
           background: "Gainsboro",

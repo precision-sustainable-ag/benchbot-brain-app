@@ -202,25 +202,26 @@ export default function Traversal({
 
   // load config from localStorage
   useEffect(() => {
-    const res = loadBenchBotConfig();
-    if (!res) return;
-    const {
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-      location,
-      map,
-      direction,
-    } = res;
-    setBenchBotConfig({
-      ...benchBotConfig,
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-    });
-    setBenchBotData({ ...benchBotData, location, map, direction });
+    const fetchData = async () => {
+      const res = await loadBenchBotConfig();
+      const {
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+        location,
+        map,
+        direction,
+      } = res;
+      setBenchBotConfig({
+        ...benchBotConfig,
+        potsPerRow,
+        rowSpacing,
+        potSpacing,
+      });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+    };
+    fetchData();
   }, []);
 
   // stop traversal when leave the page, set snackbar content

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -7,6 +7,7 @@ from common.motor_controller_y import MotorControllerY
 from common.motor_controller_xz import MotorControllerXZ
 import uvicorn
 import logging
+import json
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
 app.add_middleware(
@@ -50,6 +51,23 @@ def home_z():
 @app.get("/udp_update")
 def update_udp_config(udp_ip, udp_port):
     xz_motor_control.update_config(udp_ip, udp_port)
+
+@app.post("/saveConfig/")
+async def save_config(request: Request):
+    config = await request.json()
+    print(config)
+    with open("configs.json", "w") as json_file:
+        json.dump(config, json_file)
+    return config
+
+@app.get("/loadConfig")
+async def load_config():
+    try:
+        with open("configs.json", "r") as json_file:
+            data = json.load(json_file)
+        return data
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="File not found")
 
 
 if __name__ == "__main__":

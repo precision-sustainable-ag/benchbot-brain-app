@@ -160,3 +160,5 @@ cython_debug/
 # Image files
 *.JPG
 *.ARW
+
+configs.json

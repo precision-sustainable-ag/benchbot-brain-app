@@ -1,7 +1,7 @@
 import {
   BenchBotConfig,
   BenchBotData,
-  // PotData,
+  PotData,
 } from "../interfaces/BenchBotTypes";
 
 const BenchBotConfigKey = "BenchBotConfig";
@@ -13,9 +13,54 @@ interface CameraConfig {
   port: string;
 }
 
-export const loadBenchBotConfig = () => {
-  const data = localStorage.getItem(BenchBotConfigKey);
-  if (!data) return;
+export const saveConfigUsingAPI = async (
+  config: BenchBotConfig,
+  data: BenchBotData
+) => {
+  // TODO: update url here and in the backend
+  const url = "http://localhost:8042" + "/saveConfig/";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...config, ...data }),
+  });
+  console.log("saved data to backend");
+  console.log(res);
+};
+
+interface apiConfig {
+  potsPerRow: number;
+  numberOfRows: number;
+  rowSpacing: number;
+  potSpacing: number;
+  location: number[];
+  map: PotData[][];
+  direction: number;
+}
+
+// TODO: need to define return type of the api
+export const loadConfigFromAPI = async () => {
+  const url = "http://localhost:8042" + "/loadConfig";
+  const res: apiConfig = await (await fetch(url)).json();
+  console.log("result", res);
+  return res;
+};
+
+export const loadBenchBotConfig = async () => {
+  // const data = localStorage.getItem(BenchBotConfigKey);
+  // if (!data) return;
+  // const {
+  //   potsPerRow,
+  //   numberOfRows,
+  //   rowSpacing,
+  //   potSpacing,
+  //   location,
+  //   map,
+  //   direction,
+  // } = JSON.parse(data);
+  const res = await loadConfigFromAPI();
   const {
     potsPerRow,
     numberOfRows,
@@ -24,7 +69,7 @@ export const loadBenchBotConfig = () => {
     location,
     map,
     direction,
-  } = JSON.parse(data);
+  } = res;
 
   console.log("loaded data", {
     config: { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -47,10 +92,11 @@ export const saveBenchBotConfig = (
   data: BenchBotData
 ) => {
   console.log("saved data", config, data);
-  localStorage.setItem(
-    BenchBotConfigKey,
-    JSON.stringify({ ...config, ...data })
-  );
+  // localStorage.setItem(
+  //   BenchBotConfigKey,
+  //   JSON.stringify({ ...config, ...data })
+  // );
+  saveConfigUsingAPI(config, data);
 };
 
 export const loadCameraConfig = () => {

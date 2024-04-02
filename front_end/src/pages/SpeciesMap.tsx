@@ -97,16 +97,18 @@ export default function SpeciesMap() {
 
   // load benchbot config from localstorage
   useEffect(() => {
-    const res = loadBenchBotConfig();
-    if (!res) return;
-    const { potsPerRow, rowSpacing, potSpacing, map } = res;
-    setBenchBotConfig({
-      ...benchBotConfig,
-      potsPerRow,
-      rowSpacing,
-      potSpacing,
-    });
-    setSpeciesMap(map);
+    const fetchData = async () => {
+      const res = await loadBenchBotConfig();
+      const { potsPerRow, rowSpacing, potSpacing, map } = res;
+      setBenchBotConfig({
+        ...benchBotConfig,
+        potsPerRow,
+        rowSpacing,
+        potSpacing,
+      });
+      setSpeciesMap(map);
+    };
+    fetchData();
   }, []);
 
   // custom component for a single textbox and control buttons around it

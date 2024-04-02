@@ -15,6 +15,8 @@ from farm_ng.track.track_pb2 import TrackFollowerState
 from farm_ng.track.track_pb2 import TrackFollowRequest
 from google.protobuf.empty_pb2 import Empty
 
+from motor_controller_y import MotorControllerY
+
 
 log_dir = from_here("logs")
 Path(log_dir).mkdir(parents=True, exist_ok=True)
@@ -32,6 +34,8 @@ class MotorController_Y():
             self.path_builder = PathBuilder()
             self.total_path_length = total_path_length
             self.waypoint_gap = waypoint_gap
+
+        self.motor_controller = MotorControllerY()
 
     ''' Functions related to following the path'''
     # Set the track of the track_follower
@@ -71,18 +75,20 @@ class MotorController_Y():
                     start_time = time.time()
                     track_paused = True
                     
-                # if message.status.track_status == 'TRACK_PAUSED':
                 if track_paused:
+                    await self.motor_controller.set_motor_velocity(0.05)
                     if time.time()-start_time > 2:
                         temp_var = message.status.track_status
                         print(temp_var, type(temp_var))
                         await self.resume_track()
                         print("Resume at:", time.time())
                         track_paused = False
-                        
-                        # TrackStatusEnum.TRACK_PAUSED
                 
                 l_file.write(str(message))
+
+                # if the track is completed
+                if message.status.track_status == 5:
+                    break
                 # print("###################\n", message.progress)
 
     # Start the trackfollower service to have the robot following the path

@@ -206,7 +206,7 @@ export default function Traversal({
       const res = await loadBenchBotConfig();
       const {
         potsPerRow,
-        numberOfRows,
+        // numberOfRows,
         rowSpacing,
         potSpacing,
         location,

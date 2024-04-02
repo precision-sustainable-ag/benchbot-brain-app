@@ -4,7 +4,7 @@ import {
   PotData,
 } from "../interfaces/BenchBotTypes";
 
-const BenchBotConfigKey = "BenchBotConfig";
+// const BenchBotConfigKey = "BenchBotConfig";
 const CameraConfigKey = "CameraConfig";
 // const SpeciesMapKey = "SpeciesMap";
 

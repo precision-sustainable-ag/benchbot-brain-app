@@ -43,9 +43,16 @@ interface apiConfig {
 // TODO: need to define return type of the api
 export const loadConfigFromAPI = async () => {
   const url = "http://localhost:8042" + "/loadConfig";
-  const res: apiConfig = await (await fetch(url)).json();
-  console.log("result", res);
-  return res;
+  try{
+    // TODO: this returns even it's 404
+    const res: apiConfig = await (await fetch(url)).json();
+    console.log("result", res);
+    return res;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
 };
 
 export const loadBenchBotConfig = async () => {
@@ -61,6 +68,7 @@ export const loadBenchBotConfig = async () => {
   //   direction,
   // } = JSON.parse(data);
   const res = await loadConfigFromAPI();
+  if (!res) return null;
   const {
     potsPerRow,
     numberOfRows,
@@ -70,6 +78,7 @@ export const loadBenchBotConfig = async () => {
     map,
     direction,
   } = res;
+  if (potsPerRow === undefined) return null;
 
   console.log("loaded data", {
     config: { potsPerRow, numberOfRows, rowSpacing, potSpacing },

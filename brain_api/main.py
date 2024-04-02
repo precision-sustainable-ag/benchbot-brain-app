@@ -62,6 +62,7 @@ async def save_config(request: Request):
 
 @app.get("/loadConfig")
 async def load_config():
+    print("Load config")
     try:
         with open("configs.json", "r") as json_file:
             data = json.load(json_file)

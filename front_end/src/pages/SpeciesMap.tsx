@@ -99,6 +99,7 @@ export default function SpeciesMap() {
   useEffect(() => {
     const fetchData = async () => {
       const res = await loadBenchBotConfig();
+      if (!res) return;
       const { potsPerRow, rowSpacing, potSpacing, map } = res;
       setBenchBotConfig({
         ...benchBotConfig,

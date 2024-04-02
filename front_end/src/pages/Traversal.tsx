@@ -204,6 +204,7 @@ export default function Traversal({
   useEffect(() => {
     const fetchData = async () => {
       const res = await loadBenchBotConfig();
+      if (!res) return;
       const {
         potsPerRow,
         // numberOfRows,
@@ -245,7 +246,7 @@ export default function Traversal({
           styles={{ width: "400px", color: "#61dac3", marginLeft: "50px" }}
         />
         <Button
-          name={"Pause"}
+          name={"Pause123"}
           onClick={() => {
             appendLog("Paused BenchBot traversal.");
             stopRef.current = true;

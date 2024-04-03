@@ -1,3 +1,8 @@
+import {
+  BenchBotConfig,
+  BenchBotData,
+  PotData,
+} from "../interfaces/BenchBotTypes";
 const baseUrl = "http://localhost:8042";
 
 const imageUrl = "http://10.95.76.50:5000";
@@ -14,6 +19,65 @@ interface apiResponse {
 const defaultResponse: apiResponse = {
   error: false,
   message: "",
+};
+
+interface FetchResult<T> {
+  data?: T;
+  error?: Error | undefined;
+}
+
+interface APIConfig extends BenchBotConfig, BenchBotData {}
+
+const customFetch = async <T>(
+  url: string,
+  options?: RequestInit
+): Promise<FetchResult<T>> => {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+    }
+    const data: T = await res.json();
+    return { data };
+  } catch (error) {
+    return { error: error as Error };
+  }
+};
+
+export const saveConfig = async (
+  config: BenchBotConfig,
+  data: BenchBotData
+) => {
+  const url = baseUrl + "/saveConfig/";
+  const res = await customFetch<APIConfig>(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...config, ...data }),
+  });
+
+  if (res.error) {
+    // TODO: show an message to the frontend for errors
+    console.log("Failed to save config:", res.error);
+    return null;
+  } else {
+    console.log("Successfully saved config:", res.data);
+    return res.data;
+  }
+};
+
+export const loadConfig = async () => {
+  const url = baseUrl + "/loadConfig";
+  const res = await customFetch<APIConfig>(url);
+
+  if (res.error) {
+    console.log("Failed to load config:", res.error);
+    return null;
+  } else {
+    console.log("Successfully loaded config:", res.data);
+    return res.data;
+  }
 };
 
 export const moveXandZ = async (x: number, z: number) => {

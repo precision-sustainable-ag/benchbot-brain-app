@@ -1,5 +1,5 @@
 import { BenchBotConfig, PotData } from "../interfaces/BenchBotTypes";
-import { saveBenchBotConfig } from "./configs";
+import { saveConfig } from "./api";
 
 export const initBenchBotConfig = (
   config: BenchBotConfig,
@@ -8,6 +8,6 @@ export const initBenchBotConfig = (
   const numberOfRows = map.length;
   const location = [0, 0];
   const direction = 1;
-  saveBenchBotConfig({ ...config, numberOfRows }, { location, map, direction });
+  saveConfig({ ...config, numberOfRows }, { location, map, direction });
   return { location, map, direction };
 };

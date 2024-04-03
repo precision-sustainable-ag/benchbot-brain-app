@@ -13,23 +13,6 @@ interface CameraConfig {
   port: string;
 }
 
-export const saveConfigUsingAPI = async (
-  config: BenchBotConfig,
-  data: BenchBotData
-) => {
-  // TODO: update url here and in the backend
-  const url = "http://localhost:8042" + "/saveConfig/";
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...config, ...data }),
-  });
-  console.log("saved data to backend");
-  console.log(res);
-};
-
 interface apiConfig {
   potsPerRow: number;
   numberOfRows: number;
@@ -40,33 +23,45 @@ interface apiConfig {
   direction: number;
 }
 
-// TODO: need to define return type of the api
+export const saveConfigUsingAPI = async (
+  config: BenchBotConfig,
+  data: BenchBotData
+) => {
+  // TODO: update url here and in the backend
+  const url = "http://localhost:8042" + "/saveConfig/";
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...config, ...data }),
+    });
+    if (!res.ok) throw new Error("Failed to post config!");
+    const result: apiConfig = await res.json();
+    console.log("Successfully save config!", result);
+  } catch (err) {
+    console.log("Error posting data:", err);
+  }
+};
+
 export const loadConfigFromAPI = async () => {
   const url = "http://localhost:8042" + "/loadConfig";
-  try{
-    // TODO: this returns even it's 404
-    const res: apiConfig = await (await fetch(url)).json();
-    console.log("result", res);
-    return res;
-
-  } catch(err) {
-    console.log(err);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error("Failed to fetch config!");
+    }
+    const data: apiConfig = await res.json();
+    console.log("result", data);
+    return data;
+  } catch (err) {
+    console.log("Error fetching user data:", err);
     return null;
   }
 };
 
 export const loadBenchBotConfig = async () => {
-  // const data = localStorage.getItem(BenchBotConfigKey);
-  // if (!data) return;
-  // const {
-  //   potsPerRow,
-  //   numberOfRows,
-  //   rowSpacing,
-  //   potSpacing,
-  //   location,
-  //   map,
-  //   direction,
-  // } = JSON.parse(data);
   const res = await loadConfigFromAPI();
   if (!res) return null;
   const {
@@ -78,7 +73,6 @@ export const loadBenchBotConfig = async () => {
     map,
     direction,
   } = res;
-  if (potsPerRow === undefined) return null;
 
   console.log("loaded data", {
     config: { potsPerRow, numberOfRows, rowSpacing, potSpacing },
@@ -101,10 +95,6 @@ export const saveBenchBotConfig = (
   data: BenchBotData
 ) => {
   console.log("saved data", config, data);
-  // localStorage.setItem(
-  //   BenchBotConfigKey,
-  //   JSON.stringify({ ...config, ...data })
-  // );
   saveConfigUsingAPI(config, data);
 };
 

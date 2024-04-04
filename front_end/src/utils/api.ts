@@ -1,7 +1,7 @@
 import {
   BenchBotConfig,
   BenchBotData,
-  PotData,
+  // PotData,
 } from "../interfaces/BenchBotTypes";
 const baseUrl = "http://localhost:8042";
 

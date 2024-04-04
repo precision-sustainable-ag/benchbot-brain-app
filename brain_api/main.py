@@ -56,7 +56,8 @@ def update_udp_config(udp_ip, udp_port):
 async def save_config(request: Request):
     config = await request.json()
     print(config)
-    with open("configs.json", "w") as json_file:
+    config_file = from_here("configs.json")
+    with open(config_file, "w") as json_file:
         json.dump(config, json_file)
     return config
 
@@ -64,8 +65,10 @@ async def save_config(request: Request):
 async def load_config():
     print("Load config")
     try:
-        with open("configs.json", "r") as json_file:
+        config_file = from_here("configs.json")
+        with open(config_file, "r") as json_file:
             data = json.load(json_file)
+            print(data)
         return data
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File not found")
@@ -90,5 +93,5 @@ if __name__ == "__main__":
         "/",
         StaticFiles(directory=str(react_build_directory.resolve()), html=True),
     )
-
+    print('app running')
     uvicorn.run(app, host="0.0.0.0", port=8042)

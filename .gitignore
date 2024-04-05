@@ -161,4 +161,4 @@ cython_debug/
 *.JPG
 *.ARW
 
-configs.json
+species_map.json

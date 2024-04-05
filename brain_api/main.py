@@ -23,6 +23,7 @@ xz_motor_control = MotorControllerXZ()
 if not xz_motor_control.conn_status:
     logging.ERROR("Connection to ClearCore not successful!")
 
+species_map_filename = "species_map.json"
 
 @app.get("/move_y_axis/{dist}")
 async def move_y_axis(dist):
@@ -57,7 +58,7 @@ async def save_config(request: Request):
     print("Save config")
     config = await request.json()
     print(config)
-    config_file = from_here("configs.json")
+    config_file = from_here(species_map_filename)
     with open(config_file, "w") as json_file:
         json.dump(config, json_file)
     return config
@@ -66,7 +67,7 @@ async def save_config(request: Request):
 async def load_config():
     print("Load config")
     try:
-        config_file = from_here("configs.json")
+        config_file = from_here(species_map_filename)
         with open(config_file, "r") as json_file:
             data = json.load(json_file)
             print(data)

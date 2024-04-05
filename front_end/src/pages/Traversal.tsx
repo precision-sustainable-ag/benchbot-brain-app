@@ -21,11 +21,13 @@ import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 interface TraversalProps {
   setOpen: (open: boolean) => void;
   setSnackBarContent: (content: string) => void;
+  setStatusText: (status: string) => void;
 }
 
 export default function Traversal({
   setOpen,
   setSnackBarContent,
+  setStatusText,
 }: TraversalProps) {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
@@ -80,6 +82,7 @@ export default function Traversal({
     stopRef.current = false;
     appendLog("Start BenchBot traversal.");
     traverseBenchBot(benchBotConfig, benchBotData);
+    setStatusText("running");
   };
 
   const findNext = (row: number, col: number, direction: number) => {
@@ -133,6 +136,7 @@ export default function Traversal({
             setStatus(row, pot, "failed");
           }
           if (stopRef.current) {
+            setStatusText("");
             appendLog("Traversal stopped.");
             let location = [row, pot];
             setBenchBotConfig({
@@ -186,6 +190,7 @@ export default function Traversal({
       direction *= -1;
     }
     if (!stopRef.current) {
+      setStatusText("");
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
       setBenchBotConfig({
@@ -227,6 +232,7 @@ export default function Traversal({
   useEffect(
     () => () => {
       if (stopRef.current !== true) {
+        setStatusText("");
         stopRef.current = true;
         setOpen(true);
         setSnackBarContent("Traversal paused.");

@@ -38,21 +38,24 @@ export default function SnackBar({
     if (open) {
       setTimeout(() => {
         closeSnackBar();
-      }, 3000);
+      }, 5000);
     }
   }, [open]);
 
   return (
     <div style={style}>
-      <span style={{ fontSize: "1rem", paddingRight: "1rem" }}>{text}</span>
+      <span style={{ fontSize: "2rem", paddingRight: "1rem" }}>{text}</span>
       <button
         onClick={closeSnackBar}
         style={{
           border: "none",
           background: "Gainsboro",
+          fontWeight: "bold",
+          fontSize: "1rem",
         }}
       >
-        <span style={{ fontWeight: "bold", fontSize: "1rem" }}>&#10006;</span>
+        &#10006;
+        {/* <span style={{}}>&#10006;</span> */}
       </button>
     </div>
   );

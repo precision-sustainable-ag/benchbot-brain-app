@@ -5,6 +5,7 @@ import CameraConfig from "./pages/CameraConfig";
 import SpeciesMap from "./pages/SpeciesMap";
 import Traversal from "./pages/Traversal";
 import SnackBar from "./components/SnackBar";
+import StatusBar from "./components/StatusBar";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
@@ -13,6 +14,8 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
+  const [statusText, setStatusText] = useState("");
+
   return (
     <BrowserRouter>
       <div style={{ width: "1200px", height: "800px", fontSize: "36px" }}>
@@ -49,6 +52,7 @@ function App() {
               <Traversal
                 setOpen={setOpen}
                 setSnackBarContent={setSnackBarContent}
+                setStatusText={setStatusText}
               />
             }
           />
@@ -59,7 +63,7 @@ function App() {
           text={snackBarContent}
           setText={setSnackBarContent}
         />
-        <button onClick={() => setOpen(true)}>show</button>
+        <StatusBar status={statusText} />
       </div>
     </BrowserRouter>
   );

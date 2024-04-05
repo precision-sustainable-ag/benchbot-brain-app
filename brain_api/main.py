@@ -54,6 +54,7 @@ def update_udp_config(udp_ip, udp_port):
 
 @app.post("/saveConfig/")
 async def save_config(request: Request):
+    print("Save config")
     config = await request.json()
     print(config)
     config_file = from_here("configs.json")
@@ -93,5 +94,4 @@ if __name__ == "__main__":
         "/",
         StaticFiles(directory=str(react_build_directory.resolve()), html=True),
     )
-    print('app running')
     uvicorn.run(app, host="0.0.0.0", port=8042)

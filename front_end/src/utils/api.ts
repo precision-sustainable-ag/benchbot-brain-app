@@ -58,7 +58,7 @@ export const saveConfig = async (
   });
 
   if (res.error) {
-    // TODO: show an message to the frontend for errors
+    // TODO: show error message to snackbar
     console.log("Failed to save config:", res.error);
     return null;
   } else {

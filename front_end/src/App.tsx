@@ -8,8 +8,6 @@ import SnackBar from "./components/SnackBar";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
-// call to localhost:8042?x=1&z=-1
-
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
@@ -43,15 +41,7 @@ function App() {
           <Route path="/" element={<ManualControl />} />
           <Route path="/camera-config" element={<CameraConfig />} />
           <Route path="/species-map" element={<SpeciesMap />} />
-          <Route
-            path="/traversal"
-            element={
-              <Traversal
-                setOpen={setOpen}
-                setSnackBarContent={setSnackBarContent}
-              />
-            }
-          />
+          <Route path="/traversal" element={<Traversal />} />
         </Routes>
         <SnackBar
           open={open}

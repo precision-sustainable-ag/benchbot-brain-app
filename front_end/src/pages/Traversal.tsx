@@ -23,15 +23,7 @@ import {
   defaultSpecies,
 } from "../utils/constants";
 
-interface TraversalProps {
-  setOpen: (open: boolean) => void;
-  setSnackBarContent: (content: string) => void;
-}
-
-export default function Traversal({
-  setOpen,
-  setSnackBarContent,
-}: TraversalProps) {
+export default function Traversal() {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
@@ -231,14 +223,10 @@ export default function Traversal({
     fetchData();
   }, []);
 
-  // stop traversal when leave the page, set snackbar content
+  // stop traversal when leave the page
   useEffect(
     () => () => {
-      if (stopRef.current !== true) {
-        stopRef.current = true;
-        setOpen(true);
-        setSnackBarContent("Traversal paused.");
-      }
+      stopRef.current = true;
     },
     []
   );
@@ -247,7 +235,7 @@ export default function Traversal({
     <div>
       <Row>
         <Button
-          name={stopRef.current === true ? "Resume" : "Start"}
+          name={"Start"}
           onClick={startTraversal}
           styles={{ width: "400px", color: "#61dac3", marginLeft: "50px" }}
         />

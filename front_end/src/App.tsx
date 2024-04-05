@@ -1,14 +1,16 @@
+import { useState } from "react";
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import ManualControl from "./pages/ManualControl";
 import CameraConfig from "./pages/CameraConfig";
 import SpeciesMap from "./pages/SpeciesMap";
 import Traversal from "./pages/Traversal";
+import SnackBar from "./components/SnackBar";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
-// call to localhost:8042?x=1&z=-1
-
 function App() {
+  const [open, setOpen] = useState(false);
+  const [snackBarContent, setSnackBarContent] = useState("");
   return (
     <BrowserRouter>
       <div style={{ width: "1200px", height: "800px", fontSize: "36px" }}>
@@ -41,6 +43,12 @@ function App() {
           <Route path="/species-map" element={<SpeciesMap />} />
           <Route path="/traversal" element={<Traversal />} />
         </Routes>
+        <SnackBar
+          open={open}
+          setOpen={setOpen}
+          text={snackBarContent}
+          setText={setSnackBarContent}
+        />
       </div>
     </BrowserRouter>
   );

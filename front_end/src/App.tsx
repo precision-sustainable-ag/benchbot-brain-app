@@ -59,7 +59,6 @@ function App() {
           text={snackBarContent}
           setText={setSnackBarContent}
         />
-        <button onClick={() => setOpen(true)}>show</button>
       </div>
     </BrowserRouter>
   );

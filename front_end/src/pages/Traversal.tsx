@@ -212,7 +212,7 @@ export default function Traversal({
       if (!res) return;
       const {
         potsPerRow,
-        // numberOfRows,
+        numberOfRows,
         rowSpacing,
         potSpacing,
         location,
@@ -222,6 +222,7 @@ export default function Traversal({
       setBenchBotConfig({
         ...benchBotConfig,
         potsPerRow,
+        numberOfRows,
         rowSpacing,
         potSpacing,
       });

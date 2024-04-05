@@ -1,8 +1,4 @@
-import {
-  BenchBotConfig,
-  BenchBotData,
-  // PotData,
-} from "../interfaces/BenchBotTypes";
+import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 const baseUrl = "http://localhost:8042";
 
 const imageUrl = "http://10.95.76.50:5000";

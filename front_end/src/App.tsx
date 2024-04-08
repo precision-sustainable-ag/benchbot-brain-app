@@ -50,7 +50,7 @@ function App() {
               <Traversal
                 setOpen={setOpen}
                 setSnackBarContent={setSnackBarContent}
-                setStatusText={setStatusText}
+                setStatusBarText={setStatusText}
               />
             }
           />

@@ -16,14 +16,26 @@ const SnackBarStyles = {
 };
 
 export default function StatusBar({ status }: StatusBarProps) {
+  const statusBarBgColor = () => {
+    switch (status) {
+      case "running":
+        return "#61dac3";
+      case "paused":
+        return "#FFD700";
+      default:
+        return "#f65a5b";
+    }
+  };
+
   const styles = {
     ...SnackBarStyles,
-    backgroundColor: status === "running" ? "#61dac3" : "#f65a5b",
+    backgroundColor: statusBarBgColor(),
   };
+
   return (
     <div style={styles}>
-      <span>status: </span>
-      <span>{status}</span>
+      {/* <span>status: </span> */}
+      <span>{status === "" ? "stopped" : status}</span>
     </div>
   );
 }

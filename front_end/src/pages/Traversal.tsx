@@ -26,13 +26,13 @@ import {
 interface TraversalProps {
   setOpen: (open: boolean) => void;
   setSnackBarContent: (content: string) => void;
-  setStatusText: (status: string) => void;
+  setStatusBarText: (status: string) => void;
 }
 
 export default function Traversal({
   setOpen,
   setSnackBarContent,
-  setStatusText,
+  setStatusBarText,
 }: TraversalProps) {
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
@@ -86,8 +86,8 @@ export default function Traversal({
   const startTraversal = () => {
     stopRef.current = false;
     appendLog("Start BenchBot traversal.");
+    setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
-    setStatusText("running");
   };
 
   const findNext = (row: number, col: number, direction: number) => {
@@ -141,7 +141,7 @@ export default function Traversal({
             setStatus(row, pot, "failed");
           }
           if (stopRef.current) {
-            setStatusText("");
+            setStatusBarText("paused");
             appendLog("Traversal stopped.");
             let location = [row, pot];
             setBenchBotConfig({
@@ -195,7 +195,7 @@ export default function Traversal({
       direction *= -1;
     }
     if (!stopRef.current) {
-      setStatusText("");
+      setStatusBarText("");
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
       setBenchBotConfig({
@@ -206,7 +206,16 @@ export default function Traversal({
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      saveConfig(benchBotConfig, benchBotData);
+      saveConfig(
+        {
+          ...benchBotConfig,
+          potsPerRow,
+          numberOfRows,
+          rowSpacing,
+          potSpacing,
+        },
+        { ...benchBotData, location, map, direction }
+      );
     }
   };
 
@@ -240,7 +249,7 @@ export default function Traversal({
   useEffect(
     () => () => {
       if (stopRef.current !== true) {
-        setStatusText("");
+        setStatusBarText("paused");
         stopRef.current = true;
         setOpen(true);
         setSnackBarContent("Traversal paused.");

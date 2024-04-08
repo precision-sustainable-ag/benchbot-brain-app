@@ -162,3 +162,4 @@ cython_debug/
 *.ARW
 
 species_map.json
+.test_api

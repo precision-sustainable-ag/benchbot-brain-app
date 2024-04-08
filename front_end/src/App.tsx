@@ -9,8 +9,6 @@ import StatusBar from "./components/StatusBar";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
-// call to localhost:8042?x=1&z=-1
-
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");

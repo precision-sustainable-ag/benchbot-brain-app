@@ -9,14 +9,19 @@ import {
   BenchBotData,
   Image,
 } from "../interfaces/BenchBotTypes";
-import { moveXandZ, moveY, takeImage } from "../utils/api";
+import {
+  loadConfig,
+  moveXandZ,
+  moveY,
+  saveConfig,
+  takeImage,
+} from "../utils/api";
 import {
   defaultBenchBotConfig,
   defaultBenchBotData,
   defaultImage,
   defaultSpecies,
 } from "../utils/constants";
-import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
 
 interface TraversalProps {
   setOpen: (open: boolean) => void;
@@ -148,7 +153,7 @@ export default function Traversal({
             });
             setBenchBotData({ ...benchBotData, location, map, direction });
             // FIXME: temporary solution for benchbotdata would not updated here
-            saveBenchBotConfig(benchBotConfig, {
+            saveConfig(benchBotConfig, {
               ...benchBotData,
               location,
               map,
@@ -201,31 +206,34 @@ export default function Traversal({
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      saveBenchBotConfig(benchBotConfig, benchBotData);
+      saveConfig(benchBotConfig, benchBotData);
     }
   };
 
   // load config from localStorage
   useEffect(() => {
-    const res = loadBenchBotConfig();
-    if (!res) return;
-    const {
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-      location,
-      map,
-      direction,
-    } = res;
-    setBenchBotConfig({
-      ...benchBotConfig,
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-    });
-    setBenchBotData({ ...benchBotData, location, map, direction });
+    const fetchData = async () => {
+      const res = await loadConfig();
+      if (!res) return;
+      const {
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+        location,
+        map,
+        direction,
+      } = res;
+      setBenchBotConfig({
+        ...benchBotConfig,
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+      });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+    };
+    fetchData();
   }, []);
 
   // stop traversal when leave the page

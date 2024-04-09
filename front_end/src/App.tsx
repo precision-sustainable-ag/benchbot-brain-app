@@ -16,7 +16,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div style={{ width: "1200px", height: "800px", fontSize: "36px" }}>
+      <div
+        style={{
+          width: "1200px",
+          height: "800px",
+          fontFamily: "Arial, sans-serif",
+          fontSize: "32px",
+        }}
+      >
         <nav style={{ textAlign: "left" }}>
           <button style={{ fontSize: "2rem" }}>
             <Link to="/" style={LinkStyle}>

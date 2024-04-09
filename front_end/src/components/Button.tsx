@@ -3,7 +3,7 @@ import { CSSProperties } from "react";
 const buttonStyle = {
   height: "75px",
   minWidth: "100px",
-  fontSize: "36px",
+  fontSize: "32px",
 };
 
 interface ButtonProps {

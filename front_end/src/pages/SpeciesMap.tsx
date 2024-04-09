@@ -165,8 +165,10 @@ export default function SpeciesMap() {
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: "500px" }}>
-        <h5 style={{ textAlign: "center", margin: "1rem" }}>Species Config</h5>
-        <h6 style={{ margin: "0" }}>Map Setting: </h6>
+        <p style={{ textAlign: "center", margin: "1rem" }}>Species Config</p>
+        <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
+          Map Setting:{" "}
+        </p>
         <Row>
           <ValInput
             name={"Pots per row:"}
@@ -199,7 +201,15 @@ export default function SpeciesMap() {
           />
         </Row>
 
-        <h6 style={{ margin: "1rem 0 0 0" }}>Add Species: </h6>
+        <h6
+          style={{
+            margin: "1rem 0 0 0",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+          }}
+        >
+          Add Species:{" "}
+        </h6>
 
         <Row>
           <span style={{ width: "400px" }}>Species: </span>

@@ -122,4 +122,14 @@ class MotorController_Y():
     def run(self, track_file: str) -> None:
         # Create the asyncio event loop and run the track function
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.run_track_service(track_file))
+        # handle KeyboardInterrupt
+        loop.add_signal_handler(signal.SIGINT, self.signal_handler, loop)
+        try:
+            loop.run_until_complete(self.run_track_service(track_file))
+        finally:
+            # loop.run_until_complete(self.stop_track())
+            loop.close()
+    
+    def signal_handler(self, loop):
+        asyncio.ensure_future(self.stop_track(), loop=loop)
+

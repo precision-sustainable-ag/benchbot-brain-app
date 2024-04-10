@@ -9,10 +9,9 @@ interface SnackBarProps {
 
 const SnackBarStyles = {
   position: "fixed" as "fixed",
-  bottom: "1rem",
-  right: "1rem",
-  zIndex: "999",
-  padding: "1rem 0.5rem",
+  bottom: "4rem",
+  right: "2rem",
+  zIndex: "1000",
   borderRadius: "0.5rem",
   backgroundColor: "Gainsboro",
   transition: "opacity 0.2s ease-in-out",
@@ -44,18 +43,17 @@ export default function SnackBar({
 
   return (
     <div style={style}>
-      <span style={{ fontSize: "2rem", paddingRight: "1rem" }}>{text}</span>
+      <span style={{ fontSize: "2rem", padding: "1rem", paddingRight: '0' }}>{text}</span>
       <button
         onClick={closeSnackBar}
         style={{
           border: "none",
           background: "Gainsboro",
-          fontWeight: "bold",
           fontSize: "1rem",
+          padding: "1rem",
         }}
       >
         &#10006;
-        {/* <span style={{}}>&#10006;</span> */}
       </button>
     </div>
   );

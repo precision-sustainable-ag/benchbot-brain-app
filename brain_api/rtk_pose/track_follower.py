@@ -25,7 +25,7 @@ from google.protobuf.empty_pb2 import Empty
 log_dir = from_here("logs")
 Path(log_dir).mkdir(parents=True, exist_ok=True)
 curr_date = datetime.now().strftime('%m-%d_%H:%M')
-logfile = f"{curr_date}_track.log"          
+logfile = f"logs/{curr_date}_track.log"          
 
 
 class MotorController_Y():
@@ -54,14 +54,15 @@ class MotorController_Y():
         await asyncio.sleep(1.0)
         message: TrackFollowerState
         with open(logfile, "a") as l_file:
-            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=1)):
+            async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=20)):
+                l_file.write(str(message))
                 status = message.status.track_status
+                print(f"{status}\t{message.progress.distance_remaining}")
                 # if there is issue with following the track
-                if status in [0, 1, 2, 6, 7]:
+                if status in [0, 6, 7, 8]:
                     print("ABORT!")
                     break
-                # l_file.write(str(message))
-                print(f"{message.progress.distance_remaining}\n")
+                
 
     # Start the trackfollower service to have the robot following the path
     async def start_track(self, track_file: str) -> None:
@@ -75,11 +76,13 @@ class MotorController_Y():
         print('Retrieved Poses')
         # await self.start()
         for target_pose in self.poses:
+            print(f"x: {target_pose.a_from_b.translation.x}, y: {target_pose.a_from_b.translation.y}")
             await self.clients["track_follower"].request_reply("/go_to_goal", target_pose)
             print('Pose request sent')
-            break
+            
             # wait between poses
-            await asyncio.sleep(1.0)
+            await asyncio.sleep(10.0)
+            # break
         print('Poses done')
 
     async def run_track_service(self, track_file: str) -> None:
@@ -91,7 +94,7 @@ class MotorController_Y():
             ]
             await asyncio.gather(*tasks)
         finally:
-            ("Stop follower")
+            print("Stop follower main")
             await self.stop_track()
 
     def run(self, track_file: str) -> None:
@@ -102,11 +105,12 @@ class MotorController_Y():
         try:
             loop.run_until_complete(self.run_track_service(track_file))
         finally:
-            # loop.run_until_complete(self.stop_track())
+            loop.run_until_complete(self.stop_track())
             loop.close()
     
     def signal_handler(self, loop):
         asyncio.ensure_future(self.stop_track(), loop=loop)
+        exit(1)
 
 
 def get_poses(track: Track, track_gap) -> list[Pose3F64]:
@@ -122,6 +126,7 @@ def get_poses(track: Track, track_gap) -> list[Pose3F64]:
             p2 = [ [ waypoint.a_from_b.translation.x,    waypoint.a_from_b.translation.y ] ]
             dist = round(cdist(p1, p2, 'euclidean')[0][0], 2)
             if dist >= track_gap:
+                # print(f"Distance gap: {dist}")
                 sub_track.append(waypoint)
                 previous_pose = waypoint
     return sub_track

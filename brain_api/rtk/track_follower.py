@@ -127,7 +127,8 @@ class MotorController_Y():
         try:
             loop.run_until_complete(self.run_track_service(track_file))
         finally:
-            # loop.run_until_complete(self.stop_track())
+            ("Stop track_follower 2")
+            loop.run_until_complete(self.stop_track())
             loop.close()
     
     def signal_handler(self, loop):

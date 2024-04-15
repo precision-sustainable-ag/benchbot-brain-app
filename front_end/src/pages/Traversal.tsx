@@ -180,6 +180,8 @@ export default function Traversal({
           appendLog(`move X: ${direction * potSpacing}`);
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
+          appendLog(`move completed.`);
+
         }
       }
       // break outside loop if stop triggered

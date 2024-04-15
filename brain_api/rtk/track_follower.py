@@ -118,7 +118,7 @@ class MotorController_Y():
             ]
             await asyncio.gather(*tasks)
         finally:
-            ("from run_track_service")
+            print("from run_track_service")
             await self.stop_track()
 
     def run(self, track_file: str) -> None:
@@ -129,7 +129,7 @@ class MotorController_Y():
         try:
             loop.run_until_complete(self.run_track_service(track_file))
         finally:
-            ("from run")
+            print("from run")
             loop.run_until_complete(self.stop_track())
             loop.close()
     

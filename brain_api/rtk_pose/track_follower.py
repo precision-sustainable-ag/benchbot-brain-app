@@ -44,8 +44,9 @@ class MotorController_Y():
     # Request to stop the track follower
     async def stop_track(self) -> None:
         try:
+            print("sending cancel request")
             await self.clients["track_follower"].request_reply("/cancel", Empty())
-            print('Follower stopped')
+            print("request sent")
         except:
             pass
 
@@ -57,10 +58,10 @@ class MotorController_Y():
             async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=20)):
                 l_file.write(str(message))
                 status = message.status.track_status
-                print(f"{status}\t{message.progress.distance_remaining}")
+                print(f"Status code: {status}\tDistance: {message.progress.distance_remaining}")
                 # if there is issue with following the track
                 if status in [0, 6, 7, 8]:
-                    print("ABORT!")
+                    print("Stop message streaming")
                     break
                 
 
@@ -94,7 +95,7 @@ class MotorController_Y():
             ]
             await asyncio.gather(*tasks)
         finally:
-            print("Stop follower main")
+            print("from run_track_service")
             await self.stop_track()
 
     def run(self, track_file: str) -> None:
@@ -105,6 +106,7 @@ class MotorController_Y():
         try:
             loop.run_until_complete(self.run_track_service(track_file))
         finally:
+            print("from run")
             loop.run_until_complete(self.stop_track())
             loop.close()
     

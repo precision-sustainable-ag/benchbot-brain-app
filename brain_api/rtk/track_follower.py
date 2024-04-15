@@ -54,7 +54,9 @@ class MotorController_Y():
     
     # Request to stop the track follower
     async def stop_track(self) -> None:
+        print("sending cancel request")
         await self.clients["track_follower"].request_reply("/cancel", Empty())
+        print("request sent")
 
     # stream the track_follower state
     async def stream_status(self) -> None:
@@ -116,7 +118,7 @@ class MotorController_Y():
             ]
             await asyncio.gather(*tasks)
         finally:
-            ("Stop track_follower")
+            ("from run_track_service")
             await self.stop_track()
 
     def run(self, track_file: str) -> None:
@@ -127,7 +129,7 @@ class MotorController_Y():
         try:
             loop.run_until_complete(self.run_track_service(track_file))
         finally:
-            ("Stop track_follower 2")
+            ("from run")
             loop.run_until_complete(self.stop_track())
             loop.close()
     

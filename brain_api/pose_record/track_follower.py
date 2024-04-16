@@ -32,7 +32,7 @@ logfile = f"logs/{curr_date}_track.log"
 
 
 class MotorController_Y():
-    def __init__(self, config_file="brain_api/rtk_pose/track_config.json", build_new_path=False, total_path_length=0, waypoint_gap=0):
+    def __init__(self, config_file="brain_api/pose_record/track_config.json", build_new_path=False, total_path_length=0, waypoint_gap=0):
         config_file_path = from_root(config_file)
         # Setup EventClients defined by the service file
         expected_configs = ["track_follower", "filter"]

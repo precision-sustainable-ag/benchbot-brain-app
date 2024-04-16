@@ -83,23 +83,38 @@ class MotorController_Y():
                     last_distance_mark = track_progress.distance_total
                     print("Distance Mark:", last_distance_mark)
                 if last_distance_mark-track_progress.distance_remaining >= distance_gap:
-                    await self.pause_track()
+                    try:
+                        await self.pause_track()
+                    except:
+                        pass
                     last_distance_mark = track_progress.distance_remaining
                     print("Pause at:", last_distance_mark)
+                    
+                    curr_pose: Pose3F64 = await self.get_pose()
+                    # print(curr_pose.to_proto())
+                    l_file.write(str(curr_pose.to_proto())+"\n")
+
                     start_time = time.time()
                     track_paused = True
-                    curr_pose: Pose3F64 = await self.get_pose()
-                    l_file.write(str(curr_pose))
                     
                 if track_paused:
-                    if time.time()-start_time > 5:
+                    if time.time()-start_time > 10:
                         await self.resume_track()
                         print("Resume at:", time.time())
                         track_paused = False
 
+                # when track is paused
+                if message.status.track_status == 4:
+                    curr_pose: Pose3F64 = await self.get_pose()
+                    # print(curr_pose.to_proto())
+                    l_file.write(str(curr_pose.to_proto())+"\n")
+
+
                 # if the track is completed
                 if message.status.track_status == 5:
                     print("COMPLETED!")
+                    last_distance_mark = track_progress.distance_remaining
+                    print("Complete at:", last_distance_mark)
                     break
                 # if there is issue with following the track
                 if message.status.track_status == 7:

@@ -88,7 +88,7 @@ class MotorController_Y():
         with open(logfile, "a") as l_file:
             for target_pose in self.poses:
                 curr_pose: Pose3F64 = await self.get_pose()
-                l_file.write(str(curr_pose))
+                l_file.write(str(curr_pose.to_proto())+"\n")
 
                 print(f"x: {target_pose.a_from_b.translation.x}, y: {target_pose.a_from_b.translation.y}")
                 await self.clients["track_follower"].request_reply("/go_to_goal", target_pose)

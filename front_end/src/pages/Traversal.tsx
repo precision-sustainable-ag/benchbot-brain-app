@@ -29,6 +29,8 @@ interface TraversalProps {
   setStatusBarText: (status: string) => void;
 }
 
+type traversalStatus = "stopped" | "running" | "paused";
+
 export default function Traversal({
   setOpen,
   setSnackBarContent,
@@ -43,7 +45,7 @@ export default function Traversal({
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
 
-  const stopRef = useRef(false);
+  const stopRef = useRef<traversalStatus>("stopped");
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
@@ -84,7 +86,7 @@ export default function Traversal({
   };
 
   const startTraversal = () => {
-    stopRef.current = false;
+    stopRef.current = "running";
     appendLog("Start BenchBot traversal.");
     setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
@@ -146,7 +148,7 @@ export default function Traversal({
           if (image.status === "error") {
             setStatus(row, pot, "failed");
           }
-          if (stopRef.current) {
+          if (stopRef.current === "paused") {
             setStatusBarText("paused");
             appendLog("Traversal stopped.");
             let location = [row, pot];
@@ -191,7 +193,7 @@ export default function Traversal({
         }
       }
       // break outside loop if stop triggered
-      if (stopRef.current) break;
+      if (stopRef.current === "paused") break;
       if (row !== numberOfRows - 1) {
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
@@ -202,8 +204,9 @@ export default function Traversal({
       if (pot === -1) pot += 1;
       direction *= -1;
     }
-    if (!stopRef.current) {
-      setStatusBarText("");
+    if (stopRef.current !== "paused") {
+      stopRef.current = "stopped";
+      setStatusBarText("stopped");
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
       setBenchBotConfig({
@@ -256,9 +259,9 @@ export default function Traversal({
   // stop traversal when leave the page
   useEffect(
     () => () => {
-      if (stopRef.current !== true) {
+      if (stopRef.current === "running") {
         setStatusBarText("paused");
-        stopRef.current = true;
+        stopRef.current = "paused";
         setOpen(true);
         setSnackBarContent("Traversal paused.");
       }
@@ -278,7 +281,7 @@ export default function Traversal({
           name={"Pause"}
           onClick={() => {
             appendLog("Paused BenchBot traversal.");
-            stopRef.current = true;
+            stopRef.current = "paused";
           }}
           styles={{ width: "400px", color: "#f65a5b", marginLeft: "50px" }}
         />
@@ -290,10 +293,7 @@ export default function Traversal({
             status={Image.status}
             imagePreview={Image.image}
             imageErrMsg={Image.errorMsg}
-            retry={() => {
-              stopRef.current = false;
-              startTraversal();
-            }}
+            retry={() => {}}
             showRetry={false}
           />
         </div>

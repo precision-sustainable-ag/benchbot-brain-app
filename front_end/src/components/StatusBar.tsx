@@ -22,6 +22,7 @@ export default function StatusBar({ status }: StatusBarProps) {
         return "#61dac3";
       case "paused":
         return "#FFD700";
+      case "stopped":
       default:
         return "#f65a5b";
     }
@@ -34,8 +35,7 @@ export default function StatusBar({ status }: StatusBarProps) {
 
   return (
     <div style={styles}>
-      {/* <span>status: </span> */}
-      <span>{status === "" ? "stopped" : status}</span>
+      <span>{status}</span>
     </div>
   );
 }

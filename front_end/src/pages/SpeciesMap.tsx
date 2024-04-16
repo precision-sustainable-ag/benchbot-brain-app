@@ -80,7 +80,6 @@ export default function SpeciesMap() {
     const clearedMap = speciesMap.map((row) =>
       row.map((pot) => ({
         ...pot,
-        visited: false,
         status: "unVisited" as "unVisited",
       }))
     );

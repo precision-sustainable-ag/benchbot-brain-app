@@ -103,7 +103,13 @@ export default function Traversal({
   const setStatus = (
     row: number,
     col: number,
-    status: "unVisited" | "visiting" | "nextVisit" | "visited" | "failed"
+    status:
+      | "unVisited"
+      | "visiting"
+      | "nextVisit"
+      | "visited"
+      | "failed"
+      | "skipped"
   ) => {
     if (row < benchBotData.map.length) {
       let currMap = benchBotData.map;
@@ -169,6 +175,7 @@ export default function Traversal({
         }
         if (benchBotData.map[row][pot].status !== "failed") {
           setStatus(row, pot, "visited");
+          if (map[row][pot].removed) setStatus(row, pot, "skipped");
         }
 
         if (
@@ -181,7 +188,6 @@ export default function Traversal({
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
           appendLog(`move completed.`);
-
         }
       }
       // break outside loop if stop triggered

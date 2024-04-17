@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import ManualControl from "./pages/ManualControl";
 import CameraConfig from "./pages/CameraConfig";
@@ -7,12 +7,50 @@ import Traversal from "./pages/Traversal";
 import SnackBar from "./components/SnackBar";
 import StatusBar from "./components/StatusBar";
 
+import { BenchBotConfig, BenchBotData } from "./interfaces/BenchBotTypes";
+import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
+import { loadConfig } from "./utils/api";
+
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
   const [statusText, setStatusText] = useState("");
+
+  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
+    defaultBenchBotConfig
+  );
+  const [benchBotData, setBenchBotData] =
+    useState<BenchBotData>(defaultBenchBotData);
+
+  console.log(benchBotConfig, benchBotData);
+
+  // load config from local file
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await loadConfig();
+      if (!res) return;
+      const {
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+        location,
+        map,
+        direction,
+      } = res;
+      setBenchBotConfig({
+        ...benchBotConfig,
+        potsPerRow,
+        numberOfRows,
+        rowSpacing,
+        potSpacing,
+      });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+    };
+    fetchData();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -50,7 +88,17 @@ function App() {
         <Routes>
           <Route path="/" element={<ManualControl />} />
           <Route path="/camera-config" element={<CameraConfig />} />
-          <Route path="/species-map" element={<SpeciesMap />} />
+          <Route
+            path="/species-map"
+            element={
+              <SpeciesMap
+                benchBotConfig={benchBotConfig}
+                setBenchBotConfig={setBenchBotConfig}
+                benchBotData={benchBotData}
+                setBenchBotData={setBenchBotData}
+              />
+            }
+          />
           <Route
             path="/traversal"
             element={
@@ -58,6 +106,10 @@ function App() {
                 setOpen={setOpen}
                 setSnackBarContent={setSnackBarContent}
                 setStatusBarText={setStatusText}
+                benchBotConfig={benchBotConfig}
+                setBenchBotConfig={setBenchBotConfig}
+                benchBotData={benchBotData}
+                setBenchBotData={setBenchBotData}
               />
             }
           />

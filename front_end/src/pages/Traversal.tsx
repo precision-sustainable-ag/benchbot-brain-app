@@ -9,24 +9,17 @@ import {
   BenchBotData,
   Image,
 } from "../interfaces/BenchBotTypes";
-import {
-  loadConfig,
-  moveXandZ,
-  moveY,
-  saveConfig,
-  takeImage,
-} from "../utils/api";
-import {
-  defaultBenchBotConfig,
-  defaultBenchBotData,
-  defaultImage,
-  defaultSpecies,
-} from "../utils/constants";
+import { moveXandZ, moveY, saveConfig, takeImage } from "../utils/api";
+import { defaultImage, defaultSpecies } from "../utils/constants";
 
 interface TraversalProps {
   setOpen: (open: boolean) => void;
   setSnackBarContent: (content: string) => void;
   setStatusBarText: (status: string) => void;
+  benchBotConfig: BenchBotConfig;
+  setBenchBotConfig: (config: BenchBotConfig) => void;
+  benchBotData: BenchBotData;
+  setBenchBotData: (data: BenchBotData) => void;
 }
 
 type traversalStatus = "stopped" | "running" | "paused";
@@ -35,13 +28,11 @@ export default function Traversal({
   setOpen,
   setSnackBarContent,
   setStatusBarText,
+  benchBotConfig,
+  setBenchBotConfig,
+  benchBotData,
+  setBenchBotData,
 }: TraversalProps) {
-  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
-    defaultBenchBotConfig
-  );
-  const [benchBotData, setBenchBotData] =
-    useState<BenchBotData>(defaultBenchBotData);
-
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
 
@@ -137,7 +128,6 @@ export default function Traversal({
         setStatus(nextRow, nextPot, "nextVisit");
         // if this pot had visited or removed, continue the loop
         if (map[row][pot].status === "visited") {
-          // setStatus(row, pot, "visited");
           continue;
         }
         if (map[row][pot].removed) {
@@ -229,32 +219,6 @@ export default function Traversal({
       );
     }
   };
-
-  // load config from localStorage
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await loadConfig();
-      if (!res) return;
-      const {
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-        location,
-        map,
-        direction,
-      } = res;
-      setBenchBotConfig({
-        ...benchBotConfig,
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-      });
-      setBenchBotData({ ...benchBotData, location, map, direction });
-    };
-    fetchData();
-  }, []);
 
   // stop traversal when leave the page
   useEffect(

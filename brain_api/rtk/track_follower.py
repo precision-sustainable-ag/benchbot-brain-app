@@ -10,6 +10,7 @@ from path_builder import add_from_json_file, PathBuilder
 
 from farm_ng.core.event_service_pb2 import SubscribeRequest
 from farm_ng.core.events_file_reader import proto_from_json_file
+from farm_ng.core.events_file_writer import proto_to_json_file
 from farm_ng.core.uri_pb2 import Uri
 from farm_ng.track.track_pb2 import Track
 from farm_ng.track.track_pb2 import TrackFollowerState
@@ -22,8 +23,9 @@ from farm_ng_core_pybind import Pose3F64
 
 log_dir = from_here("logs")
 Path(log_dir).mkdir(parents=True, exist_ok=True)
-curr_date = datetime.now().strftime('%m-%d_%H:%M')
-logfile = f"logs/{curr_date}_track.log"          
+curr_date = datetime.now().strftime('D%m%d_T%H%M')
+logfile = f"logs/{curr_date}.log"
+pose_file = f"logs/{curr_date}.json"
 
 
 class MotorController_Y():
@@ -76,45 +78,47 @@ class MotorController_Y():
         distance_gap = 0.5
         last_distance_mark = None
         track_paused = False
+        recorded_poses: list[Pose3F64] = []
+        dist_list = []
         with open(logfile, "a") as l_file:
             async for _, message in self.clients["track_follower"].subscribe(SubscribeRequest(uri=Uri(path="/state"), every_n=1)):
                 track_progress = message.progress
                 if not last_distance_mark:
+                    curr_pose = await self.get_pose()
+                    recorded_poses.append(curr_pose)
+                    # l_file.write(str(curr_pose.to_proto()))
                     last_distance_mark = track_progress.distance_total
-                    print("Distance Mark:", last_distance_mark)
+                    print("Start:", last_distance_mark)
+                    dist_list.append(last_distance_mark)
                 if last_distance_mark-track_progress.distance_remaining >= distance_gap:
                     try:
                         await self.pause_track()
                     except:
                         pass
                     last_distance_mark = track_progress.distance_remaining
-                    print("Pause at:", last_distance_mark)
-                    
-                    curr_pose: Pose3F64 = await self.get_pose()
-                    # print(curr_pose.to_proto())
-                    l_file.write(str(curr_pose.to_proto())+"\n")
-
+                    print("Pause:", last_distance_mark)
+                    dist_list.append(last_distance_mark)
                     start_time = time.time()
                     track_paused = True
-                    
+                    curr_pose = await self.get_pose()
+                    # l_file.write(str(curr_pose.to_proto()))
+                    recorded_poses.append(curr_pose)
+
                 if track_paused:
-                    if time.time()-start_time > 10:
+                    if time.time()-start_time > 8:
                         await self.resume_track()
-                        print("Resume at:", time.time())
+                        print("Resume:", time.time())
                         track_paused = False
-
-                # when track is paused
-                if message.status.track_status == 4:
-                    curr_pose: Pose3F64 = await self.get_pose()
-                    # print(curr_pose.to_proto())
-                    l_file.write(str(curr_pose.to_proto())+"\n")
-
 
                 # if the track is completed
                 if message.status.track_status == 5:
-                    print("COMPLETED!")
                     last_distance_mark = track_progress.distance_remaining
-                    print("Complete at:", last_distance_mark)
+                    print("Finish:", last_distance_mark)
+                    dist_list.append(last_distance_mark)
+                    curr_pose = await self.get_pose()
+                    # l_file.write(str(curr_pose.to_proto()))
+                    recorded_poses.append(curr_pose)
+                    print("COMPLETED!")
                     break
                 # if there is issue with following the track
                 if message.status.track_status == 7:
@@ -122,6 +126,8 @@ class MotorController_Y():
                     break
                 # l_file.write(str(message))
                 # print("###################\n", message.progress)
+            l_file.write(str(dist_list))
+        save_poses(recorded_poses)
 
     # Start the trackfollower service to have the robot following the path
     async def start_track(self, track_file: str) -> None:
@@ -161,3 +167,11 @@ class MotorController_Y():
     def signal_handler(self, loop):
         asyncio.ensure_future(self.stop_track(), loop=loop)
 
+
+# Save poses list
+def save_poses(r_poses) -> None:
+    poses_list = [pose.to_proto() for pose in r_poses]
+    pose_dict: Track = Track(waypoints=poses_list)
+    if not proto_to_json_file(pose_file, pose_dict):
+        raise RuntimeError(f"Failed to log poses")
+    print(f"Saved {len(poses_list)} poses to {pose_file}")

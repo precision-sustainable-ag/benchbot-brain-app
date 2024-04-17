@@ -14,7 +14,7 @@ from scipy.spatial.distance import cdist
 from farm_ng_core_pybind import Pose3F64
 
 from farm_ng.core.event_service_pb2 import SubscribeRequest
-from farm_ng.core.events_file_reader import proto_from_json_file
+from farm_ng.core.events_file_reader import proto_from_json_file, proto_to_json_file
 from farm_ng.core.uri_pb2 import Uri
 from farm_ng.track.track_pb2 import Track
 from farm_ng.track.track_pb2 import TrackFollowerState
@@ -26,8 +26,9 @@ from farm_ng.filter.filter_pb2 import FilterState
 
 log_dir = from_here("logs")
 Path(log_dir).mkdir(parents=True, exist_ok=True)
-curr_date = datetime.now().strftime('%m-%d_%H:%M')
-logfile = f"logs/{curr_date}_track.log"          
+curr_date = datetime.now().strftime('D%m%d_T%H%M')
+logfile = f"logs/{curr_date}.log"
+pose_file = f"logs/{curr_date}.json"       
 
 
 
@@ -85,18 +86,27 @@ class MotorController_Y():
         self.poses = get_poses(track, 0.5)
         print('Retrieved Poses')
         # await self.start()
+        xy_pos = ""
+        recorded_poses: list[Pose3F64] = []
         with open(logfile, "a") as l_file:
             for target_pose in self.poses:
                 curr_pose: Pose3F64 = await self.get_pose()
-                l_file.write(str(curr_pose.to_proto())+"\n")
-
-                print(f"x: {target_pose.a_from_b.translation.x}, y: {target_pose.a_from_b.translation.y}")
+                recorded_poses.append(curr_pose)
+                # l_file.write(str(curr_pose.to_proto())+"\n")
+                xy_pos += f"This: x={curr_pose.a_from_b.translation[0]}, y={curr_pose.a_from_b.translation[1]}\n"
+                xy_pos += f"Next: x={target_pose.a_from_b.translation.x}, y={target_pose.a_from_b.translation.y}\n\n"
                 await self.clients["track_follower"].request_reply("/go_to_goal", target_pose)
                 print('Pose request sent')
                 
                 # wait between poses
                 await asyncio.sleep(10.0)
                 # break
+            # record final position pose
+            curr_pose: Pose3F64 = await self.get_pose()
+            recorded_poses.append(curr_pose)
+            # current pose values are real time from filter, target values are from mathematical calculations
+            l_file.write(xy_pos)
+        save_poses(recorded_poses)
         print('Poses done')
 
     async def run_track_service(self, track_file: str) -> None:
@@ -143,3 +153,11 @@ def get_poses(track: Track, track_gap) -> list[Pose3F64]:
                 previous_pose = waypoint
     return sub_track
 
+
+# Save poses list
+def save_poses(r_poses) -> None:
+    poses_list = [pose.to_proto() for pose in r_poses]
+    pose_dict: Track = Track(waypoints=poses_list)
+    if not proto_to_json_file(pose_file, pose_dict):
+        raise RuntimeError(f"Failed to log poses")
+    print(f"Saved {len(poses_list)} poses to {pose_file}")

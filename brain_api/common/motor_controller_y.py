@@ -15,6 +15,7 @@ from farm_ng.core.events_file_reader import proto_from_json_file
 LINEAR_VELOCITY = 0.1
 VELOCITY_INCREMENT = 0.05
 ANGULAR_VELOCITY = 0.05
+TURN_TIMES = 30
 
 class MotorControllerY():
     def __init__(self, file_path=from_root("brain_api/common/service_config.json")):
@@ -22,11 +23,21 @@ class MotorControllerY():
         self.twist = Twist2d()
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
         self.client: EventClient = EventClient(config)
+        self.turn_direction = None
 
-    async def set_motor_velocity(self, speed) -> None:
+    async def set_motor_velocity(self, speed, turn=None) -> None:
         self.twist.linear_velocity_x = speed
+        if turn is not None:
+            self.twist.angular_velocity = turn
+        else:
+            self.twist.angular_velocity = 0
         await self.client.request_reply("/twist", self.twist)
         await asyncio.sleep(0.05)
+
+    async def hold_position(self, time_s) -> None:
+        total = int(time_s/0.05)
+        for v in range(total):
+           await self.set_motor_velocity(0.0)
 
     async def move_y(self, distance) -> None:
         distance_in_m = abs(distance/100)
@@ -34,8 +45,21 @@ class MotorControllerY():
         if distance < 0:
             direction_flag = False
         velocity_track = get_velocity_graph(distance_in_m, LINEAR_VELOCITY, VELOCITY_INCREMENT, direction_flag)
+        turn_count = TURN_TIMES
         for v in velocity_track:
-           await self.set_motor_velocity(v)
+            if self.turn_direction is not None:
+                if self.turn_direction=='left':
+                    await self.set_motor_velocity(v, -ANGULAR_VELOCITY)
+                else:
+                    await self.set_motor_velocity(v, ANGULAR_VELOCITY)
+                turn_count -= 1
+                if turn_count<=0:
+                    self.turn_direction = None
+            else:
+                await self.set_motor_velocity(v)
+
+    def set_turn(self, direction) -> None:
+        self.turn_direction = direction
 
 
 '''

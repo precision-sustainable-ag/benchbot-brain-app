@@ -5,6 +5,7 @@ from pathlib import Path
 import time
 from from_root import from_root, from_here
 import numpy as np
+import threading
 
 from farm_ng.canbus.canbus_pb2 import Twist2d
 from farm_ng.core.event_client import EventClient
@@ -24,6 +25,13 @@ class MotorControllerY():
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
         self.client: EventClient = EventClient(config)
         self.turn_direction = None
+        self.hold_motor_position = True
+        self.movement_finished = False
+        holding_task = threading.Thread(target=self.start_motor_control)
+        holding_task.start()
+
+    def start_motor_control(self):
+        asyncio.run(self.hold_position())
 
     async def set_motor_velocity(self, speed, turn=None) -> None:
         self.twist.linear_velocity_x = speed
@@ -34,10 +42,21 @@ class MotorControllerY():
         await self.client.request_reply("/twist", self.twist)
         await asyncio.sleep(0.05)
 
-    async def hold_position(self, time_s) -> None:
-        total = int(time_s/0.05)
-        for v in range(total):
-           await self.set_motor_velocity(0.0)
+    async def hold_position(self) -> None:
+        while True:
+            if self.hold_motor_position:
+                await self.set_motor_velocity(0.0)
+            else:
+                await asyncio.sleep(0.05)
+                continue
+            if self.movement_finished:
+                break
+
+    def hold_motors(self) -> None:
+        self.hold_motor_position = True
+
+    def release_motors(self) -> None:
+        self.hold_motor_position = False
 
     async def move_y(self, distance) -> None:
         distance_in_m = abs(distance/100)
@@ -45,6 +64,8 @@ class MotorControllerY():
         if distance < 0:
             direction_flag = False
         velocity_track = get_velocity_graph(distance_in_m, LINEAR_VELOCITY, VELOCITY_INCREMENT, direction_flag)
+        print('releasing motors')
+        self.release_motors()
         turn_count = TURN_TIMES
         for v in velocity_track:
             if self.turn_direction is not None:
@@ -57,9 +78,14 @@ class MotorControllerY():
                     self.turn_direction = None
             else:
                 await self.set_motor_velocity(v)
+        print('holding motors')
+        self.hold_motors()
 
     def set_turn(self, direction) -> None:
         self.turn_direction = direction
+
+    def release_motor_control(self):
+        self.movement_finished = True
 
 
 '''

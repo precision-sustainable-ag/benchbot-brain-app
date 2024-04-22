@@ -57,7 +57,6 @@ def update_udp_config(udp_ip, udp_port):
 async def save_config(request: Request):
     print("Save config")
     config = await request.json()
-    print(config)
     config_file = from_here(species_map_filename)
     with open(config_file, "w") as json_file:
         json.dump(config, json_file)
@@ -70,7 +69,6 @@ async def load_config():
         config_file = from_here(species_map_filename)
         with open(config_file, "r") as json_file:
             data = json.load(json_file)
-            print(data)
         return data
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File not found")

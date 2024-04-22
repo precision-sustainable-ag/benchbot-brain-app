@@ -16,7 +16,6 @@ export const defaultSpeciesConfig: SpeciesConfig = {
 export const defaultPotData: PotData = {
   species: "",
   removed: false,
-  visited: false,
   status: "unVisited",
 };
 

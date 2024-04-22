@@ -19,8 +19,13 @@ export interface SpeciesConfig {
 export interface PotData {
   species: string;
   removed: boolean;
-  visited: boolean;
-  status: "unVisited" | "visiting" | "nextVisit" | "visited" | "failed";
+  status:
+    | "unVisited"
+    | "nextVisit"
+    | "visiting"
+    | "visited"
+    | "failed"
+    | "skipped";
 }
 
 export interface Image {

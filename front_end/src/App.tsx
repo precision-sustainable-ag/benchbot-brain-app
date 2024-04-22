@@ -24,8 +24,6 @@ function App() {
   const [benchBotData, setBenchBotData] =
     useState<BenchBotData>(defaultBenchBotData);
 
-  console.log(benchBotConfig, benchBotData);
-
   // load config from local file
   useEffect(() => {
     const fetchData = async () => {

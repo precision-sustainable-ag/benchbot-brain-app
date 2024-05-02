@@ -48,7 +48,7 @@ class MotorControllerY():
                 await self.set_motor_velocity(0.0)
             else:
                 await asyncio.sleep(0.05)
-                continue
+                # continue
             if self.movement_finished:
                 break
 
@@ -59,20 +59,23 @@ class MotorControllerY():
         self.hold_motor_position = False
 
     async def move_y(self, distance) -> None:
+        print('releasing motors')
+        self.release_motors()
+        
         distance_in_m = abs(distance/100)
         direction_flag = True
         if distance < 0:
             direction_flag = False
+        
+        # await asyncio.sleep(0.01)
         velocity_track = get_velocity_graph(distance_in_m, LINEAR_VELOCITY, VELOCITY_INCREMENT, direction_flag)
-        print('releasing motors')
-        self.release_motors()
         turn_count = TURN_TIMES
         for v in velocity_track:
             if self.turn_direction is not None:
                 if self.turn_direction=='left':
-                    await self.set_motor_velocity(v, -ANGULAR_VELOCITY)
-                else:
                     await self.set_motor_velocity(v, ANGULAR_VELOCITY)
+                else:
+                    await self.set_motor_velocity(v, -ANGULAR_VELOCITY)
                 turn_count -= 1
                 if turn_count<=0:
                     self.turn_direction = None

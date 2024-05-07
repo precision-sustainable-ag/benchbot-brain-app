@@ -160,3 +160,37 @@ export const updateIPandPort = async (ip: string, port: string) => {
   const data = await res.json();
   console.log(data);
 };
+
+const fetchData = async (url: string, options = {}) => {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`Fetch Status: ${res.status} ${res.statusText}`);
+    }
+    // TODO: NOTE: there might be more res structure like res.text()
+    return await res.json();
+  } catch (error) {
+    console.error("Error when fetching: ", error);
+    throw error;
+  }
+};
+
+export const nudge = async (direction: "left" | "right") => {
+  const url = baseUrl + `/nudge_${direction}`;
+  try {
+    const res = await fetchData(url);
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const endMotorHold = async () => {
+  const url = baseUrl + "/end_motor_hold";
+  try {
+    const res = await fetchData(url);
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};

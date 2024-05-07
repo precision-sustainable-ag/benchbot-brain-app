@@ -10,9 +10,11 @@ import {
   Image,
 } from "../interfaces/BenchBotTypes";
 import {
+  endMotorHold,
   loadConfig,
   moveXandZ,
   moveY,
+  nudge,
   saveConfig,
   takeImage,
 } from "../utils/api";
@@ -183,6 +185,7 @@ export default function Traversal() {
       direction *= -1;
     }
     if (!stopRef.current) {
+      await endMotorHold();
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
       setBenchBotConfig({
@@ -194,6 +197,18 @@ export default function Traversal() {
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
       saveConfig(benchBotConfig, benchBotData);
+    }
+  };
+
+  // TODO: call api for turning
+  const handleTurn = async (direction: "left" | "right") => {
+    if (direction === "left") {
+      appendLog("nudge left");
+      await nudge("left");
+    }
+    if (direction === "right") {
+      appendLog("nudge right");
+      await nudge("right");
     }
   };
 
@@ -264,6 +279,20 @@ export default function Traversal() {
         </div>
         <PotMap speciesMap={benchBotData.map} species={defaultSpecies} />
       </div>
+      <Row>
+        <Button
+          name={"👈left"}
+          onClick={() => handleTurn("left")}
+          // disabled={stopRef.current}
+          styles={{ width: "400px", marginLeft: "50px" }}
+        />
+        <Button
+          name={"right👉"}
+          onClick={() => handleTurn("right")}
+          // disabled={stopRef.current}
+          styles={{ width: "400px", marginLeft: "50px" }}
+        />
+      </Row>
     </div>
   );
 }

@@ -18,8 +18,8 @@ async def move_y_axis(dist):
         time.sleep(5)
     
     # release motor control
-    y_motor_control.release_motor_control()
-        
+    y_motor_control.end_motor_hold()
+    print("\nFinished\n")
 
 
 if __name__ == "__main__":

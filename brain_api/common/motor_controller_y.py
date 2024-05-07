@@ -27,6 +27,8 @@ class MotorControllerY():
         self.turn_direction = None
         self.hold_motor_position = Value('b', False)
         self.movement_finished = Value('b', False)
+    
+    def start_motor_hold(self):
         holding_task = Process(target=self.initiate_motor_hold)
         holding_task.start()
 

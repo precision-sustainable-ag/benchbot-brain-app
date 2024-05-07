@@ -30,6 +30,17 @@ async def move_y_axis(dist):
     print('Y: ' + dist)
     await y_motor_control.move_y(float(dist))
 
+@app.get("/nudge_left")
+def nudge_left():
+    y_motor_control.set_turn('left')
+
+@app.get("/nudge_right")
+def nudge_right():
+    y_motor_control.set_turn('right')
+
+@app.get("/end_motor_hold")
+def end_motor_hold():
+    y_motor_control.end_motor_hold()
 
 # x, and z distance in cm
 # +x is left, -x is right

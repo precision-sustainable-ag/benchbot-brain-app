@@ -5,7 +5,7 @@ from pathlib import Path
 import time
 from from_root import from_root, from_here
 import numpy as np
-import threading
+from multiprocessing import Process, Value
 
 from farm_ng.canbus.canbus_pb2 import Twist2d
 from farm_ng.core.event_client import EventClient
@@ -25,13 +25,13 @@ class MotorControllerY():
         config: EventServiceConfig = proto_from_json_file(service_config_path, EventServiceConfig())
         self.client: EventClient = EventClient(config)
         self.turn_direction = None
-        self.hold_motor_position = True
-        self.movement_finished = False
-        holding_task = threading.Thread(target=self.start_motor_control)
+        self.hold_motor_position = Value('b', False)
+        self.movement_finished = Value('b', False)
+        holding_task = Process(target=self.initiate_motor_hold)
         holding_task.start()
 
-    def start_motor_control(self):
-        asyncio.run(self.hold_position())
+    def initiate_motor_hold(self):
+        asyncio.run(self.hold_position(self.hold_motor_position, self.movement_finished))
 
     async def set_motor_velocity(self, speed, turn=None) -> None:
         self.twist.linear_velocity_x = speed
@@ -42,32 +42,29 @@ class MotorControllerY():
         await self.client.request_reply("/twist", self.twist)
         await asyncio.sleep(0.05)
 
-    async def hold_position(self) -> None:
+    async def hold_position(self, hold, finish) -> None:
         while True:
-            if self.hold_motor_position:
+            if hold.value:
                 await self.set_motor_velocity(0.0)
             else:
                 await asyncio.sleep(0.05)
                 # continue
-            if self.movement_finished:
+            if finish.value:
                 break
 
     def hold_motors(self) -> None:
-        self.hold_motor_position = True
+        self.hold_motor_position.value = True
 
     def release_motors(self) -> None:
-        self.hold_motor_position = False
+        self.hold_motor_position.value = False
 
     async def move_y(self, distance) -> None:
         print('releasing motors')
         self.release_motors()
-        
         distance_in_m = abs(distance/100)
         direction_flag = True
         if distance < 0:
             direction_flag = False
-        
-        # await asyncio.sleep(0.01)
         velocity_track = get_velocity_graph(distance_in_m, LINEAR_VELOCITY, VELOCITY_INCREMENT, direction_flag)
         turn_count = TURN_TIMES
         for v in velocity_track:
@@ -87,8 +84,8 @@ class MotorControllerY():
     def set_turn(self, direction) -> None:
         self.turn_direction = direction
 
-    def release_motor_control(self):
-        self.movement_finished = True
+    def end_motor_hold(self):
+        self.movement_finished.value = True
 
 
 '''

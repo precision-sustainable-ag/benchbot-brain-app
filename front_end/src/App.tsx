@@ -16,7 +16,7 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
-  const [statusText, setStatusText] = useState("");
+  const [statusText, setStatusText] = useState("stopped");
 
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig

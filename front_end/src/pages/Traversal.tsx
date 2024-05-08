@@ -10,7 +10,7 @@ import {
   Image,
 } from "../interfaces/BenchBotTypes";
 import {
-  endMotorHold,
+  motorHold,
   moveXandZ,
   moveY,
   nudge,
@@ -83,7 +83,10 @@ export default function Traversal({
     }
   };
 
-  const startTraversal = () => {
+  const startTraversal = async () => {
+    if (stopRef.current === "stopped") {
+      await motorHold("start");
+    }
     stopRef.current = "running";
     appendLog("Start BenchBot traversal.");
     setStatusBarText("running");
@@ -204,7 +207,7 @@ export default function Traversal({
     if (stopRef.current !== "paused") {
       stopRef.current = "stopped";
       setStatusBarText("stopped");
-      await endMotorHold();
+      await motorHold("end");
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
       setBenchBotConfig({

@@ -5,7 +5,6 @@ const imageUrl = "http://10.95.76.50:5000";
 // testing api
 // const imageUrl = "http://localhost:5001";
 
-
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log
 
@@ -188,8 +187,8 @@ export const nudge = async (direction: "left" | "right") => {
   }
 };
 
-export const endMotorHold = async () => {
-  const url = baseUrl + "/end_motor_hold";
+export const motorHold = async (param: "start" | "end") => {
+  const url = baseUrl + `/${param}_motor_hold`;
   try {
     const res = await fetchData(url);
     console.log(res);

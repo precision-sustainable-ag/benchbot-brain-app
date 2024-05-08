@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Row from "../components/Row";
 import {
   ControlButtonsMinus,
@@ -8,6 +8,7 @@ import {
   SpeciesConfig,
   BenchBotConfig,
   PotData,
+  BenchBotData,
 } from "../interfaces/BenchBotTypes";
 import {
   defaultSpeciesConfig,
@@ -17,20 +18,30 @@ import {
 import Button from "../components/Button";
 import PotMap from "../components/PotMap";
 import { defaultSpecies } from "../utils/constants";
-import { initBenchBotConfig } from "../utils/calculation";
-import { loadConfig } from "../utils/api";
+import { saveConfig } from "../utils/api";
 
-export default function SpeciesMap() {
-  // config for map properties
-  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
-    defaultBenchBotConfig
-  );
+interface SpeciesMapProps {
+  benchBotConfig: BenchBotConfig;
+  setBenchBotConfig: (config: BenchBotConfig) => void;
+  benchBotData: BenchBotData;
+  setBenchBotData: (data: BenchBotData) => void;
+}
+
+export default function SpeciesMap({
+  benchBotConfig,
+  setBenchBotConfig,
+  benchBotData,
+  setBenchBotData,
+}: SpeciesMapProps) {
   // config for current species
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
     ...defaultSpeciesConfig,
     species: defaultSpecies[0],
   });
-  const [speciesMap, setSpeciesMap] = useState<PotData[][]>([]);
+  const { map: speciesMap } = benchBotData;
+  const setSpeciesMap = (map: PotData[][]) => {
+    setBenchBotData({ ...benchBotData, map });
+  };
   const [helperText, setHelperText] = useState("");
   const [operations, setOperations] = useState<number[]>([]);
 
@@ -68,6 +79,7 @@ export default function SpeciesMap() {
   };
 
   // reset the map and configs
+  // TODO: do we need to update the file?
   const resetSpecies = () => {
     setSpeciesMap([]);
     setBenchBotConfig(defaultBenchBotConfig);
@@ -80,37 +92,37 @@ export default function SpeciesMap() {
     const clearedMap = speciesMap.map((row) =>
       row.map((pot) => ({
         ...pot,
-        visited: false,
         status: "unVisited" as "unVisited",
       }))
     );
     return clearedMap;
   };
 
-  // save current map to localstorage
+  // save current map to file
   const saveSpecies = () => {
     const clearedMap = setMapUnvisited();
     setSpeciesMap(clearedMap);
-    initBenchBotConfig(benchBotConfig, clearedMap);
+    const numberOfRows = speciesMap.length;
+    const location = [0, 0];
+    const direction = 1;
+    saveConfig(
+      { ...benchBotConfig, numberOfRows },
+      {
+        ...benchBotData,
+        location,
+        direction,
+        map: clearedMap,
+      }
+    );
+    setBenchBotConfig({ ...benchBotConfig, numberOfRows });
+    setBenchBotData({
+      ...benchBotData,
+      location,
+      direction,
+      map: clearedMap,
+    });
     setHelperText("Species map saved!");
   };
-
-  // load benchbot config from localstorage
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await loadConfig();
-      if (!res) return;
-      const { potsPerRow, rowSpacing, potSpacing, map } = res;
-      setBenchBotConfig({
-        ...benchBotConfig,
-        potsPerRow,
-        rowSpacing,
-        potSpacing,
-      });
-      setSpeciesMap(map);
-    };
-    fetchData();
-  }, []);
 
   // custom component for a single textbox and control buttons around it
   const ValInput = ({
@@ -165,8 +177,10 @@ export default function SpeciesMap() {
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: "500px" }}>
-        <h5 style={{ textAlign: "center", margin: "1rem" }}>Species Config</h5>
-        <h6 style={{ margin: "0" }}>Map Setting: </h6>
+        <p style={{ textAlign: "center", margin: "1rem" }}>Species Config</p>
+        <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
+          Map Setting:{" "}
+        </p>
         <Row>
           <ValInput
             name={"Pots per row:"}
@@ -199,7 +213,15 @@ export default function SpeciesMap() {
           />
         </Row>
 
-        <h6 style={{ margin: "1rem 0 0 0" }}>Add Species: </h6>
+        <h6
+          style={{
+            margin: "1rem 0 0 0",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+          }}
+        >
+          Add Species:{" "}
+        </h6>
 
         <Row>
           <span style={{ width: "400px" }}>Species: </span>

@@ -19,6 +19,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
   const bgColor = () => {
     switch (potData.status) {
       case "visited":
+      case "skipped":
         return "silver";
       case "visiting":
         return "yellowgreen";
@@ -72,6 +73,7 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
       )}
       <p style={{ fontSize: "1.25rem", margin: "0" }}>
         {potData.status === "visited" ? "visited" : ""}
+        {potData.status === "skipped" ? "skipped" : ""}
         {potData.status === "failed" ? "failed" : ""}
       </p>
     </div>

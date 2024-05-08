@@ -11,31 +11,39 @@ import {
 } from "../interfaces/BenchBotTypes";
 import {
   endMotorHold,
-  loadConfig,
   moveXandZ,
   moveY,
   nudge,
   saveConfig,
   takeImage,
 } from "../utils/api";
-import {
-  defaultBenchBotConfig,
-  defaultBenchBotData,
-  defaultImage,
-  defaultSpecies,
-} from "../utils/constants";
+import { defaultImage, defaultSpecies } from "../utils/constants";
 
-export default function Traversal() {
-  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
-    defaultBenchBotConfig
-  );
-  const [benchBotData, setBenchBotData] =
-    useState<BenchBotData>(defaultBenchBotData);
+interface TraversalProps {
+  setOpen: (open: boolean) => void;
+  setSnackBarContent: (content: string) => void;
+  setStatusBarText: (status: string) => void;
+  benchBotConfig: BenchBotConfig;
+  setBenchBotConfig: (config: BenchBotConfig) => void;
+  benchBotData: BenchBotData;
+  setBenchBotData: (data: BenchBotData) => void;
+}
 
+type traversalStatus = "stopped" | "running" | "paused";
+
+export default function Traversal({
+  setOpen,
+  setSnackBarContent,
+  setStatusBarText,
+  benchBotConfig,
+  setBenchBotConfig,
+  benchBotData,
+  setBenchBotData,
+}: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
 
-  const stopRef = useRef(false);
+  const stopRef = useRef<traversalStatus>("stopped");
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
@@ -76,8 +84,9 @@ export default function Traversal() {
   };
 
   const startTraversal = () => {
-    stopRef.current = false;
+    stopRef.current = "running";
     appendLog("Start BenchBot traversal.");
+    setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
   };
 
@@ -94,7 +103,13 @@ export default function Traversal() {
   const setStatus = (
     row: number,
     col: number,
-    status: "unVisited" | "visiting" | "nextVisit" | "visited" | "failed"
+    status:
+      | "unVisited"
+      | "visiting"
+      | "nextVisit"
+      | "visited"
+      | "failed"
+      | "skipped"
   ) => {
     if (row < benchBotData.map.length) {
       let currMap = benchBotData.map;
@@ -120,7 +135,6 @@ export default function Traversal() {
         setStatus(nextRow, nextPot, "nextVisit");
         // if this pot had visited or removed, continue the loop
         if (map[row][pot].status === "visited") {
-          // setStatus(row, pot, "visited");
           continue;
         }
         if (map[row][pot].removed) {
@@ -131,7 +145,8 @@ export default function Traversal() {
           if (image.status === "error") {
             setStatus(row, pot, "failed");
           }
-          if (stopRef.current) {
+          if (stopRef.current === "paused") {
+            setStatusBarText("paused");
             appendLog("Traversal stopped.");
             let location = [row, pot];
             setBenchBotConfig({
@@ -159,6 +174,7 @@ export default function Traversal() {
         }
         if (benchBotData.map[row][pot].status !== "failed") {
           setStatus(row, pot, "visited");
+          if (map[row][pot].removed) setStatus(row, pot, "skipped");
         }
 
         if (
@@ -170,10 +186,11 @@ export default function Traversal() {
           appendLog(`move X: ${direction * potSpacing}`);
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
+          appendLog(`move completed.`);
         }
       }
       // break outside loop if stop triggered
-      if (stopRef.current) break;
+      if (stopRef.current === "paused") break;
       if (row !== numberOfRows - 1) {
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
@@ -184,7 +201,9 @@ export default function Traversal() {
       if (pot === -1) pot += 1;
       direction *= -1;
     }
-    if (!stopRef.current) {
+    if (stopRef.current !== "paused") {
+      stopRef.current = "stopped";
+      setStatusBarText("stopped");
       await endMotorHold();
       appendLog("BenchBot traversal finished.");
       let location = [row, pot];
@@ -196,7 +215,16 @@ export default function Traversal() {
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      saveConfig(benchBotConfig, benchBotData);
+      saveConfig(
+        {
+          ...benchBotConfig,
+          potsPerRow,
+          numberOfRows,
+          rowSpacing,
+          potSpacing,
+        },
+        { ...benchBotData, location, map, direction }
+      );
     }
   };
 
@@ -212,36 +240,15 @@ export default function Traversal() {
     }
   };
 
-  // load config from localStorage
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await loadConfig();
-      if (!res) return;
-      const {
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-        location,
-        map,
-        direction,
-      } = res;
-      setBenchBotConfig({
-        ...benchBotConfig,
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-      });
-      setBenchBotData({ ...benchBotData, location, map, direction });
-    };
-    fetchData();
-  }, []);
-
   // stop traversal when leave the page
   useEffect(
     () => () => {
-      stopRef.current = true;
+      if (stopRef.current === "running") {
+        setStatusBarText("paused");
+        stopRef.current = "paused";
+        setOpen(true);
+        setSnackBarContent("Traversal paused.");
+      }
     },
     []
   );
@@ -258,7 +265,7 @@ export default function Traversal() {
           name={"Pause"}
           onClick={() => {
             appendLog("Paused BenchBot traversal.");
-            stopRef.current = true;
+            stopRef.current = "paused";
           }}
           styles={{ width: "400px", color: "#f65a5b", marginLeft: "50px" }}
         />
@@ -270,10 +277,7 @@ export default function Traversal() {
             status={Image.status}
             imagePreview={Image.image}
             imageErrMsg={Image.errorMsg}
-            retry={() => {
-              stopRef.current = false;
-              startTraversal();
-            }}
+            retry={() => {}}
             showRetry={false}
           />
         </div>

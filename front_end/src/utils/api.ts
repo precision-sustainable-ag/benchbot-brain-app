@@ -2,6 +2,9 @@ import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 const baseUrl = "http://localhost:8042";
 
 const imageUrl = "http://10.95.76.50:5000";
+// testing api
+// const imageUrl = "http://localhost:5001";
+
 
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log

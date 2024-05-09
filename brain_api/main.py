@@ -53,7 +53,7 @@ def end_motor_hold():
 def move_xz_axis(x, z):
     res = xz_motor_control.move_motors(x, z)
     print(res)
-    if 'error' in res:
+    if 'Error' in res:
         return res, 404
     return res, 200
 

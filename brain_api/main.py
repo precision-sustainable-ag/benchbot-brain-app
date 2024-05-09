@@ -36,7 +36,7 @@ async def move_y_axis(dist):
 @app.get("/start_motor_hold")
 def start_motor_hold():
     y_motor_control.start_motor_hold()
-    logging.info("Starting holding y-axis motors in place")
+    logging.info("Start holding y-axis motors in place")
 
 @app.get("/nudge_left")
 def nudge_left():
@@ -59,11 +59,7 @@ def end_motor_hold():
 @app.get("/move_xz_axis")
 def move_xz_axis(x, z):
     logging.info(f"Move x={x}, z={z}")
-    res = xz_motor_control.move_motors(x, z)
-    if 'Error' in res:
-        logging.error(res)
-        return res, 417
-    return res, 200
+    return xz_motor_control.move_motors(x, z)
 
 @app.get("/home_x")
 def home_x():
@@ -114,7 +110,6 @@ if __name__ == "__main__":
     # if not args.debug:
         # print("entered if block")
     react_build_directory = from_root("front_end/dist")
-
     print(react_build_directory)
 
     app.mount(

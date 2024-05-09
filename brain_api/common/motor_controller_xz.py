@@ -1,7 +1,8 @@
 import json
 import socket
 from from_root import from_here
-import logger
+import logging
+from fastapi import Response
 
 
 class MotorControllerXZ():
@@ -28,31 +29,33 @@ class MotorControllerXZ():
         json_obj = json.dumps(udp_config, indent=4)
         with open(self.config_file, 'w') as outfile:
             outfile.write(json_obj)
-        logger.Info(f"Updated UDP configuration [{new_ip}:{new_port}]")
+        logging.info(f"Updated UDP configuration [{new_ip}:{new_port}]")
         self.init_connection(new_ip, new_port)
 
     def init_connection(self, ip, port):
         self.server_socket.connect((ip, port))
         response_msg = self.move_motors(0, 0)
-        if "Error" not in response_msg:
+        if response_msg.status_code == 200:
             self.conn_status = True
-            logger.Info(f"UDP Connection successful with {ip}:{port}")
+            logging.info(f"UDP Connection successful with {ip}:{port}")
         else:
-            logger.Error(f"UDP Connection unsuccessful with {ip}:{port}")
+            logging.error(f"UDP Connection unsuccessful with {ip}:{port}")
 
     def send_message(self, msg_in):
         msgbyte = bytes(msg_in, 'ascii')
         self.server_socket.send(msgbyte)
-        logger.Info(f"Message {msg_in} sent")
+        logging.info(f"Message {msg_in} sent")
         try:
             self.server_socket.settimeout(2)
             cc_reply = self.server_socket.recv(1024)
             msg_reply = cc_reply.decode()
-            logger.Info(f"Received reply: {msg_reply}")
+            logging.info(f"Received reply: {msg_reply}")
+            response = Response(content=msg_reply, status_code=200)
         except:
             msg_reply = "Error! No reply from clearcore server"
-            logger.Error(msg_reply)
-        return msg_reply
+            logging.error(msg_reply)
+            response = Response(content=msg_reply, status_code=417)
+        return response
     
     def move_motors(self, x_val, z_val):
         x_counts = int(x_val) // self.x_steps_to_cm

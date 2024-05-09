@@ -6,7 +6,6 @@ from from_root import from_root, from_here
 from common.motor_controller_y import MotorControllerY
 from common.motor_controller_xz import MotorControllerXZ
 import uvicorn
-import logging
 import json
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 app = FastAPI()
@@ -92,10 +91,6 @@ async def load_config():
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File not found")
 
-from datetime import date
-log_dir = from_here("logs")
-log_file_path = log_dir / f"{date.today()}_backend.ini"
-logfile = str(log_file_path)
 
 if __name__ == "__main__":
     # run the server
@@ -116,4 +111,4 @@ if __name__ == "__main__":
         "/",
         StaticFiles(directory=str(react_build_directory.resolve()), html=True),
     )
-    uvicorn.run(app, host="0.0.0.0", port=8042, log_config=logfile)
+    uvicorn.run(app, host="0.0.0.0", port=8042, log_config="log_config.ini")

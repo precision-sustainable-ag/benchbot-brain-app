@@ -24,7 +24,9 @@ interface FetchResult<T> {
   error?: Error | undefined;
 }
 
-interface APIConfig extends BenchBotConfig, BenchBotData {}
+interface APIConfig extends BenchBotConfig, BenchBotData {
+  startedMotorHold: boolean;
+}
 
 const customFetch = async <T>(
   url: string,
@@ -44,7 +46,8 @@ const customFetch = async <T>(
 
 export const saveConfig = async (
   config: BenchBotConfig,
-  data: BenchBotData
+  data: BenchBotData,
+  startedMotorHold: boolean
 ) => {
   const url = baseUrl + "/saveConfig/";
   const res = await customFetch<APIConfig>(url, {
@@ -52,7 +55,7 @@ export const saveConfig = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...config, ...data }),
+    body: JSON.stringify({ ...config, ...data, startedMotorHold }),
   });
 
   if (res.error) {

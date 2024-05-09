@@ -51,7 +51,11 @@ def end_motor_hold():
 # +z is down, -z is up
 @app.get("/move_xz_axis")
 def move_xz_axis(x, z):
-    return xz_motor_control.move_motors(x, z)
+    res = xz_motor_control.move_motors(x, z)
+    print(res)
+    if 'error' in res:
+        return res, 404
+    return res, 200
 
 
 @app.get("/home_x")

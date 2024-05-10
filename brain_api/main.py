@@ -117,3 +117,23 @@ if __name__ == "__main__":
         StaticFiles(directory=str(react_build_directory.resolve()), html=True),
     )
     uvicorn.run(app, host="0.0.0.0", port=8042, log_config="log_config.ini")
+
+from uvicorn.config import LOGGING_CONFIG
+if __name__ == "__main__":
+    react_build_directory = from_root("front_end/dist")
+    print(react_build_directory)
+
+    app.mount(
+        "/",
+        StaticFiles(directory=str(react_build_directory.resolve()), html=True),
+    )
+       
+    LOGGING_CONFIG["formatters"]["default"]["fmt"] = '[%(asctime)s] [ %(levelname)s ] - %(message)s '
+    date_fmt = "%Y-%m-%d %H:%M:%S"
+    LOGGING_CONFIG["formatters"]["default"]["datefmt"] = date_fmt
+    
+    file_dict = {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'default', 'filename': 'server_logs.log', 'mode': 'a+'}
+    f_handler = dict({'file_handler':file_dict})
+    LOGGING_CONFIG["handlers"].update(f_handler)
+    LOGGING_CONFIG['loggers']['uvicorn']['handlers'].append('file_handler')
+    uvicorn.run(app, host="127.0.0.1", port=8042)

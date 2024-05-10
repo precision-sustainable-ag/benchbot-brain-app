@@ -126,4 +126,4 @@ if __name__ == "__main__":
     LOGGING_CONFIG["handlers"].update(f_handler)
     LOGGING_CONFIG['loggers']['uvicorn']['handlers'].append('file_handler')
 
-    uvicorn.run(app, host="127.0.0.1", port=8042)
+    uvicorn.run(app, host="0.0.0.0", port=8042)

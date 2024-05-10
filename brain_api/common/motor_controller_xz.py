@@ -5,6 +5,11 @@ import logging
 from fastapi import Response
 
 
+from datetime import date
+logfile = f"{date.today()}_server.log"
+logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
+
+
 class MotorControllerXZ():
     def __init__(self):
         # x axis -> 0.003175 cm per enocoder count

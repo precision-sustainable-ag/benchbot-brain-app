@@ -9,7 +9,13 @@ import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 import logging
 import json
+from datetime import date
 
+log_dir = from_here("logs")
+Path(log_dir).mkdir(parents=True, exist_ok=True)
+log_file_path = log_dir / f"backend_log_{date.today()}.log"
+logfile = str(log_file_path)
+logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] - [ %(levelname)s ] - %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
 app = FastAPI()
 app.add_middleware(
@@ -117,13 +123,7 @@ if __name__ == "__main__":
         "/",
         StaticFiles(directory=str(react_build_directory.resolve()), html=True),
     )
-       
-    LOGGING_CONFIG["formatters"]["default"]["fmt"] = '[%(asctime)s] [ %(levelname)s ] - %(message)s '
-    date_fmt = "%Y-%m-%d %H:%M:%S"
-    LOGGING_CONFIG["formatters"]["default"]["datefmt"] = date_fmt
-    file_dict = {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'default', 'filename': 'server_logs.log', 'mode': 'a+'}
-    f_handler = dict({'file_handler':file_dict})
-    LOGGING_CONFIG["handlers"].update(f_handler)
-    LOGGING_CONFIG['loggers']['uvicorn']['handlers'].append('file_handler')
 
+    LOGGING_CONFIG['loggers']['uvicorn']['propagate'] = True
+    LOGGING_CONFIG['loggers']['uvicorn.access']['propagate'] = True
     uvicorn.run(app, host="0.0.0.0", port=8042)

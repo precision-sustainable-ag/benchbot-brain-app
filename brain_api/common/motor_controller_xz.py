@@ -3,6 +3,7 @@ import socket
 from from_root import from_here
 import logging
 from fastapi import Response
+import time
 
 
 class MotorControllerXZ():
@@ -51,10 +52,13 @@ class MotorControllerXZ():
             msg_reply = cc_reply.decode()
             logging.info(f"Received reply: {msg_reply}")
             response = Response(content=msg_reply, status_code=200)
+            wait_time = 5
         except:
             msg_reply = "Error! No reply from clearcore server"
             logging.error(msg_reply)
             response = Response(content=msg_reply, status_code=417)
+            wait_time = 2
+        time.sleep(wait_time)
         return response
     
     def move_motors(self, x_val, z_val):

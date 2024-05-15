@@ -5,7 +5,7 @@ from pathlib import Path
 import time
 from from_root import from_root, from_here
 import numpy as np
-from multiprocessing import Process, Value
+from multiprocessing import Process, Value, active_children
 
 from farm_ng.canbus.canbus_pb2 import Twist2d
 from farm_ng.core.event_client import EventClient
@@ -87,6 +87,10 @@ class MotorControllerY():
 
     def end_motor_hold(self) -> None:
         self.movement_finished.value = True
+        active = active_children()
+        print(f'Active Children: {len(active)}')
+        for child in active:
+            child.terminate()
 
 
 '''

@@ -50,7 +50,6 @@ class MotorControllerY():
                 await self.set_motor_velocity(0.0)
             else:
                 await asyncio.sleep(0.05)
-                # continue
             if finish.value:
                 break
 
@@ -86,7 +85,7 @@ class MotorControllerY():
     def set_turn(self, direction) -> None:
         self.turn_direction = direction
 
-    def end_motor_hold(self):
+    def end_motor_hold(self) -> None:
         self.movement_finished.value = True
 
 

@@ -25,9 +25,7 @@ interface FetchResult<T> {
   error?: Error | undefined;
 }
 
-interface APIConfig extends BenchBotConfig, BenchBotData {
-  startedMotorHold: boolean;
-}
+interface APIConfig extends BenchBotConfig, BenchBotData {}
 
 const customFetch = async <T>(
   url: string,
@@ -47,8 +45,7 @@ const customFetch = async <T>(
 
 export const saveConfig = async (
   config: BenchBotConfig,
-  data: BenchBotData,
-  startedMotorHold: boolean
+  data: BenchBotData
 ) => {
   const url = baseUrl + "/saveConfig/";
   const res = await customFetch<APIConfig>(url, {
@@ -56,7 +53,7 @@ export const saveConfig = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...config, ...data, startedMotorHold }),
+    body: JSON.stringify({ ...config, ...data }),
   });
 
   if (res.error) {
@@ -165,38 +162,4 @@ export const updateIPandPort = async (ip: string, port: string) => {
   }
   const data = await res.json();
   console.log(data);
-};
-
-const fetchData = async (url: string, options = {}) => {
-  try {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      throw new Error(`Fetch Status: ${res.status} ${res.statusText}`);
-    }
-    // TODO: NOTE: there might be more res structure like res.text()
-    return await res.json();
-  } catch (error) {
-    console.error("Error when fetching: ", error);
-    throw error;
-  }
-};
-
-export const nudge = async (direction: "left" | "right") => {
-  const url = baseUrl + `/nudge_${direction}`;
-  try {
-    const res = await fetchData(url);
-    console.log(res);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-export const motorHold = async (param: "start" | "end") => {
-  const url = baseUrl + `/${param}_motor_hold`;
-  try {
-    const res = await fetchData(url);
-    console.log(res);
-  } catch (err) {
-    console.log(err);
-  }
 };

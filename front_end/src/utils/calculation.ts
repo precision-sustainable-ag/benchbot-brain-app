@@ -9,6 +9,6 @@ export const initBenchBotConfig = (
   const numberOfRows = map.length;
   const location = [0, 0];
   const direction = 1;
-  saveConfig({ ...config, numberOfRows }, { location, map, direction }, false);
+  saveConfig({ ...config, numberOfRows }, { location, map, direction });
   return { location, map, direction };
 };

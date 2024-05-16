@@ -25,7 +25,9 @@ interface FetchResult<T> {
   error?: Error | undefined;
 }
 
-interface APIConfig extends BenchBotConfig, BenchBotData {}
+interface APIConfig extends BenchBotConfig, BenchBotData {
+  startedMotorHold: boolean;
+}
 
 const customFetch = async <T>(
   url: string,
@@ -45,7 +47,8 @@ const customFetch = async <T>(
 
 export const saveConfig = async (
   config: BenchBotConfig,
-  data: BenchBotData
+  data: BenchBotData,
+  startedMotorHold: boolean
 ) => {
   const url = baseUrl + "/saveConfig/";
   const res = await customFetch<APIConfig>(url, {
@@ -53,7 +56,7 @@ export const saveConfig = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...config, ...data }),
+    body: JSON.stringify({ ...config, ...data, startedMotorHold }),
   });
 
   if (res.error) {
@@ -162,4 +165,28 @@ export const updateIPandPort = async (ip: string, port: string) => {
   }
   const data = await res.json();
   console.log(data);
+};
+
+const fetchData = async (url: string, options = {}) => {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`Fetch Status: ${res.status} ${res.statusText}`);
+    }
+    // TODO: NOTE: there might be more res structure like res.text()
+    return await res.json();
+  } catch (error) {
+    console.error("Error when fetching: ", error);
+    throw error;
+  }
+};
+
+export const motorHold = async (param: "start" | "end") => {
+  const url = baseUrl + `/${param}_motor_hold`;
+  try {
+    const res = await fetchData(url, {method: 'PUT'});
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
 };

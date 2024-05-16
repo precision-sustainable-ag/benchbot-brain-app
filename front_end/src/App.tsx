@@ -16,13 +16,14 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
-  const [statusText, setStatusText] = useState("");
+  const [statusText, setStatusText] = useState("stopped");
 
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
   const [benchBotData, setBenchBotData] =
     useState<BenchBotData>(defaultBenchBotData);
+  const [startedMotorHold, setStartedMotorHold] = useState(false);
 
   // load config from local file
   useEffect(() => {
@@ -37,6 +38,7 @@ function App() {
         location,
         map,
         direction,
+        startedMotorHold,
       } = res;
       setBenchBotConfig({
         ...benchBotConfig,
@@ -46,6 +48,7 @@ function App() {
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
+      setStartedMotorHold(startedMotorHold);
     };
     fetchData();
   }, []);
@@ -94,6 +97,7 @@ function App() {
                 setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
+                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />
@@ -108,6 +112,8 @@ function App() {
                 setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
+                startedMotorHold={startedMotorHold}
+                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />

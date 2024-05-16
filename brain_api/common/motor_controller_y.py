@@ -3,9 +3,9 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 import time
-from from_root import from_root, from_here
+from from_root import from_root
 import numpy as np
-from multiprocessing import Process, Value, active_children
+from multiprocessing import Process, Value
 
 from farm_ng.canbus.canbus_pb2 import Twist2d
 from farm_ng.core.event_client import EventClient
@@ -33,6 +33,9 @@ class MotorControllerY():
         holding_task.start()
 
     def initiate_motor_hold(self):
+        self.turn_direction = None
+        self.release_motors()
+        self.movement_finished.value = False
         asyncio.run(self.hold_position(self.hold_motor_position, self.movement_finished))
 
     async def set_motor_velocity(self, speed, turn=None) -> None:
@@ -60,7 +63,7 @@ class MotorControllerY():
         self.hold_motor_position.value = False
 
     async def move_y(self, distance) -> None:
-        print('releasing motors')
+        print('releasing motors for movement')
         self.release_motors()
         distance_in_m = abs(distance/100)
         direction_flag = True
@@ -79,7 +82,7 @@ class MotorControllerY():
                     self.turn_direction = None
             else:
                 await self.set_motor_velocity(v)
-        print('holding motors')
+        print('holding motors after movement done')
         self.hold_motors()
 
     def set_turn(self, direction) -> None:
@@ -87,10 +90,6 @@ class MotorControllerY():
 
     def end_motor_hold(self) -> None:
         self.movement_finished.value = True
-        active = active_children()
-        print(f'Active Children: {len(active)}')
-        for child in active:
-            child.terminate()
 
 
 '''

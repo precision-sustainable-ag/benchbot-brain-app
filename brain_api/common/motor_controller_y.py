@@ -26,18 +26,12 @@ class MotorControllerY():
         self.client: EventClient = EventClient(config)
         self.turn_direction = None
         self.hold_motor_position = Value('b', False)
-        self.movement_finished = Value('b', False)
-        self.start_motor_hold()
-    
-    def start_motor_hold(self):
+        self.traversal = Value('b', False)
         holding_task = Process(target=self.initiate_motor_hold)
         holding_task.start()
 
     def initiate_motor_hold(self):
-        self.turn_direction = None
-        self.release_motors()
-        self.movement_finished.value = False
-        asyncio.run(self.hold_position(self.hold_motor_position, self.movement_finished))
+        asyncio.run(self.hold_position(self.hold_motor_position, self.traversal))
 
     async def set_motor_velocity(self, speed, turn=None) -> None:
         self.twist.linear_velocity_x = speed
@@ -48,14 +42,15 @@ class MotorControllerY():
         await self.client.request_reply("/twist", self.twist)
         await asyncio.sleep(0.05)
 
-    async def hold_position(self, hold, finish) -> None:
+    async def hold_position(self, hold, traverse) -> None:
         while True:
-            if hold.value:
+            if hold.value and traverse.value:
                 await self.set_motor_velocity(0.0)
             else:
                 await asyncio.sleep(0.05)
-            if finish.value:
-                break
+
+    def start_motor_hold(self):
+        self.traversal.value = True
 
     def hold_motors(self) -> None:
         self.hold_motor_position.value = True
@@ -90,7 +85,7 @@ class MotorControllerY():
         self.turn_direction = direction
 
     def end_motor_hold(self) -> None:
-        self.movement_finished.value = True
+        self.traversal.value = False
 
 
 '''

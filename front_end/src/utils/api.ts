@@ -158,7 +158,7 @@ export const homeZ = async () => {
 
 export const updateIPandPort = async (ip: string, port: string) => {
   const url = baseUrl + `/udp_update?udp_ip=${ip}&udp_port=${port}`;
-  const res = await fetch(url, {method: 'POST'});
+  const res = await fetch(url);
   if (!res.ok) {
     const errMsg = await res.text();
     console.log(errMsg);
@@ -184,7 +184,7 @@ const fetchData = async (url: string, options = {}) => {
 export const nudge = async (direction: "left" | "right") => {
   const url = baseUrl + `/nudge_${direction}`;
   try {
-    const res = await fetchData(url, {method: 'PUT'});
+    const res = await fetchData(url);
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -194,7 +194,7 @@ export const nudge = async (direction: "left" | "right") => {
 export const motorHold = async (param: "start" | "end") => {
   const url = baseUrl + `/${param}_motor_hold`;
   try {
-    const res = await fetchData(url, {method: 'PUT'});
+    const res = await fetchData(url);
     console.log(res);
   } catch (err) {
     console.log(err);

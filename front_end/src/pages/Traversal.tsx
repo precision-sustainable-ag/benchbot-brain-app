@@ -179,6 +179,7 @@ export default function Traversal({
           appendLog(`move X: ${direction * potSpacing}`);
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
+          await sleep(potSpacing * 100);
           appendLog(`move completed.`);
         }
       }

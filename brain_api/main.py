@@ -21,41 +21,64 @@ app.add_middleware(
 y_motor_control = MotorControllerY()
 xz_motor_control = MotorControllerXZ()
 if not xz_motor_control.conn_status:
-    logging.ERROR("Connection to ClearCore not successful!")
+    logging.error("Connection to ClearCore not successful!")
 
 species_map_filename = "species_map.json"
+logging.info(f"Using species file {species_map_filename}")
+
 
 @app.get("/move_y_axis/{dist}")
 async def move_y_axis(dist):
-    print('Y: ' + dist)
+    logging.info(f"Move y={dist}")
     await y_motor_control.move_y(float(dist))
 
+@app.put("/start_motor_hold")
+def start_motor_hold():
+    y_motor_control.start_motor_hold()
+    logging.info("Start holding y-axis motors in place")
+
+@app.put("/nudge_left")
+def nudge_left():
+    y_motor_control.set_turn('left')
+    logging.info("Nudge left")
+
+@app.put("/nudge_right")
+def nudge_right():
+    y_motor_control.set_turn('right')
+    logging.info("Nudge right")
+
+@app.put("/end_motor_hold")
+def end_motor_hold():
+    y_motor_control.end_motor_hold()
+    logging.info("Stop holding y-axis motors in place")
 
 # x, and z distance in cm
 # +x is left, -x is right
 # +z is down, -z is up
 @app.get("/move_xz_axis")
 def move_xz_axis(x, z):
+    logging.info(f"Move x={x}, z={z}")
     return xz_motor_control.move_motors(x, z)
-
 
 @app.get("/home_x")
 def home_x():
+    logging.info("Home x axis")
     return xz_motor_control.home_x()
-
 
 @app.get("/home_z")
 def home_z():
+    logging.info("Home z axis")
     return xz_motor_control.home_z()
 
 
-@app.get("/udp_update")
+@app.post("/udp_update")
 def update_udp_config(udp_ip, udp_port):
     xz_motor_control.update_config(udp_ip, udp_port)
 
+
 @app.post("/saveConfig/")
 async def save_config(request: Request):
-    print("Save config")
+    logging.info("Save species config")
     config = await request.json()
     config_file = from_here(species_map_filename)
     with open(config_file, "w") as json_file:
@@ -64,7 +87,7 @@ async def save_config(request: Request):
 
 @app.get("/loadConfig")
 async def load_config():
-    print("Load config")
+    logging.info("Load species config")
     try:
         config_file = from_here(species_map_filename)
         with open(config_file, "r") as json_file:
@@ -86,7 +109,6 @@ if __name__ == "__main__":
     # if not args.debug:
         # print("entered if block")
     react_build_directory = from_root("front_end/dist")
-
     print(react_build_directory)
 
     app.mount(

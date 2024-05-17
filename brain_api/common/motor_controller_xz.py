@@ -1,6 +1,7 @@
 import json
 import socket
 from from_root import from_here
+import logging
 
 
 class MotorControllerXZ():
@@ -28,22 +29,29 @@ class MotorControllerXZ():
         with open(self.config_file, 'w') as outfile:
             outfile.write(json_obj)
         self.init_connection()
+        logging.info(f"Updated UDP configuration [{new_ip}:{new_port}]")
 
     def init_connection(self):
         self.server_socket.connect((self.ip, self.port))
         response_msg = self.move_motors(0, 0)
         if "Error" not in response_msg:
             self.conn_status = True
+            logging.info(f"UDP Connection successful")
+        else:
+            logging.error(f"UDP Connection unsuccessful")
 
     def send_message(self, msg_in):
         msgbyte = bytes(msg_in, 'ascii')
         self.server_socket.send(msgbyte)
+        logging.info(f"Message {msg_in} sent")
         try:
             self.server_socket.settimeout(2)
             cc_reply = self.server_socket.recv(1024)
             msg_reply = cc_reply.decode()
+            logging.info(f"Received reply: {msg_reply}")
         except:
             msg_reply = "Error! No reply from server"
+            logging.error(msg_reply)
         return msg_reply
     
     def move_motors(self, x_val, z_val):

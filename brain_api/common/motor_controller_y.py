@@ -26,12 +26,17 @@ class MotorControllerY():
         self.client: EventClient = EventClient(config)
         self.turn_direction = None
         self.hold_motor_position = Value('b', False)
-        self.traversal = Value('b', False)
+        self.movement_finished = Value('b', False)
+    
+    def start_motor_hold(self):
         holding_task = Process(target=self.initiate_motor_hold)
         holding_task.start()
 
     def initiate_motor_hold(self):
-        asyncio.run(self.hold_position(self.hold_motor_position, self.traversal))
+        self.turn_direction = None
+        self.release_motors()
+        self.movement_finished.value = False
+        asyncio.run(self.hold_position(self.hold_motor_position, self.movement_finished))
 
     async def set_motor_velocity(self, speed, turn=None) -> None:
         self.twist.linear_velocity_x = speed
@@ -42,28 +47,20 @@ class MotorControllerY():
         await self.client.request_reply("/twist", self.twist)
         await asyncio.sleep(0.05)
 
-    async def hold_position(self, hold, traverse) -> None:
+    async def hold_position(self, hold, finish) -> None:
         while True:
-            if hold.value and traverse.value:
+            if hold.value:
                 await self.set_motor_velocity(0.0)
             else:
                 await asyncio.sleep(0.05)
-
-    def start_motor_hold(self):
-        self.release_motors()
-        self.traversal.value = True
-
-    def end_motor_hold(self) -> None:
-        self.traversal.value = False
+            if finish.value:
+                break
 
     def hold_motors(self) -> None:
         self.hold_motor_position.value = True
 
     def release_motors(self) -> None:
         self.hold_motor_position.value = False
-
-    def set_turn(self, direction) -> None:
-        self.turn_direction = direction
 
     async def move_y(self, distance) -> None:
         print('releasing motors for movement')
@@ -87,6 +84,12 @@ class MotorControllerY():
                 await self.set_motor_velocity(v)
         print('holding motors after movement done')
         self.hold_motors()
+
+    def set_turn(self, direction) -> None:
+        self.turn_direction = direction
+
+    def end_motor_hold(self) -> None:
+        self.movement_finished.value = True
 
 
 '''

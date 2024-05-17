@@ -59,7 +59,7 @@ def end_motor_hold():
 def move_xz_axis(x, z):
     logging.info(f"Move x={x}, z={z}")
     res_msg = xz_motor_control.move_motors(x, z)
-    if "Error":
+    if "Error" in res_msg:
         response = Response(content=res_msg, status_code=417)
     else:
         response = Response(content=res_msg, status_code=200)

@@ -155,7 +155,7 @@ export default function Traversal({
           }
           if (stopRef.current === "paused") {
             setStatusBarText("paused");
-            appendLog("Traversal stopped.");
+            appendLog("Traversal paused.");
             let location = [row, pot];
             setBenchBotConfig({
               ...benchBotConfig,
@@ -280,7 +280,7 @@ export default function Traversal({
         <Button
           name={"Pause"}
           onClick={() => {
-            appendLog("Paused BenchBot traversal.");
+            appendLog("Pausing BenchBot traversal.");
             stopRef.current = "paused";
           }}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}

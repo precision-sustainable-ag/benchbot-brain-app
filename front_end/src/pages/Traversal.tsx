@@ -287,7 +287,11 @@ export default function Traversal({
         />
         <Button
           name={"Stop"}
-          onClick={() => {}}
+          onClick={async () => {
+            appendLog("Stopped BenchBot traversal.");
+            stopRef.current = "paused";
+            await motorHold("end")
+          }}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />
         <Button

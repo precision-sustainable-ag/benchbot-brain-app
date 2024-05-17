@@ -14,10 +14,10 @@ class MotorControllerXZ():
         self.config_file = from_here('udp_config.json')
         with open(self.config_file, 'r') as openfile:
             udp_info = json.load(openfile)
-        self.ip = udp_info.get("ip")
-        self.port = udp_info.get("port")
+        ip = udp_info.get("ip")
+        port = udp_info.get("port")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.init_connection()
+        self.init_connection(ip, port)
  
     def update_config(self, new_ip, new_port):
         udp_config = {
@@ -27,17 +27,17 @@ class MotorControllerXZ():
         json_obj = json.dumps(udp_config, indent=4)
         with open(self.config_file, 'w') as outfile:
             outfile.write(json_obj)
-        self.init_connection()
+        self.init_connection(new_ip, new_port)
         logging.info(f"Updated UDP configuration [{new_ip}:{new_port}]")
 
-    def init_connection(self):
-        self.server_socket.connect((self.ip, self.port))
+    def init_connection(self, ip, port):
+        self.server_socket.connect((ip, port))
         response_msg = self.move_motors(0, 0)
         if "Error" not in response_msg:
             self.conn_status = True
-            logging.info(f"UDP Connection successful")
+            logging.info(f"UDP Connection successful with {ip}:{port}")
         else:
-            logging.error(f"UDP Connection unsuccessful")
+            logging.error(f"UDP Connection unsuccessful with {ip}:{port}")
 
     def send_message(self, msg_in):
         msgbyte = bytes(msg_in, 'ascii')

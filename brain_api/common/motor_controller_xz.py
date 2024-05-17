@@ -1,7 +1,6 @@
 import json
 import socket
 from from_root import from_here
-from fastapi import Response
 
 
 class MotorControllerXZ():
@@ -33,7 +32,7 @@ class MotorControllerXZ():
     def init_connection(self):
         self.server_socket.connect((self.ip, self.port))
         response_msg = self.move_motors(0, 0)
-        if response_msg.status_code == 200:
+        if "Error" not in response_msg:
             self.conn_status = True
 
     def send_message(self, msg_in):
@@ -43,11 +42,9 @@ class MotorControllerXZ():
             self.server_socket.settimeout(2)
             cc_reply = self.server_socket.recv(1024)
             msg_reply = cc_reply.decode()
-            response = Response(content=msg_reply, status_code=200)
         except:
-            msg_reply = "Error! No reply from clearcore server"
-            response = Response(content=msg_reply, status_code=417)
-        return response
+            msg_reply = "Error! No reply from server"
+        return msg_reply
     
     def move_motors(self, x_val, z_val):
         x_counts = int(x_val) // self.x_steps_to_cm

@@ -181,6 +181,16 @@ const fetchData = async (url: string, options = {}) => {
   }
 };
 
+export const nudge = async (direction: "left" | "right") => {
+  const url = baseUrl + `/nudge_${direction}`;
+  try {
+    const res = await fetchData(url);
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const motorHold = async (param: "start" | "end") => {
   const url = baseUrl + `/${param}_motor_hold`;
   try {

@@ -275,7 +275,7 @@ export default function Traversal({
         <Button
           name={"Start"}
           onClick={startTraversal}
-          styles={{ width: "400px", color: "#61dac3", marginLeft: "50px" }}
+          styles={{ width: "150px", color: "#61dac3", marginLeft: "25px" }}
         />
         <Button
           name={"Pause"}
@@ -283,7 +283,24 @@ export default function Traversal({
             appendLog("Paused BenchBot traversal.");
             stopRef.current = "paused";
           }}
-          styles={{ width: "400px", color: "#f65a5b", marginLeft: "50px" }}
+          styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
+        />
+        <Button
+          name={"Stop"}
+          onClick={() => {}}
+          styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
+        />
+        <Button
+          name={"👈left"}
+          onClick={() => handleTurn("left")}
+          // disabled={stopRef.current}
+          styles={{ width: "150px", marginLeft: "25px" }}
+        />
+        <Button
+          name={"right👉"}
+          onClick={() => handleTurn("right")}
+          // disabled={stopRef.current}
+          styles={{ width: "150px", marginLeft: "25px" }}
         />
       </Row>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
@@ -299,20 +316,6 @@ export default function Traversal({
         </div>
         <PotMap speciesMap={benchBotData.map} species={defaultSpecies} />
       </div>
-      <Row>
-        <Button
-          name={"👈left"}
-          onClick={() => handleTurn("left")}
-          // disabled={stopRef.current}
-          styles={{ width: "400px", marginLeft: "50px" }}
-        />
-        <Button
-          name={"right👉"}
-          onClick={() => handleTurn("right")}
-          // disabled={stopRef.current}
-          styles={{ width: "400px", marginLeft: "50px" }}
-        />
-      </Row>
     </div>
   );
 }

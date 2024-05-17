@@ -25,6 +25,7 @@ interface SpeciesMapProps {
   setBenchBotConfig: (config: BenchBotConfig) => void;
   benchBotData: BenchBotData;
   setBenchBotData: (data: BenchBotData) => void;
+  setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function SpeciesMap({
@@ -32,6 +33,7 @@ export default function SpeciesMap({
   setBenchBotConfig,
   benchBotData,
   setBenchBotData,
+  setStartedMotorHold,
 }: SpeciesMapProps) {
   // config for current species
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
@@ -112,7 +114,9 @@ export default function SpeciesMap({
         location,
         direction,
         map: clearedMap,
-      }
+      },
+      // set startedMotorHold to false since the state is cleared
+      false
     );
     setBenchBotConfig({ ...benchBotConfig, numberOfRows });
     setBenchBotData({
@@ -121,6 +125,7 @@ export default function SpeciesMap({
       direction,
       map: clearedMap,
     });
+    setStartedMotorHold(false);
     setHelperText("Species map saved!");
   };
 

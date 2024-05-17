@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -58,7 +58,12 @@ def end_motor_hold():
 @app.get("/move_xz_axis")
 def move_xz_axis(x, z):
     logging.info(f"Move x={x}, z={z}")
-    return xz_motor_control.move_motors(x, z)
+    res_msg = xz_motor_control.move_motors(x, z)
+    if "Error":
+        response = Response(content=res_msg, status_code=417)
+    else:
+        response = Response(content=res_msg, status_code=200)
+    return response
 
 @app.get("/home_x")
 def home_x():

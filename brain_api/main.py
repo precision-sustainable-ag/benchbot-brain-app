@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -60,10 +62,9 @@ def move_xz_axis(x, z):
     logging.info(f"Move x={x}, z={z}")
     res_msg = xz_motor_control.move_motors(x, z)
     if "Error" in res_msg:
-        response = Response(content=res_msg, status_code=417)
+        return JSONResponse(content=jsonable_encoder(res_msg), status_code=417)
     else:
-        response = Response(content=res_msg, status_code=200)
-    return response
+        return JSONResponse(content=jsonable_encoder(res_msg), status_code=200)
 
 @app.get("/home_x")
 def home_x():

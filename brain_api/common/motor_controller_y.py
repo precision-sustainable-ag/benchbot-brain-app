@@ -50,13 +50,20 @@ class MotorControllerY():
                 await asyncio.sleep(0.05)
 
     def start_motor_hold(self):
+        self.release_motors()
         self.traversal.value = True
+
+    def end_motor_hold(self) -> None:
+        self.traversal.value = False
 
     def hold_motors(self) -> None:
         self.hold_motor_position.value = True
 
     def release_motors(self) -> None:
         self.hold_motor_position.value = False
+
+    def set_turn(self, direction) -> None:
+        self.turn_direction = direction
 
     async def move_y(self, distance) -> None:
         print('releasing motors for movement')
@@ -80,12 +87,6 @@ class MotorControllerY():
                 await self.set_motor_velocity(v)
         print('holding motors after movement done')
         self.hold_motors()
-
-    def set_turn(self, direction) -> None:
-        self.turn_direction = direction
-
-    def end_motor_hold(self) -> None:
-        self.traversal.value = False
 
 
 '''

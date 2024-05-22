@@ -8,6 +8,8 @@ import {
   BenchBotConfig,
   BenchBotData,
   Image,
+  PotStatus,
+  traversalStatus,
 } from "../interfaces/BenchBotTypes";
 import {
   motorHold,
@@ -30,8 +32,6 @@ interface TraversalProps {
   startedMotorHold: boolean;
   setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-type traversalStatus = "stopped" | "running" | "paused";
 
 export default function Traversal({
   setOpen,
@@ -108,17 +108,7 @@ export default function Traversal({
     } else return [row, col + direction];
   };
 
-  const setStatus = (
-    row: number,
-    col: number,
-    status:
-      | "unVisited"
-      | "visiting"
-      | "nextVisit"
-      | "visited"
-      | "failed"
-      | "skipped"
-  ) => {
+  const setStatus = (row: number, col: number, status: PotStatus) => {
     if (row < benchBotData.map.length) {
       let currMap = benchBotData.map;
       currMap[row][col].status = status;
@@ -244,7 +234,6 @@ export default function Traversal({
     }
   };
 
-  // TODO: call api for turning
   const handleTurn = async (direction: "left" | "right") => {
     if (direction === "left") {
       appendLog("nudge left");
@@ -290,7 +279,7 @@ export default function Traversal({
           onClick={async () => {
             appendLog("Stopped BenchBot traversal.");
             stopRef.current = "paused";
-            await motorHold("end")
+            await motorHold("end");
           }}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />

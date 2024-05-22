@@ -146,7 +146,7 @@ export default function SpeciesMap({
     disabled?: boolean;
   }) => {
     return (
-      <>
+      <Row>
         <span style={{ width: "250px" }}>{name}</span>
         <ControlButtonsMinus
           setValue={(num) => {
@@ -175,7 +175,7 @@ export default function SpeciesMap({
           setValue={(num) => setValue(configName, value + num)}
           disabled={disabled}
         />
-      </>
+      </Row>
     );
   };
 
@@ -186,47 +186,35 @@ export default function SpeciesMap({
         <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
           Map Setting:{" "}
         </p>
-        <Row>
-          <ValInput
-            name={"Pots per row:"}
-            configName={"potsPerRow"}
-            value={benchBotConfig.potsPerRow}
-            setValue={setBenchBotConfigByParam}
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Pots per row:"}
+          configName={"potsPerRow"}
+          value={benchBotConfig.potsPerRow}
+          setValue={setBenchBotConfigByParam}
+          disabled={speciesMap.length > 0}
+        />
 
-        <Row>
-          <ValInput
-            name={"Row spacing: "}
-            configName={"rowSpacing"}
-            value={benchBotConfig.rowSpacing}
-            setValue={setBenchBotConfigByParam}
-            unit="cm"
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Row spacing: "}
+          configName={"rowSpacing"}
+          value={benchBotConfig.rowSpacing}
+          setValue={setBenchBotConfigByParam}
+          unit="cm"
+          disabled={speciesMap.length > 0}
+        />
 
-        <Row>
-          <ValInput
-            name={"Pot spacing: "}
-            configName={"potSpacing"}
-            value={benchBotConfig.potSpacing}
-            setValue={setBenchBotConfigByParam}
-            unit="cm"
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Pot spacing: "}
+          configName={"potSpacing"}
+          value={benchBotConfig.potSpacing}
+          setValue={setBenchBotConfigByParam}
+          unit="cm"
+          disabled={speciesMap.length > 0}
+        />
 
-        <h6
-          style={{
-            margin: "1rem 0 0 0",
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-          }}
-        >
+        <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
           Add Species:{" "}
-        </h6>
+        </p>
 
         <Row>
           <span style={{ width: "400px" }}>Species: </span>
@@ -244,14 +232,12 @@ export default function SpeciesMap({
           </select>
         </Row>
 
-        <Row>
-          <ValInput
-            name={"Rows: "}
-            configName={"numberOfRows"}
-            value={speciesConfig.numberOfRows}
-            setValue={setSpeciesConfigByParam}
-          />
-        </Row>
+        <ValInput
+          name={"Rows: "}
+          configName={"numberOfRows"}
+          value={speciesConfig.numberOfRows}
+          setValue={setSpeciesConfigByParam}
+        />
 
         <Row styles={{ gap: "1rem" }}>
           <Button name={"Add Species"} onClick={addSpecies} />

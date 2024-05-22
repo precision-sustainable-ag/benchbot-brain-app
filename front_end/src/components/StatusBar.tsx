@@ -1,5 +1,7 @@
+import { traversalStatus } from "../interfaces/BenchBotTypes";
+
 interface StatusBarProps {
-  status: string;
+  status: traversalStatus;
 }
 
 const SnackBarStyles = {

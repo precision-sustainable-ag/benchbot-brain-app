@@ -25,9 +25,7 @@ interface FetchResult<T> {
   error?: Error | undefined;
 }
 
-interface APIConfig extends BenchBotConfig, BenchBotData {
-  startedMotorHold: boolean;
-}
+interface APIConfig extends BenchBotConfig, BenchBotData {}
 
 const customFetch = async <T>(
   url: string,
@@ -47,8 +45,7 @@ const customFetch = async <T>(
 
 export const saveConfig = async (
   config: BenchBotConfig,
-  data: BenchBotData,
-  startedMotorHold: boolean
+  data: BenchBotData
 ) => {
   const url = baseUrl + "/saveConfig/";
   const res = await customFetch<APIConfig>(url, {
@@ -56,7 +53,7 @@ export const saveConfig = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...config, ...data, startedMotorHold }),
+    body: JSON.stringify({ ...config, ...data }),
   });
 
   if (res.error) {
@@ -158,7 +155,7 @@ export const homeZ = async () => {
 
 export const updateIPandPort = async (ip: string, port: string) => {
   const url = baseUrl + `/udp_update?udp_ip=${ip}&udp_port=${port}`;
-  const res = await fetch(url, {method:'POST'});
+  const res = await fetch(url, { method: "POST" });
   if (!res.ok) {
     const errMsg = await res.text();
     console.log(errMsg);
@@ -184,7 +181,7 @@ const fetchData = async (url: string, options = {}) => {
 export const nudge = async (direction: "left" | "right") => {
   const url = baseUrl + `/nudge_${direction}`;
   try {
-    const res = await fetchData(url, {method: 'PUT'});
+    const res = await fetchData(url, { method: "PUT" });
     console.log(res);
   } catch (err) {
     console.log(err);
@@ -194,7 +191,7 @@ export const nudge = async (direction: "left" | "right") => {
 export const motorHold = async (param: "start" | "end") => {
   const url = baseUrl + `/${param}_motor_hold`;
   try {
-    const res = await fetchData(url, {method: 'PUT'});
+    const res = await fetchData(url, { method: "PUT" });
     console.log(res);
   } catch (err) {
     console.log(err);

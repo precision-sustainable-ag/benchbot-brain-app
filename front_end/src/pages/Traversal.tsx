@@ -156,17 +156,12 @@ export default function Traversal({
             });
             setBenchBotData({ ...benchBotData, location, map, direction });
             // FIXME: temporary solution for benchbotdata would not updated here
-            saveConfig(
-              benchBotConfig,
-              {
-                ...benchBotData,
-                location,
-                map,
-                direction,
-              },
-              // set startedMotorHold to true
-              true
-            );
+            saveConfig(benchBotConfig, {
+              ...benchBotData,
+              location,
+              map,
+              direction,
+            });
             break;
           }
           // visit pot
@@ -227,9 +222,7 @@ export default function Traversal({
           rowSpacing,
           potSpacing,
         },
-        { ...benchBotData, location, map, direction },
-        // set startedMotorHold to true
-        true
+        { ...benchBotData, location, map, direction }
       );
     }
   };
@@ -280,6 +273,7 @@ export default function Traversal({
             appendLog("Stopped BenchBot traversal.");
             stopRef.current = "paused";
             await motorHold("end");
+            setStartedMotorHold(false);
           }}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />

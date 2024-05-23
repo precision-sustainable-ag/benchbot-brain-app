@@ -42,7 +42,6 @@ function App() {
         location,
         map,
         direction,
-        startedMotorHold,
       } = res;
       setBenchBotConfig({
         ...benchBotConfig,
@@ -52,7 +51,6 @@ function App() {
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      setStartedMotorHold(startedMotorHold);
     };
     fetchData();
   }, []);

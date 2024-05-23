@@ -114,9 +114,7 @@ export default function SpeciesMap({
         location,
         direction,
         map: clearedMap,
-      },
-      // set startedMotorHold to false since the state is cleared
-      false
+      }
     );
     setBenchBotConfig({ ...benchBotConfig, numberOfRows });
     setBenchBotData({

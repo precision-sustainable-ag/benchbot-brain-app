@@ -7,7 +7,11 @@ import Traversal from "./pages/Traversal";
 import SnackBar from "./components/SnackBar";
 import StatusBar from "./components/StatusBar";
 
-import { BenchBotConfig, BenchBotData } from "./interfaces/BenchBotTypes";
+import {
+  BenchBotConfig,
+  BenchBotData,
+  traversalStatus,
+} from "./interfaces/BenchBotTypes";
 import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
 import { loadConfig } from "./utils/api";
 
@@ -16,7 +20,7 @@ const LinkStyle = { color: "inherit", textDecoration: "none" };
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
-  const [statusText, setStatusText] = useState("stopped");
+  const [statusText, setStatusText] = useState<traversalStatus>("stopped");
 
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig

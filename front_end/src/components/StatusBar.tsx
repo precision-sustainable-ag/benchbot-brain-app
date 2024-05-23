@@ -4,7 +4,7 @@ interface StatusBarProps {
   status: traversalStatus;
 }
 
-const SnackBarStyles = {
+const StatusBarStyles = {
   position: "fixed" as "fixed",
   top: "0.5rem",
   right: "0.5rem",
@@ -31,7 +31,7 @@ export default function StatusBar({ status }: StatusBarProps) {
   };
 
   const styles = {
-    ...SnackBarStyles,
+    ...StatusBarStyles,
     backgroundColor: statusBarBgColor(),
   };
 

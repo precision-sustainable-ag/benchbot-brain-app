@@ -22,13 +22,13 @@ import {
 import { defaultImage, defaultSpecies } from "../utils/constants";
 
 interface TraversalProps {
-  setOpen: (open: boolean) => void;
-  setSnackBarContent: (content: string) => void;
-  setStatusBarText: (status: string) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSnackBarContent: React.Dispatch<React.SetStateAction<string>>;
+  setStatusBarText: React.Dispatch<React.SetStateAction<traversalStatus>>;
   benchBotConfig: BenchBotConfig;
-  setBenchBotConfig: (config: BenchBotConfig) => void;
+  setBenchBotConfig: React.Dispatch<React.SetStateAction<BenchBotConfig>>;
   benchBotData: BenchBotData;
-  setBenchBotData: (data: BenchBotData) => void;
+  setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
   startedMotorHold: boolean;
   setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
 }

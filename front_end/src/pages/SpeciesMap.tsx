@@ -22,9 +22,9 @@ import { saveConfig } from "../utils/api";
 
 interface SpeciesMapProps {
   benchBotConfig: BenchBotConfig;
-  setBenchBotConfig: (config: BenchBotConfig) => void;
+  setBenchBotConfig: React.Dispatch<React.SetStateAction<BenchBotConfig>>;
   benchBotData: BenchBotData;
-  setBenchBotData: (data: BenchBotData) => void;
+  setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
   setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

@@ -139,43 +139,41 @@ export default function Traversal({
         setStatus(row, pot, "visiting");
         const [nextRow, nextPot] = findNext(row, pot, direction);
         setStatus(nextRow, nextPot, "nextVisit");
-        // if this pot had visited or removed, continue the loop
-        if (map[row][pot].status === "visited") {
-          continue;
+
+        // pause/stop traversal
+        if (stopRef.current === "paused") {
+          setStatusBarText("paused");
+          appendLog("Traversal paused.");
+          let location = [row, pot];
+          setBenchBotData({ ...benchBotData, location, map, direction });
+          saveConfig(benchBotConfig, {
+            ...benchBotData,
+            location,
+            map,
+            direction,
+          });
+          break;
+        } else if (stopRef.current === "stopped") {
+          // stop traversal if hit stop button
+          setStatusBarText("stopped");
+          appendLog("Traversal stopped.");
+          return;
         }
+
+        // visit pot, skip pot or take image
         if (map[row][pot].removed) {
           appendLog(`skipped pot at row ${row + 1} pot ${pot + 1}`);
+          setStatus(row, pot, "skipped");
         } else {
           const image = await loadImage();
           setImage(image);
+          appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
           if (image.status === "error") {
             setStatus(row, pot, "failed");
-          }
-          if (stopRef.current === "paused") {
-            setStatusBarText("paused");
-            appendLog("Traversal paused.");
-            let location = [row, pot];
-            setBenchBotData({ ...benchBotData, location, map, direction });
-            // FIXME: temporary solution for benchbotdata would not updated here
-            saveConfig(benchBotConfig, {
-              ...benchBotData,
-              location,
-              map,
-              direction,
-            });
-            break;
-          }
-          // visit pot
-          if (benchBotData.map[row][pot].status !== "failed") {
-            setStatus(row, pot, "visited");
-          }
-          appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
-        }
-        if (benchBotData.map[row][pot].status !== "failed") {
-          setStatus(row, pot, "visited");
-          if (map[row][pot].removed) setStatus(row, pot, "skipped");
+          } else setStatus(row, pot, "visited");
         }
 
+        // move x
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -191,6 +189,7 @@ export default function Traversal({
       }
       // break outside loop if stop triggered
       if (stopRef.current === "paused") break;
+      // move y
       if (row !== numberOfRows - 1) {
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
@@ -201,6 +200,7 @@ export default function Traversal({
       if (pot === -1) pot += 1;
       direction *= -1;
     }
+    // finish traversal
     if (stopRef.current !== "paused") {
       appendLog("BenchBot traversal finished.");
       stopRef.current = "stopped";

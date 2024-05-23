@@ -19,6 +19,7 @@ import Button from "../components/Button";
 import PotMap from "../components/PotMap";
 import { defaultSpecies } from "../utils/constants";
 import { saveConfig } from "../utils/api";
+import { resetBenchBotData } from "../utils/functions";
 
 interface SpeciesMapProps {
   benchBotConfig: BenchBotConfig;
@@ -89,31 +90,17 @@ export default function SpeciesMap({
     setHelperText("Reset species map.");
   };
 
-  // FIXME: temporary function to remove all visited stage of the map
-  const setMapUnvisited = () => {
-    const clearedMap = speciesMap.map((row) =>
-      row.map((pot) => ({
-        ...pot,
-        status: "unVisited" as "unVisited",
-      }))
-    );
-    return clearedMap;
-  };
-
   // save current map to file
   const saveSpecies = () => {
-    const clearedMap = setMapUnvisited();
-    setSpeciesMap(clearedMap);
     const numberOfRows = speciesMap.length;
-    const location = [0, 0];
-    const direction = 1;
+    const { location, map, direction } = resetBenchBotData(speciesMap);
     saveConfig(
       { ...benchBotConfig, numberOfRows },
       {
         ...benchBotData,
         location,
         direction,
-        map: clearedMap,
+        map,
       }
     );
     setBenchBotConfig({ ...benchBotConfig, numberOfRows });
@@ -121,7 +108,7 @@ export default function SpeciesMap({
       ...benchBotData,
       location,
       direction,
-      map: clearedMap,
+      map,
     });
     setStartedMotorHold(false);
     setHelperText("Species map saved!");

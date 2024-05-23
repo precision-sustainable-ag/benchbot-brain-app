@@ -20,13 +20,13 @@ import {
   takeImage,
 } from "../utils/api";
 import { defaultImage, defaultSpecies } from "../utils/constants";
+import { resetBenchBotData } from "../utils/functions";
 
 interface TraversalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setSnackBarContent: React.Dispatch<React.SetStateAction<string>>;
   setStatusBarText: React.Dispatch<React.SetStateAction<traversalStatus>>;
   benchBotConfig: BenchBotConfig;
-  setBenchBotConfig: React.Dispatch<React.SetStateAction<BenchBotConfig>>;
   benchBotData: BenchBotData;
   setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
   startedMotorHold: boolean;
@@ -38,7 +38,6 @@ export default function Traversal({
   setSnackBarContent,
   setStatusBarText,
   benchBotConfig,
-  setBenchBotConfig,
   benchBotData,
   setBenchBotData,
   startedMotorHold,
@@ -98,6 +97,21 @@ export default function Traversal({
     traverseBenchBot(benchBotConfig, benchBotData);
   };
 
+  const pauseTraversal = () => {
+    appendLog("Pausing BenchBot traversal.");
+    stopRef.current = "paused";
+  };
+
+  // save current map to file
+  const stopTraversal = async () => {
+    appendLog("Stopping BenchBot traversal.");
+    stopRef.current = "stopped";
+    await motorHold("end");
+    setStartedMotorHold(false);
+    const { location, map, direction } = resetBenchBotData(benchBotData.map);
+    saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
+  };
+
   const findNext = (row: number, col: number, direction: number) => {
     if (benchBotData.map.length === 0) return [0, 0];
     let totalCol = benchBotData.map[0].length;
@@ -147,13 +161,6 @@ export default function Traversal({
             setStatusBarText("paused");
             appendLog("Traversal paused.");
             let location = [row, pot];
-            setBenchBotConfig({
-              ...benchBotConfig,
-              potsPerRow,
-              numberOfRows,
-              rowSpacing,
-              potSpacing,
-            });
             setBenchBotData({ ...benchBotData, location, map, direction });
             // FIXME: temporary solution for benchbotdata would not updated here
             saveConfig(benchBotConfig, {
@@ -201,29 +208,13 @@ export default function Traversal({
       direction *= -1;
     }
     if (stopRef.current !== "paused") {
+      appendLog("BenchBot traversal finished.");
       stopRef.current = "stopped";
       setStatusBarText("stopped");
       await motorHold("end");
-      appendLog("BenchBot traversal finished.");
       let location = [row, pot];
-      setBenchBotConfig({
-        ...benchBotConfig,
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-      });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      saveConfig(
-        {
-          ...benchBotConfig,
-          potsPerRow,
-          numberOfRows,
-          rowSpacing,
-          potSpacing,
-        },
-        { ...benchBotData, location, map, direction }
-      );
+      saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
     }
   };
 
@@ -261,32 +252,28 @@ export default function Traversal({
         />
         <Button
           name={"Pause"}
-          onClick={() => {
-            appendLog("Pausing BenchBot traversal.");
-            stopRef.current = "paused";
-          }}
+          onClick={pauseTraversal}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />
         <Button
           name={"Stop"}
-          onClick={async () => {
-            appendLog("Stopped BenchBot traversal.");
-            stopRef.current = "paused";
-            await motorHold("end");
-            setStartedMotorHold(false);
-          }}
+          onClick={stopTraversal}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />
         <Button
           name={"👈left"}
           onClick={() => handleTurn("left")}
-          // disabled={stopRef.current}
+          disabled={
+            stopRef.current === "paused" || stopRef.current === "stopped"
+          }
           styles={{ width: "150px", marginLeft: "25px" }}
         />
         <Button
           name={"right👉"}
           onClick={() => handleTurn("right")}
-          // disabled={stopRef.current}
+          disabled={
+            stopRef.current === "paused" || stopRef.current === "stopped"
+          }
           styles={{ width: "150px", marginLeft: "25px" }}
         />
       </Row>

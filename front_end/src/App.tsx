@@ -111,7 +111,6 @@ function App() {
                 setSnackBarContent={setSnackBarContent}
                 setStatusBarText={setStatusText}
                 benchBotConfig={benchBotConfig}
-                setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
                 startedMotorHold={startedMotorHold}

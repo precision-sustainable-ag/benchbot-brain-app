@@ -27,7 +27,6 @@ function App() {
   );
   const [benchBotData, setBenchBotData] =
     useState<BenchBotData>(defaultBenchBotData);
-  const [startedMotorHold, setStartedMotorHold] = useState(false);
 
   // load config from local file
   useEffect(() => {
@@ -99,7 +98,6 @@ function App() {
                 setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
-                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />
@@ -113,8 +111,6 @@ function App() {
                 benchBotConfig={benchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
-                startedMotorHold={startedMotorHold}
-                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />

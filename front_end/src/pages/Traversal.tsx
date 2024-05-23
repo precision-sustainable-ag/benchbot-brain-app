@@ -29,8 +29,6 @@ interface TraversalProps {
   benchBotConfig: BenchBotConfig;
   benchBotData: BenchBotData;
   setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
-  startedMotorHold: boolean;
-  setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function Traversal({
@@ -40,8 +38,6 @@ export default function Traversal({
   benchBotConfig,
   benchBotData,
   setBenchBotData,
-  startedMotorHold,
-  setStartedMotorHold,
 }: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
@@ -87,9 +83,8 @@ export default function Traversal({
   };
 
   const startTraversal = async () => {
-    if (!startedMotorHold) {
+    if (stopRef.current === "stopped") {
       await motorHold("start");
-      setStartedMotorHold(true);
     }
     stopRef.current = "running";
     appendLog("Start BenchBot traversal.");
@@ -107,7 +102,6 @@ export default function Traversal({
     appendLog("Stopping BenchBot traversal.");
     stopRef.current = "stopped";
     await motorHold("end");
-    setStartedMotorHold(false);
     const { location, map, direction } = resetBenchBotData(benchBotData.map);
     saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
   };

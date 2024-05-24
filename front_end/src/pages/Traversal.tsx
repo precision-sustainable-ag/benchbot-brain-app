@@ -99,29 +99,22 @@ export default function Traversal({
 
   // save current map to file
   const stopTraversal = async () => {
+    if (stopRef.current === "stopped") {
+      console.log("reset");
+      const { location, map, direction } = resetBenchBotData(benchBotData.map);
+      saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+      return;
+    }
     appendLog("Stopping BenchBot traversal.");
+    if (stopRef.current === "paused") {
+      setStatusBarText("stopped");
+      appendLog("Traversal stopped.");
+    }
     stopRef.current = "stopped";
     await motorHold("end");
     const { location, map, direction } = resetBenchBotData(benchBotData.map);
     saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
-  };
-
-  const findNext = (row: number, col: number, direction: number) => {
-    if (benchBotData.map.length === 0) return [0, 0];
-    let totalCol = benchBotData.map[0].length;
-    if (col === 0 && row % 2 === 1) {
-      return [row + 1, col];
-    } else if (col === totalCol - 1 && row % 2 === 0) {
-      return [row + 1, col];
-    } else return [row, col + direction];
-  };
-
-  const setStatus = (row: number, col: number, status: PotStatus) => {
-    if (row < benchBotData.map.length) {
-      let currMap = benchBotData.map;
-      currMap[row][col].status = status;
-      setBenchBotData({ ...benchBotData, map: currMap });
-    }
   };
 
   const traverseBenchBot = async (
@@ -134,6 +127,25 @@ export default function Traversal({
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+
+    const findNext = (row: number, col: number, direction: number) => {
+      if (benchBotData.map.length === 0) return [0, 0];
+      let totalCol = benchBotData.map[0].length;
+      if (col === 0 && row % 2 === 1) {
+        return [row + 1, col];
+      } else if (col === totalCol - 1 && row % 2 === 0) {
+        return [row + 1, col];
+      } else return [row, col + direction];
+    };
+
+    const setStatus = (row: number, col: number, status: PotStatus) => {
+      if (row < benchBotData.map.length) {
+        let currMap = benchBotData.map;
+        currMap[row][col].status = status;
+        setBenchBotData({ ...benchBotData, map: currMap });
+      }
+    };
+
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         setStatus(row, pot, "visiting");
@@ -250,7 +262,7 @@ export default function Traversal({
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />
         <Button
-          name={"Stop"}
+          name={stopRef.current === "stopped" ? "Reset" : "Stop"}
           onClick={stopTraversal}
           styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
         />

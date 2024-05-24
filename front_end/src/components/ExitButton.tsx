@@ -51,10 +51,13 @@ const ExitButton: React.FC = () => {
         bottom: 5,
         left: 10,
         zIndex: 1000,
+        fontSize: "24px",
+        height: "48px",
+        width: "100px",
       }}
       onClick={handleClick}
     >
-      Exit App
+      EXIT
     </button>
   );
 };

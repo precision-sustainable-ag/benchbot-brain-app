@@ -14,6 +14,7 @@ import {
 } from "./interfaces/BenchBotTypes";
 import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
 import { loadConfig } from "./utils/api";
+import ExitButton from "./components/ExitButton";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
@@ -122,6 +123,7 @@ function App() {
           setText={setSnackBarContent}
         />
         <StatusBar status={statusText} />
+        <ExitButton />
       </div>
     </BrowserRouter>
   );

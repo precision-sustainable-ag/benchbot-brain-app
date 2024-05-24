@@ -6,6 +6,7 @@ import SpeciesMap from "./pages/SpeciesMap";
 import Traversal from "./pages/Traversal";
 import SnackBar from "./components/SnackBar";
 import StatusBar from "./components/StatusBar";
+import ExitButton from "./components/ExitButton";
 
 import { BenchBotConfig, BenchBotData } from "./interfaces/BenchBotTypes";
 import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
@@ -125,6 +126,7 @@ function App() {
           setText={setSnackBarContent}
         />
         <StatusBar status={statusText} />
+        <ExitButton />
       </div>
     </BrowserRouter>
   );

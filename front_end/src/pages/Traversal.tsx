@@ -269,17 +269,13 @@ export default function Traversal({
         <Button
           name={"👈left"}
           onClick={() => handleTurn("left")}
-          disabled={
-            stopRef.current === "paused" || stopRef.current === "stopped"
-          }
+          disabled={stopRef.current === "stopped"}
           styles={{ width: "150px", marginLeft: "25px" }}
         />
         <Button
           name={"right👉"}
           onClick={() => handleTurn("right")}
-          disabled={
-            stopRef.current === "paused" || stopRef.current === "stopped"
-          }
+          disabled={stopRef.current === "stopped"}
           styles={{ width: "150px", marginLeft: "25px" }}
         />
       </Row>

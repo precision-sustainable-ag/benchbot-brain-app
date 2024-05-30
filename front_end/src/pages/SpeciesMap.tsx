@@ -37,7 +37,6 @@ export default function SpeciesMap({
   // config for current species
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
     ...defaultSpeciesConfig,
-    species: defaultSpecies[0],
   });
   const { map: speciesMap } = benchBotData;
   const setSpeciesMap = (map: PotData[][]) => {
@@ -57,7 +56,7 @@ export default function SpeciesMap({
   // function to add rows for one species
   const addSpecies = () => {
     const { species, numberOfRows } = speciesConfig;
-    const Pot = { ...defaultPotData, species };
+    const Pot = { ...defaultPotData, species, removed: species === "none" };
     const { potsPerRow } = benchBotConfig;
     const speciesArray = new Array(numberOfRows);
     for (let i = 0; i < numberOfRows; i++) {

@@ -41,6 +41,7 @@ export default function Traversal({
 }: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
+  const [stopTriggered, setStopTriggered] = useState(false);
 
   const stopRef = useRef<traversalStatus>("stopped");
 
@@ -100,12 +101,14 @@ export default function Traversal({
   // save current map to file
   const stopTraversal = async () => {
     if (stopRef.current === "stopped") {
+      setStopTriggered(false);
       console.log("reset");
       const { location, map, direction } = resetBenchBotData(benchBotData.map);
       saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
       setBenchBotData({ ...benchBotData, location, map, direction });
       return;
     }
+    setStopTriggered(true);
     appendLog("Stopping BenchBot traversal.");
     if (stopRef.current === "paused") {
       setStatusBarText("stopped");
@@ -254,12 +257,14 @@ export default function Traversal({
         <Button
           name={"Start"}
           onClick={startTraversal}
-          styles={{ width: "150px", color: "#61dac3", marginLeft: "25px" }}
+          disabled={stopTriggered === true}
+          styles={{ width: "150px", color: stopTriggered ? "#61dac46a" : "#61dac3", marginLeft: "25px" }}
         />
         <Button
           name={"Pause"}
           onClick={pauseTraversal}
-          styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
+          disabled={stopRef.current === 'paused'}
+          styles={{ width: "150px", color: stopRef.current === 'paused' ? "#f65a5a79" : "#f65a5b", marginLeft: "25px" }}
         />
         <Button
           name={stopRef.current === "stopped" ? "Reset" : "Stop"}

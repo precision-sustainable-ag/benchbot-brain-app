@@ -1,0 +1,1 @@
+ACTION=="add", KERNEL=="sd*[!0-9]", ATTRS{manufacturer}=="Norelsys", ATTRS{serial}=="0123456789ABCDE", RUN+="/usr/bin/sudo /usr/bin/bash -c '/home/benchbot/benchbot-brain-app/mini_computer_api/init_transfer.sh'"

@@ -33,6 +33,7 @@ logging.info(f"Using species file {species_map_filename}")
 @app.put("/initialize_wifi")
 def initialize_wifi():
     os.system("sudo sysctl -w net.ipv4.ip_forward=1")
+    os.system("sudo mkdir -p /etc/iptables")
     os.system("sudo sh -c 'iptables-save > /etc/iptables/rules.v4'")
 
 @app.get("/move_y_axis/{dist}")

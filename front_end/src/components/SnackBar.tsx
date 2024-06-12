@@ -2,9 +2,9 @@ import { useEffect } from "react";
 
 interface SnackBarProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   text: string;
-  setText: (text: string) => void;
+  setText: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const SnackBarStyles = {
@@ -43,7 +43,9 @@ export default function SnackBar({
 
   return (
     <div style={style}>
-      <span style={{ fontSize: "2rem", padding: "1rem", paddingRight: '0' }}>{text}</span>
+      <span style={{ fontSize: "2rem", padding: "1rem", paddingRight: "0" }}>
+        {text}
+      </span>
       <button
         onClick={closeSnackBar}
         style={{

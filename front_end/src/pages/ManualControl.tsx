@@ -61,7 +61,7 @@ function ManualControl() {
     moveRobot: (axis: "X" | "Y" | "Z", distance: number) => void;
   }) => {
     return (
-      <>
+      <Row styles={{ gap: "1rem" }}>
         <ControlButtonsMinus
           setValue={(num) => {
             if (value + num < 0) setAxisValue(0);
@@ -92,7 +92,7 @@ function ManualControl() {
             moveRobot(axis, -value);
           }}
         />
-      </>
+      </Row>
     );
   };
 
@@ -106,32 +106,26 @@ function ManualControl() {
           <Button name={"Home Z"} onClick={homeZ} />
         </Row>
 
-        <Row styles={{ gap: "1rem" }}>
-          <AxisControl
-            axis="X"
-            value={xValue}
-            setAxisValue={setXValue}
-            moveRobot={moveRobot}
-          />
-        </Row>
+        <AxisControl
+          axis="X"
+          value={xValue}
+          setAxisValue={setXValue}
+          moveRobot={moveRobot}
+        />
 
-        <Row styles={{ gap: "1rem" }}>
-          <AxisControl
-            axis="Y"
-            value={yValue}
-            setAxisValue={setYValue}
-            moveRobot={moveRobot}
-          />
-        </Row>
+        <AxisControl
+          axis="Y"
+          value={yValue}
+          setAxisValue={setYValue}
+          moveRobot={moveRobot}
+        />
 
-        <Row styles={{ gap: "1rem" }}>
-          <AxisControl
-            axis="Z"
-            value={zValue}
-            setAxisValue={setZValue}
-            moveRobot={moveRobot}
-          />
-        </Row>
+        <AxisControl
+          axis="Z"
+          value={zValue}
+          setAxisValue={setZValue}
+          moveRobot={moveRobot}
+        />
 
         <Row styles={{ justifyContent: "space-around" }}>
           <Button

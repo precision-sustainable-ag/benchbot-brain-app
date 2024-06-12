@@ -95,11 +95,16 @@ To persist this on reboot do the following:
 ```
 sudo nano /etc/network/if-up.d/add-default-route
 ```
-Add to the new file
+
+Add following to the new file, save and exit.
 ```
 #!/bin/sh
 sudo /sbin/ip route add default via 10.95.76.1
-Run sudo chmod +x /etc/network/if-up.d/add-default-route
+```
+
+Then run:
+```
+sudo chmod +x /etc/network/if-up.d/add-default-route
 ```
 
 Verify by rebooting and then running
@@ -111,7 +116,7 @@ which should show
 default via 10.95.76.1
 ```
 
-#### Testing connection
+### Testing connection
 
 ```
 ping 8.8.8.8

@@ -1,12 +1,17 @@
 {
   "services": {
-    "example-app": {
-      "name": "example-app",
+    "benchbot-app": {
+      "name": "benchbot-app",
       "type": "app",
       "exec_cmd": "/mnt/managed_home/farm-ng-user-ted-xu/benchbot-brain-app/venv/bin/python3 /mnt/managed_home/farm-ng-user-ted-xu/benchbot-brain-app/brain_api/main.py",
-      "args": ["--config /opt/farmng/config.json", "--port 8042"],
+      "args": [
+        "--config",
+        "/opt/farmng/config.json",
+        "--port",
+        "8042"
+      ],
       "autostart": true,
-      "http_gui_port": 8042,
+      "app_route": "8042",
       "display_name": "BenchBot App"
     }
   }

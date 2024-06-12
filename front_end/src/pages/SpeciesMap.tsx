@@ -19,13 +19,13 @@ import Button from "../components/Button";
 import PotMap from "../components/PotMap";
 import { defaultSpecies } from "../utils/constants";
 import { saveConfig } from "../utils/api";
+import { resetBenchBotData } from "../utils/functions";
 
 interface SpeciesMapProps {
   benchBotConfig: BenchBotConfig;
-  setBenchBotConfig: (config: BenchBotConfig) => void;
+  setBenchBotConfig: React.Dispatch<React.SetStateAction<BenchBotConfig>>;
   benchBotData: BenchBotData;
-  setBenchBotData: (data: BenchBotData) => void;
-  setStartedMotorHold: React.Dispatch<React.SetStateAction<boolean>>;
+  setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
 }
 
 export default function SpeciesMap({
@@ -33,12 +33,10 @@ export default function SpeciesMap({
   setBenchBotConfig,
   benchBotData,
   setBenchBotData,
-  setStartedMotorHold,
 }: SpeciesMapProps) {
   // config for current species
   const [speciesConfig, setSpeciesConfig] = useState<SpeciesConfig>({
     ...defaultSpeciesConfig,
-    species: defaultSpecies[0],
   });
   const { map: speciesMap } = benchBotData;
   const setSpeciesMap = (map: PotData[][]) => {
@@ -58,7 +56,7 @@ export default function SpeciesMap({
   // function to add rows for one species
   const addSpecies = () => {
     const { species, numberOfRows } = speciesConfig;
-    const Pot = { ...defaultPotData, species };
+    const Pot = { ...defaultPotData, species, removed: species === "none" };
     const { potsPerRow } = benchBotConfig;
     const speciesArray = new Array(numberOfRows);
     for (let i = 0; i < numberOfRows; i++) {
@@ -89,43 +87,26 @@ export default function SpeciesMap({
     setHelperText("Reset species map.");
   };
 
-  // FIXME: temporary function to remove all visited stage of the map
-  const setMapUnvisited = () => {
-    const clearedMap = speciesMap.map((row) =>
-      row.map((pot) => ({
-        ...pot,
-        status: "unVisited" as "unVisited",
-      }))
-    );
-    return clearedMap;
-  };
-
   // save current map to file
   const saveSpecies = () => {
-    const clearedMap = setMapUnvisited();
-    setSpeciesMap(clearedMap);
     const numberOfRows = speciesMap.length;
-    const location = [0, 0];
-    const direction = 1;
+    const { location, map, direction } = resetBenchBotData(speciesMap);
     saveConfig(
       { ...benchBotConfig, numberOfRows },
       {
         ...benchBotData,
         location,
         direction,
-        map: clearedMap,
-      },
-      // set startedMotorHold to false since the state is cleared
-      false
+        map,
+      }
     );
     setBenchBotConfig({ ...benchBotConfig, numberOfRows });
     setBenchBotData({
       ...benchBotData,
       location,
       direction,
-      map: clearedMap,
+      map,
     });
-    setStartedMotorHold(false);
     setHelperText("Species map saved!");
   };
 
@@ -146,7 +127,7 @@ export default function SpeciesMap({
     disabled?: boolean;
   }) => {
     return (
-      <>
+      <Row>
         <span style={{ width: "250px" }}>{name}</span>
         <ControlButtonsMinus
           setValue={(num) => {
@@ -175,7 +156,7 @@ export default function SpeciesMap({
           setValue={(num) => setValue(configName, value + num)}
           disabled={disabled}
         />
-      </>
+      </Row>
     );
   };
 
@@ -186,47 +167,35 @@ export default function SpeciesMap({
         <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
           Map Setting:{" "}
         </p>
-        <Row>
-          <ValInput
-            name={"Pots per row:"}
-            configName={"potsPerRow"}
-            value={benchBotConfig.potsPerRow}
-            setValue={setBenchBotConfigByParam}
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Pots per row:"}
+          configName={"potsPerRow"}
+          value={benchBotConfig.potsPerRow}
+          setValue={setBenchBotConfigByParam}
+          disabled={speciesMap.length > 0}
+        />
 
-        <Row>
-          <ValInput
-            name={"Row spacing: "}
-            configName={"rowSpacing"}
-            value={benchBotConfig.rowSpacing}
-            setValue={setBenchBotConfigByParam}
-            unit="cm"
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Row spacing: "}
+          configName={"rowSpacing"}
+          value={benchBotConfig.rowSpacing}
+          setValue={setBenchBotConfigByParam}
+          unit="cm"
+          disabled={speciesMap.length > 0}
+        />
 
-        <Row>
-          <ValInput
-            name={"Pot spacing: "}
-            configName={"potSpacing"}
-            value={benchBotConfig.potSpacing}
-            setValue={setBenchBotConfigByParam}
-            unit="cm"
-            disabled={speciesMap.length > 0}
-          />
-        </Row>
+        <ValInput
+          name={"Pot spacing: "}
+          configName={"potSpacing"}
+          value={benchBotConfig.potSpacing}
+          setValue={setBenchBotConfigByParam}
+          unit="cm"
+          disabled={speciesMap.length > 0}
+        />
 
-        <h6
-          style={{
-            margin: "1rem 0 0 0",
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-          }}
-        >
+        <p style={{ margin: "0", fontSize: "1.5rem", fontWeight: "bold" }}>
           Add Species:{" "}
-        </h6>
+        </p>
 
         <Row>
           <span style={{ width: "400px" }}>Species: </span>
@@ -244,14 +213,12 @@ export default function SpeciesMap({
           </select>
         </Row>
 
-        <Row>
-          <ValInput
-            name={"Rows: "}
-            configName={"numberOfRows"}
-            value={speciesConfig.numberOfRows}
-            setValue={setSpeciesConfigByParam}
-          />
-        </Row>
+        <ValInput
+          name={"Rows: "}
+          configName={"numberOfRows"}
+          value={speciesConfig.numberOfRows}
+          setValue={setSpeciesConfigByParam}
+        />
 
         <Row styles={{ gap: "1rem" }}>
           <Button name={"Add Species"} onClick={addSpecies} />

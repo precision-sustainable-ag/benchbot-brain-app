@@ -7,23 +7,27 @@ import Traversal from "./pages/Traversal";
 import SnackBar from "./components/SnackBar";
 import StatusBar from "./components/StatusBar";
 
-import { BenchBotConfig, BenchBotData } from "./interfaces/BenchBotTypes";
+import {
+  BenchBotConfig,
+  BenchBotData,
+  traversalStatus,
+} from "./interfaces/BenchBotTypes";
 import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
 import { loadConfig } from "./utils/api";
+import ExitButton from "./components/ExitButton";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
 
 function App() {
   const [open, setOpen] = useState(false);
   const [snackBarContent, setSnackBarContent] = useState("");
-  const [statusText, setStatusText] = useState("stopped");
+  const [statusText, setStatusText] = useState<traversalStatus>("stopped");
 
   const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
     defaultBenchBotConfig
   );
   const [benchBotData, setBenchBotData] =
     useState<BenchBotData>(defaultBenchBotData);
-  const [startedMotorHold, setStartedMotorHold] = useState(false);
 
   // load config from local file
   useEffect(() => {
@@ -38,7 +42,6 @@ function App() {
         location,
         map,
         direction,
-        startedMotorHold,
       } = res;
       setBenchBotConfig({
         ...benchBotConfig,
@@ -48,7 +51,6 @@ function App() {
         potSpacing,
       });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      setStartedMotorHold(startedMotorHold);
     };
     fetchData();
   }, []);
@@ -97,7 +99,6 @@ function App() {
                 setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
-                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />
@@ -109,11 +110,8 @@ function App() {
                 setSnackBarContent={setSnackBarContent}
                 setStatusBarText={setStatusText}
                 benchBotConfig={benchBotConfig}
-                setBenchBotConfig={setBenchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
-                startedMotorHold={startedMotorHold}
-                setStartedMotorHold={setStartedMotorHold}
               />
             }
           />
@@ -125,6 +123,7 @@ function App() {
           setText={setSnackBarContent}
         />
         <StatusBar status={statusText} />
+        <ExitButton />
       </div>
     </BrowserRouter>
   );

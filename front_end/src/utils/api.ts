@@ -25,9 +25,7 @@ interface FetchResult<T> {
   error?: Error | undefined;
 }
 
-interface APIConfig extends BenchBotConfig, BenchBotData {
-  startedMotorHold: boolean;
-}
+interface APIConfig extends BenchBotConfig, BenchBotData {}
 
 const customFetch = async <T>(
   url: string,
@@ -47,8 +45,7 @@ const customFetch = async <T>(
 
 export const saveConfig = async (
   config: BenchBotConfig,
-  data: BenchBotData,
-  startedMotorHold: boolean
+  data: BenchBotData
 ) => {
   const url = baseUrl + "/saveConfig/";
   const res = await customFetch<APIConfig>(url, {
@@ -56,7 +53,7 @@ export const saveConfig = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...config, ...data, startedMotorHold }),
+    body: JSON.stringify({ ...config, ...data }),
   });
 
   if (res.error) {
@@ -83,18 +80,48 @@ export const loadConfig = async () => {
 };
 
 export const moveXandZ = async (x: number, z: number) => {
-  console.log("move x", x, "move z", z);
   const url = baseUrl + `/move_xz_axis?x=${x}&z=${z}`;
-  const res = await (await fetch(url)).json();
-  console.log(res);
+  const res = await customFetch(url);
+  if (res.error) {
+    console.log("Failed to move on x axis", res.error);
+  } else {
+    console.log("move x", x, "move z", z);
+    return res.data;
+  }
 };
 
+// param y is in meter scale
 export const moveY = async (y: number) => {
-  // param is in meter scale
-  console.log("move y", y);
   const url = baseUrl + `/move_y_axis/${y}`;
-  const res = await (await fetch(url)).json();
-  console.log(res);
+  const res = await customFetch(url);
+  if (res.error) {
+    console.log("Failed to move on y axis", res.error);
+  } else {
+    console.log("move y", y);
+    return res.data;
+  }
+};
+
+export const homeX = async () => {
+  const url = baseUrl + `/home_x`;
+  const res = await customFetch(url);
+  if (res.error) {
+    console.log("Failed to home x", res.error);
+  } else {
+    console.log("home x");
+    return res.data;
+  }
+};
+
+export const homeZ = async () => {
+  const url = baseUrl + `/home_z`;
+  const res = await customFetch(url);
+  if (res.error) {
+    console.log("Failed to home z", res.error);
+  } else {
+    console.log("home z");
+    return res.data;
+  }
 };
 
 export const takeImage = async () => {
@@ -109,7 +136,7 @@ export const takeImage = async () => {
     } else {
       response.error = false;
       response.data = await res.blob();
-      console.log("response", response);
+      console.log("taken image", response.data);
       return response;
     }
   } catch (error) {
@@ -122,6 +149,7 @@ export const takeImage = async () => {
   }
 };
 
+// TODO: not used now
 export const getImagePreview = async () => {
   const response = defaultResponse;
   const url = imageUrl + "/image_latest";
@@ -143,60 +171,35 @@ export const getImagePreview = async () => {
   }
 };
 
-// FIXME: update home function api param for clearcore
-export const homeX = async () => {
-  const url = baseUrl + `/home_x`;
-  const res = await (await fetch(url)).json();
-  console.log(res);
-};
-
-export const homeZ = async () => {
-  const url = baseUrl + `/home_z`;
-  const res = await (await fetch(url)).json();
-  console.log(res);
-};
-
 export const updateIPandPort = async (ip: string, port: string) => {
   const url = baseUrl + `/udp_update?udp_ip=${ip}&udp_port=${port}`;
-  const res = await fetch(url, {method:'POST'});
-  if (!res.ok) {
-    const errMsg = await res.text();
-    console.log(errMsg);
-  }
-  const data = await res.json();
-  console.log(data);
-};
-
-const fetchData = async (url: string, options = {}) => {
-  try {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      throw new Error(`Fetch Status: ${res.status} ${res.statusText}`);
-    }
-    // TODO: NOTE: there might be more res structure like res.text()
-    return await res.json();
-  } catch (error) {
-    console.error("Error when fetching: ", error);
-    throw error;
+  const res = await customFetch(url, { method: "POST" });
+  if (res.error) {
+    console.log(`Failed to update}`, res.error);
+  } else {
+    console.log(`updated Ip and port`);
+    return res.data;
   }
 };
 
 export const nudge = async (direction: "left" | "right") => {
   const url = baseUrl + `/nudge_${direction}`;
-  try {
-    const res = await fetchData(url, {method: 'PUT'});
-    console.log(res);
-  } catch (err) {
-    console.log(err);
+  const res = await customFetch(url, { method: "PUT" });
+  if (res.error) {
+    console.log(`Failed to nudge ${direction}}`, res.error);
+  } else {
+    console.log(`nudge ${direction}`);
+    return res.data;
   }
 };
 
 export const motorHold = async (param: "start" | "end") => {
   const url = baseUrl + `/${param}_motor_hold`;
-  try {
-    const res = await fetchData(url, {method: 'PUT'});
-    console.log(res);
-  } catch (err) {
-    console.log(err);
+  const res = await customFetch(url, { method: "PUT" });
+  if (res.error) {
+    console.log(`Failed to ${param} motor hold`, res.error);
+  } else {
+    console.log(`${param} motor hold`);
+    return res.data;
   }
 };

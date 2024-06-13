@@ -33,6 +33,3 @@ done
 
 # delete all empty directories
 find $log_dir -type d -empty -delete
-
-# cron job
-# 0,30 11-18 * * * /home/benchbot/benchbot-brain-app/mini_computer_api/delete_copied_files.sh

@@ -24,3 +24,45 @@ sudo nano usb-drive.rules
 * Reload udev rules for changes to take effect by running:
 ```
 sudo udevadm control --reload-rules
+```
+
+-----
+
+### Setup cron job for regular backed up data removal
+
+*Crontab Syntax*
+
+```
+MIN HOUR DOM MON DOW CMD
+```
+
+MIN for minutes
+
+HOUR for hours
+
+DOM for day of the month
+
+MON for month
+
+DOW for day of the week
+
+CMD command, path to a script or a system command
+
+<br>
+
+* Open crontab configuration file by:
+```
+crontab -e
+```
+
+* If its the first time accessing the crontab, the system creates a new file. When prompted, select a preferred text editor for editing.
+
+* Add a line containing a cron expression and path to the script.
+```
+0,30 11-18 * * * /home/benchbot/benchbot-brain-app/mini_computer_api/usb_transfer/delete_copied_files.sh
+```
+
+* List all cron jobs on the system without opening the crontab configuration file by:
+```
+crontab -l
+```

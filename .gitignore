@@ -161,5 +161,13 @@ cython_debug/
 *.JPG
 *.ARW
 
+# log files
+mini_computer_api/files_uploaded_to_globus.txt
+mini_computer_api/logs/*
+
+# image folders
+/mini_computer_api/images/*
+
+# front end files
 species_map.json
 .test_api

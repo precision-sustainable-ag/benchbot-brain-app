@@ -10,8 +10,8 @@ data_age_limit=1
 
 # iterate over every folder in globus ls
 for i in $(globus ls "ea8aff4a-274e-4c48-bc23-5b93da0cc941:/semifield-upload/"); do
-    # echo current folder
-    echo "$i"
+    # append current folder to deleted_files.log
+    echo "$i" >> deleted_files.log
 
     # if folder does not exist locally, continue
     if [ ! -d "/home/benchbot/benchbot-brain-app/mini_computer_api/images/${i::-1}" ]; then
@@ -45,8 +45,8 @@ for i in $(globus ls "ea8aff4a-274e-4c48-bc23-5b93da0cc941:/semifield-upload/");
         echo "$files_uploaded_to_globus" > files_uploaded_to_globus.txt
 
         for j in $(ls "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i"); do
-          # echo out current file
-          echo $j
+          # append current folder/file to deleted_files.log
+          echo "$i/$j" >> deleted_files.log
 
           # by default, assume image exists
           current_image_missing=false

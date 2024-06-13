@@ -14,7 +14,7 @@ log_file_path = log_dir / f"{date.today()}_server.log"
 logfile = str(log_file_path)
 logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
-STATE = 'MD'
+STATE = 'NC'
 sony_camera = CameraController(STATE)
 app = Flask(__name__)
 CORS(app)

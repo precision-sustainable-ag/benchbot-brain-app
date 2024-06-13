@@ -159,3 +159,7 @@ cython_debug/
 # Image files
 *.JPG
 *.ARW
+
+# log files
+mini_computer_api/files_uploaded_to_globus.txt
+mini_computer_api/deleted_files.log

@@ -17,14 +17,12 @@ export default function ImagePreview({
 }: ImagePreviewProps) {
   return (
     <div style={{ width: "400px", paddingLeft: "20px" }}>
+      <img
+        src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
+        alt={"Image not available"}
+        style={{ width: "400px" }}
+      />
       {status === "pending" && <div>Loading...</div>}
-      {status === "success" && (
-        <img
-          src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
-          alt={"Image not available"}
-          style={{ width: "400px" }}
-        />
-      )}
       {status === "error" && (
         <div>
           <p style={{ color: "red" }}> Error: {imageErrMsg} </p>

@@ -1,18 +1,25 @@
 interface ControlButtonsProps {
   setValue: (num: number) => void;
+  disabled?: boolean;
 }
-export function ControlButtonsPlus({ setValue }: ControlButtonsProps) {
+
+export function ControlButtonsPlus({
+  setValue,
+  disabled,
+}: ControlButtonsProps) {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
       <button
         onClick={() => setValue(1)}
         style={{ width: "40px", height: "40px", margin: "0 5px" }}
+        disabled={disabled}
       >
         +1
       </button>
       <button
         onClick={() => setValue(10)}
         style={{ width: "40px", height: "40px", margin: "0 5px" }}
+        disabled={disabled}
       >
         +10
       </button>
@@ -20,18 +27,23 @@ export function ControlButtonsPlus({ setValue }: ControlButtonsProps) {
   );
 }
 
-export function ControlButtonsMinus({ setValue }: ControlButtonsProps) {
+export function ControlButtonsMinus({
+  setValue,
+  disabled,
+}: ControlButtonsProps) {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
       <button
         onClick={() => setValue(-10)}
         style={{ width: "40px", height: "40px", margin: "0 5px" }}
+        disabled={disabled}
       >
         -10
       </button>
       <button
         onClick={() => setValue(-1)}
         style={{ width: "40px", height: "40px", margin: "0 5px" }}
+        disabled={disabled}
       >
         -1
       </button>

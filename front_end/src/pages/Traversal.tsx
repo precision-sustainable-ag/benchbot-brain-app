@@ -8,98 +8,116 @@ import {
   BenchBotConfig,
   BenchBotData,
   Image,
+  PotStatus,
+  traversalStatus,
 } from "../interfaces/BenchBotTypes";
-import { moveXandZ, moveY, takeImage } from "../utils/api";
 import {
-  defaultBenchBotConfig,
-  defaultBenchBotData,
-  defaultImage,
-  defaultSpecies,
-} from "../utils/constants";
-import { loadBenchBotConfig, saveBenchBotConfig } from "../utils/configs";
+  motorHold,
+  moveXandZ,
+  moveY,
+  nudge,
+  saveConfig,
+  takeImage,
+} from "../utils/api";
+import { defaultImage, defaultSpecies } from "../utils/constants";
+import { resetBenchBotData } from "../utils/functions";
 
-export default function Traversal() {
-  const [benchBotConfig, setBenchBotConfig] = useState<BenchBotConfig>(
-    defaultBenchBotConfig
-  );
-  const [benchBotData, setBenchBotData] =
-    useState<BenchBotData>(defaultBenchBotData);
+interface TraversalProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSnackBarContent: React.Dispatch<React.SetStateAction<string>>;
+  setStatusBarText: React.Dispatch<React.SetStateAction<traversalStatus>>;
+  benchBotConfig: BenchBotConfig;
+  benchBotData: BenchBotData;
+  setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
+}
 
+export default function Traversal({
+  setOpen,
+  setSnackBarContent,
+  setStatusBarText,
+  benchBotConfig,
+  benchBotData,
+  setBenchBotData,
+}: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
+  const [stopTriggered, setStopTriggered] = useState(false);
 
-  const stopRef = useRef(false);
+  const stopRef = useRef<traversalStatus>("stopped");
 
   const appendLog = (log: string) => {
     const currentTime = new Date().toLocaleString();
     setLogs((prev) => [...prev, currentTime + ": " + log]);
   };
 
-  const loadImage = async () => {
+  const loadImage = async (): Promise<Image> => {
     appendLog("Taking image.");
-    setImage({ ...Image, status: "pending" });
+    setImage((prev) => ({ ...prev, status: "pending" }));
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
-      setImage({
+      return {
         ...Image,
         status: "success",
         image: imageData.data,
-      });
+      };
     } else {
       appendLog("Failed loading image, retrying...");
       // retake image here
       const retakeImageData = await takeImage();
       if (!retakeImageData.error && retakeImageData.data) {
         appendLog("Loading image success.");
-        setImage({
+        return {
           ...Image,
           status: "success",
           image: retakeImageData.data,
-        });
+        };
       } else {
         appendLog("Failed loading image. Skipped");
-        setImage({
+        return {
           ...Image,
           status: "error",
           errorMsg: retakeImageData.message,
-        });
+        };
       }
     }
   };
 
-  const startTraversal = () => {
-    stopRef.current = false;
+  const startTraversal = async () => {
+    if (stopRef.current === "stopped") {
+      await motorHold("start");
+    }
+    stopRef.current = "running";
     appendLog("Start BenchBot traversal.");
+    setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
   };
 
-  const setPotVisited = (row: number, col: number) => {
-    let currMap = benchBotData.map;
-    currMap[row][col].visited = true;
-    setBenchBotData({ ...benchBotData, map: currMap });
+  const pauseTraversal = () => {
+    appendLog("Pausing BenchBot traversal.");
+    stopRef.current = "paused";
   };
 
-  const findNext = (row: number, col: number, direction: number) => {
-    if (benchBotData.map.length === 0) return [0, 0];
-    let totalCol = benchBotData.map[0].length;
-    if (col === 0 && row % 2 === 1) {
-      return [row + 1, col];
-    } else if (col === totalCol - 1 && row % 2 === 0) {
-      return [row + 1, col];
-    } else return [row, col + direction];
-  };
-
-  const setStatus = (
-    row: number,
-    col: number,
-    status: "visiting" | "nextVisit" | "visited"
-  ) => {
-    if (row < benchBotData.map.length) {
-      let currMap = benchBotData.map;
-      currMap[row][col].status = status;
-      setBenchBotData({ ...benchBotData, map: currMap });
+  // save current map to file
+  const stopTraversal = async () => {
+    if (stopRef.current === "stopped") {
+      setStopTriggered(false);
+      console.log("reset");
+      const { location, map, direction } = resetBenchBotData(benchBotData.map);
+      saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
+      setBenchBotData({ ...benchBotData, location, map, direction });
+      return;
     }
+    setStopTriggered(true);
+    appendLog("Stopping BenchBot traversal.");
+    if (stopRef.current === "paused") {
+      setStatusBarText("stopped");
+      appendLog("Traversal stopped.");
+    }
+    stopRef.current = "stopped";
+    await motorHold("end");
+    const { location, map, direction } = resetBenchBotData(benchBotData.map);
+    saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
   };
 
   const traverseBenchBot = async (
@@ -112,40 +130,65 @@ export default function Traversal() {
     let { location, map, direction } = data;
     let [row, pot] = location;
     let { potsPerRow, numberOfRows, rowSpacing, potSpacing } = config;
+
+    const findNext = (row: number, col: number, direction: number) => {
+      if (benchBotData.map.length === 0) return [0, 0];
+      let totalCol = benchBotData.map[0].length;
+      if (col === 0 && row % 2 === 1) {
+        return [row + 1, col];
+      } else if (col === totalCol - 1 && row % 2 === 0) {
+        return [row + 1, col];
+      } else return [row, col + direction];
+    };
+
+    const setStatus = (row: number, col: number, status: PotStatus) => {
+      if (row < benchBotData.map.length) {
+        let currMap = benchBotData.map;
+        currMap[row][col].status = status;
+        setBenchBotData({ ...benchBotData, map: currMap });
+      }
+    };
+
     for (; row < numberOfRows; row += 1) {
       for (; pot >= 0 && pot < potsPerRow; pot += 1 * direction) {
         setStatus(row, pot, "visiting");
         const [nextRow, nextPot] = findNext(row, pot, direction);
         setStatus(nextRow, nextPot, "nextVisit");
-        // if this pot had visited or removed, continue the loop
-        if (map[row][pot].visited) {
-          setStatus(row, pot, "visited");
-          continue;
+
+        // pause/stop traversal
+        if (stopRef.current === "paused") {
+          setStatusBarText("paused");
+          appendLog("Traversal paused.");
+          let location = [row, pot];
+          setBenchBotData({ ...benchBotData, location, map, direction });
+          saveConfig(benchBotConfig, {
+            ...benchBotData,
+            location,
+            map,
+            direction,
+          });
+          break;
+        } else if (stopRef.current === "stopped") {
+          // stop traversal if hit stop button
+          setStatusBarText("stopped");
+          appendLog("Traversal stopped.");
+          return;
         }
+
+        // visit pot, skip pot or take image
         if (map[row][pot].removed) {
           appendLog(`skipped pot at row ${row + 1} pot ${pot + 1}`);
+          setStatus(row, pot, "skipped");
         } else {
-          await loadImage();
-          if (stopRef.current) {
-            appendLog("Traversal stopped.");
-            let location = [row, pot];
-            setBenchBotConfig({
-              ...benchBotConfig,
-              potsPerRow,
-              numberOfRows,
-              rowSpacing,
-              potSpacing,
-            });
-            setBenchBotData({ ...benchBotData, location, map, direction });
-            saveBenchBotConfig(benchBotConfig, benchBotData);
-            break;
-          }
-          // visit pot
-          setPotVisited(row, pot);
+          const image = await loadImage();
+          setImage(image);
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
+          if (image.status === "error") {
+            setStatus(row, pot, "failed");
+          } else setStatus(row, pot, "visited");
         }
-        setStatus(row, pot, "visited");
 
+        // move x
         if (
           !(
             (pot === 0 && direction === -1) ||
@@ -155,10 +198,13 @@ export default function Traversal() {
           appendLog(`move X: ${direction * potSpacing}`);
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
+          await sleep(potSpacing * 100);
+          appendLog(`move completed.`);
         }
       }
       // break outside loop if stop triggered
-      if (stopRef.current) break;
+      if (stopRef.current === "paused") break;
+      // move y
       if (row !== numberOfRows - 1) {
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
@@ -169,112 +215,87 @@ export default function Traversal() {
       if (pot === -1) pot += 1;
       direction *= -1;
     }
-    if (!stopRef.current) {
+    // finish traversal
+    if (stopRef.current !== "paused") {
       appendLog("BenchBot traversal finished.");
+      stopRef.current = "stopped";
+      setStatusBarText("stopped");
+      await motorHold("end");
       let location = [row, pot];
-      setBenchBotConfig({
-        ...benchBotConfig,
-        potsPerRow,
-        numberOfRows,
-        rowSpacing,
-        potSpacing,
-      });
       setBenchBotData({ ...benchBotData, location, map, direction });
-      saveBenchBotConfig(benchBotConfig, benchBotData);
+      saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
     }
   };
 
-  useEffect(() => {
-    const res = loadBenchBotConfig();
-    if (!res) return;
-    const {
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-      location,
-      map,
-      direction,
-    } = res;
-    setBenchBotConfig({
-      ...benchBotConfig,
-      potsPerRow,
-      numberOfRows,
-      rowSpacing,
-      potSpacing,
-    });
-    setBenchBotData({ ...benchBotData, location, map, direction });
-  }, []);
+  const handleTurn = async (direction: "left" | "right") => {
+    if (direction === "left") {
+      appendLog("nudge left");
+      await nudge("left");
+    }
+    if (direction === "right") {
+      appendLog("nudge right");
+      await nudge("right");
+    }
+  };
+
+  // stop traversal when leave the page
+  useEffect(
+    () => () => {
+      if (stopRef.current === "running") {
+        setStatusBarText("paused");
+        stopRef.current = "paused";
+        setOpen(true);
+        setSnackBarContent("Traversal paused.");
+      }
+    },
+    []
+  );
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: "400px" }}>
-        <h5 style={{ textAlign: "center", margin: "1rem" }}>Traversal</h5>
-        <Row>
-          <span style={{ width: "300px" }}>Pots Per Row: </span>
-          <input
-            value={benchBotConfig.potsPerRow}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Total Rows: </span>
-          <input
-            value={benchBotConfig.numberOfRows}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Row Spacing: </span>
-          <input
-            value={benchBotConfig.rowSpacing}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-        <Row>
-          <span style={{ width: "300px" }}>Pot Spacing: </span>
-          <input
-            value={benchBotConfig.potSpacing}
-            disabled
-            style={{ fontSize: "2rem", flex: 1, width: "150px" }}
-          />
-        </Row>
-
-        <Row>
-          <Button
-            name={"Start"}
-            onClick={startTraversal}
-            styles={{ width: "400px", color: "#61dac3" }}
-          />
-        </Row>
-        <Row>
-          <Button
-            name={"Pause"}
-            onClick={() => {
-              appendLog("Paused BenchBot traversal.");
-              stopRef.current = true;
-            }}
-            styles={{ width: "400px", color: "#f65a5b" }}
-          />
-        </Row>
-
-        <ImagePreview
-          status={Image.status}
-          imagePreview={Image.image}
-          imageErrMsg={Image.errorMsg}
-          retry={() => {
-            stopRef.current = false;
-            startTraversal();
-          }}
-          showRetry={false}
+    <div>
+      <Row>
+        <Button
+          name={"Start"}
+          onClick={startTraversal}
+          disabled={stopTriggered === true}
+          styles={{ width: "150px", color: stopTriggered ? "#61dac46a" : "#61dac3", marginLeft: "25px" }}
         />
-      </div>
-      <div>
+        <Button
+          name={"Pause"}
+          onClick={pauseTraversal}
+          disabled={stopRef.current === 'paused'}
+          styles={{ width: "150px", color: stopRef.current === 'paused' ? "#f65a5a79" : "#f65a5b", marginLeft: "25px" }}
+        />
+        <Button
+          name={stopRef.current === "stopped" ? "Reset" : "Stop"}
+          onClick={stopTraversal}
+          styles={{ width: "150px", color: "#f65a5b", marginLeft: "25px" }}
+        />
+        <Button
+          name={"👈left"}
+          onClick={() => handleTurn("left")}
+          disabled={stopRef.current === "stopped"}
+          styles={{ width: "150px", marginLeft: "25px" }}
+        />
+        <Button
+          name={"right👉"}
+          onClick={() => handleTurn("right")}
+          disabled={stopRef.current === "stopped"}
+          styles={{ width: "150px", marginLeft: "25px" }}
+        />
+      </Row>
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        <div>
+          <Log logs={logs} clearLog={() => setLogs([])} />
+          <ImagePreview
+            status={Image.status}
+            imagePreview={Image.image}
+            imageErrMsg={Image.errorMsg}
+            retry={() => {}}
+            showRetry={false}
+          />
+        </div>
         <PotMap speciesMap={benchBotData.map} species={defaultSpecies} />
-        <Log logs={logs} clearLog={() => setLogs([])} />
       </div>
     </div>
   );

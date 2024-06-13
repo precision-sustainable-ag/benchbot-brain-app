@@ -19,11 +19,14 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
   const bgColor = () => {
     switch (potData.status) {
       case "visited":
+      case "skipped":
         return "silver";
       case "visiting":
         return "yellowgreen";
       case "nextVisit":
         return "lightyellow";
+      case "failed":
+        return "salmon";
       default:
         return "";
     }
@@ -39,31 +42,39 @@ const Pot = ({ speciesMap, setSpeciesMap, row, col, species }: PotProps) => {
         backgroundColor: bgColor(),
       }}
     >
-      <select
-        value={speciesMap[row][col].species}
-        onChange={(e) => {
-          if (setSpeciesMap !== undefined) {
-            let currMap = speciesMap;
-            currMap[row][col] = {
-              ...currMap[row][col],
-              species: e.target.value,
-              removed: e.target.value === "",
-            };
-            setSpeciesMap([...currMap]);
-          }
-        }}
-        disabled={setSpeciesMap === undefined}
-        style={{ fontSize: "1.25rem", width: "90px" }}
-      >
-        <option value={""}></option>
-        {species.map((s, i) => (
-          <option value={s} key={i}>
-            {s}
-          </option>
-        ))}
-      </select>
+      {setSpeciesMap === undefined ? (
+        <p style={{ fontSize: "1rem", margin: "0" }}>
+          {speciesMap[row][col].species}
+        </p>
+      ) : (
+        <select
+          value={speciesMap[row][col].species}
+          onChange={(e) => {
+            if (setSpeciesMap !== undefined) {
+              let currMap = speciesMap;
+              currMap[row][col] = {
+                ...currMap[row][col],
+                species: e.target.value,
+                removed: e.target.value === "none",
+              };
+              setSpeciesMap([...currMap]);
+            }
+          }}
+          // disabled={setSpeciesMap === undefined}
+          style={{ fontSize: "1.25rem", width: "90px" }}
+        >
+          <option value={"none"}>none</option>
+          {species.map((s, i) => (
+            <option value={s} key={i}>
+              {s}
+            </option>
+          ))}
+        </select>
+      )}
       <p style={{ fontSize: "1.25rem", margin: "0" }}>
-        {potData.visited ? "visited" : ""}
+        {potData.status === "visited" ? "visited" : ""}
+        {potData.status === "skipped" ? "skipped" : ""}
+        {potData.status === "failed" ? "failed" : ""}
       </p>
     </div>
   );

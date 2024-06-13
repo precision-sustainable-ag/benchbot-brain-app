@@ -10,13 +10,12 @@ export const defaultSpecies = ["Barley", "Buckwheat", "Cereal Rye"];
 
 export const defaultSpeciesConfig: SpeciesConfig = {
   numberOfRows: 0,
-  species: "",
+  species: "none",
 };
 
 export const defaultPotData: PotData = {
   species: "",
   removed: false,
-  visited: false,
   status: "unVisited",
 };
 

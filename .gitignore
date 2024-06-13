@@ -163,3 +163,7 @@ cython_debug/
 # log files
 mini_computer_api/files_uploaded_to_globus.txt
 mini_computer_api/deleted_files.log
+
+# image folders
+/mini_computer_api/images/*
+/mini_computer_api/test_images/*

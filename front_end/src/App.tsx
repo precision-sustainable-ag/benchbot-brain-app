@@ -13,7 +13,7 @@ import {
   traversalStatus,
 } from "./interfaces/BenchBotTypes";
 import { defaultBenchBotConfig, defaultBenchBotData } from "./utils/constants";
-import { loadConfig } from "./utils/api";
+import { initializeWifi, loadConfig } from "./utils/api";
 import ExitButton from "./components/ExitButton";
 
 const LinkStyle = { color: "inherit", textDecoration: "none" };
@@ -32,6 +32,7 @@ function App() {
   // load config from local file
   useEffect(() => {
     const fetchData = async () => {
+      await initializeWifi();
       const res = await loadConfig();
       if (!res) return;
       const {

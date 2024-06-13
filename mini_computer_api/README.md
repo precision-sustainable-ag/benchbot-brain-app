@@ -80,6 +80,60 @@ sudo systemctl start bb_cam.service
 
 The script will now be executed at startup.
 
+
+## Internet sharing setup
+
+In order for the mini computer to have internet access through the brain, follow given steps. ( more details [here](https://precision-sustainable-ag.atlassian.net/wiki/spaces/BB/pages/490864642/Setting+up+Wi-Fi+Internet+Connection+forwarding+from+brain+to+mini+computer) )
+
+Set the default gateway to the IP address of the WiFi-connected computer’s Ethernet interface:
+```
+# sudo ip route add default via <ip address from brain>
+sudo ip route add default via 10.95.76.1
+```
+
+To persist this on reboot do the following:
+```
+sudo nano /etc/network/if-up.d/add-default-route
+```
+
+Add following to the new file, save and exit.
+```
+#!/bin/sh
+sudo /sbin/ip route add default via 10.95.76.1
+```
+
+Then run:
+```
+sudo chmod +x /etc/network/if-up.d/add-default-route
+```
+
+Verify by rebooting and then running
+```
+ip route show
+```
+which should show
+```
+default via 10.95.76.1
+```
+
+### Testing connection
+
+```
+ping 8.8.8.8
+```
+
+If you get the error "ping: google.com: Temporary failure in name resolution", do the following to configure name server:
+```
+sudo nano /etc/systemd/resolved.conf
+# uncomment "DNS=" line and change to "DNS=8.8.8.8", save the file
+sudo systemctl restart systemd-resolved
+# the system should be rebooted after this to make sure the changes take effect
+sudo reboot
+```
+
+Ping 8.8.8.8 (make sure the brain is setup before this) again to verify the successful internet connection.
+
+
 <br>
 <br>
 <br>

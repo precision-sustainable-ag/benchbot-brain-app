@@ -29,15 +29,11 @@ sudo udevadm control --reload-rules
 
 NOTE:
 
-**at**
-The 'at' command is useful for scheduling one-time jobs in Linux. It uses the user's shell.
-Check if it is installed by running:
-
+The *at* command is useful for scheduling one-time jobs in Linux. Check if it is installed by running:
 ```
 at now
 ```
-
-if not installed, use instruction provided by the shell to install
+If not installed, use instruction provided by the shell to install.
 
 -----
 

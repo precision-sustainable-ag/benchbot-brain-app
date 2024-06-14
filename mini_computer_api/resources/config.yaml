@@ -1,0 +1,5 @@
+# abbreviation of state in which the acquisition is happening
+state: 'NC'
+
+# first 2 letters of default image names which are generated on camera
+cam_img_name: 'NC'

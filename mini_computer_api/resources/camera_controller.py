@@ -14,7 +14,6 @@ import yaml
 
 with open('config.yaml', 'r') as f:
     config_data = yaml.load(f, Loader=yaml.SafeLoader)
-print(config_data['state'], config_data['cam_img_name'])
 
 class CameraController():
 

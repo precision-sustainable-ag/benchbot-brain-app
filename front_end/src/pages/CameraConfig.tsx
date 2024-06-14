@@ -88,7 +88,7 @@ export default function CameraConfig() {
       </div>
       <div style={{ width: "400px" }}>
         <Keyboard
-          keyboardRef={(r) => (numpadRef.current = r)}
+          keyboardRef={(r: any) => (numpadRef.current = r)}
           onChange={(input: string) => {
             numpadSetText(input);
           }}

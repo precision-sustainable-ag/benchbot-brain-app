@@ -55,7 +55,7 @@ for i in $(globus ls "ea8aff4a-274e-4c48-bc23-5b93da0cc941:/semifield-upload/");
           echo "Some files are not uploaded!"
         # else, all files are uploaded, delete folder
         else
-          echo "deleting file: /home/benchbot/benchbot-brain-app/mini_computer_api/images/$i"
+          echo "deleting folder: /home/benchbot/benchbot-brain-app/mini_computer_api/images/$i"
           echo "$i" >> ./logs/deleted_files.log 
           echo $(ls "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i") >> ./logs/deleted_files.log
           echo $(rm -r "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i")

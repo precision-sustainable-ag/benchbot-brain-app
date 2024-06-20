@@ -20,8 +20,7 @@ class CameraController():
         # imgDir = f"images/{self.location}/{date.today()}"
         imgDir = f"images/{self.location}_{date.today()}"
         self.dirName = from_root(parent_dir, imgDir)
-        Path(self.dirName).mkdir(parents=True, exist_ok=True)
-
+        self.create_img_dir = True
         # define the path to executable file of the camera
         self.camera_exe_path = from_root(parent_dir, "resources", "RemoteCli")
 
@@ -78,6 +77,9 @@ class CameraController():
     # funtion to move image files to day's image collection directory
     def move_files(self, file_name):
         try:
+            if self.create_img_dir:
+                Path(self.dirName).mkdir(parents=True, exist_ok=True)
+                self.create_img_dir = False
             shutil.move(file_name, self.dirName)
         except:
             return

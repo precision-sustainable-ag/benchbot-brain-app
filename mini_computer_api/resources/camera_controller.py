@@ -9,13 +9,17 @@ import threading
 import glob
 import cv2
 import io
+import yaml
 
+
+with open('config.yaml', 'r') as f:
+    config_data = yaml.load(f, Loader=yaml.SafeLoader)
 
 class CameraController():
 
-    def __init__(self, state):
+    def __init__(self):
         # setup directory to save images
-        self.location = state
+        self.location = config_data['state']
         parent_dir = "mini_computer_api"
         # imgDir = f"images/{self.location}/{date.today()}"
         imgDir = f"images/{self.location}_{date.today()}"
@@ -56,7 +60,7 @@ class CameraController():
         while True:
             for file_name in os.listdir('.'):
                 # if image file is found
-                if file_name.startswith(self.location) and os.path.isfile(file_name):
+                if file_name.startswith(config_data['cam_img_name']) and os.path.isfile(file_name):
                     if file_name.endswith('.JPG'):
                         new_name = new_filename + ".JPG"
                         to_remove = "JPEG"

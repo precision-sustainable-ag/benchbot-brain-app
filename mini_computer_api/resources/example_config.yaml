@@ -1,0 +1,5 @@
+# abbreviation of state in which the image acquisition is happening
+state: 'NC'
+
+# first 2 letters of default image names which are generated on camera (default is usually DSC so use 'DS')
+cam_img_name: 'NC'

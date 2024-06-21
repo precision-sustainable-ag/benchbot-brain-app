@@ -76,10 +76,10 @@ class CameraController():
 
     # funtion to move image files to day's image collection directory
     def move_files(self, file_name):
+        if self.create_img_dir:
+            Path(self.dirName).mkdir(parents=True, exist_ok=True)
+            self.create_img_dir = False
         try:
-            if self.create_img_dir:
-                Path(self.dirName).mkdir(parents=True, exist_ok=True)
-                self.create_img_dir = False
             shutil.move(file_name, self.dirName)
         except:
             return

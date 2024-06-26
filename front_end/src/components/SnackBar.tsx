@@ -33,13 +33,13 @@ export default function SnackBar({
   };
 
   // auto close snackbar after 5s
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        closeSnackBar();
-      }, 5000);
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   if (open) {
+  //     setTimeout(() => {
+  //       closeSnackBar();
+  //     }, 5000);
+  //   }
+  // }, [open]);
 
   return (
     <div style={style}>

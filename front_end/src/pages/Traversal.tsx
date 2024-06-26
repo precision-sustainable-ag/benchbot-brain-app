@@ -91,6 +91,7 @@ export default function Traversal({
     appendLog("Start BenchBot traversal.");
     setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
+    calculateImages();
   };
 
   const pauseTraversal = () => {
@@ -118,6 +119,19 @@ export default function Traversal({
     await motorHold("end");
     const { location, map, direction } = resetBenchBotData(benchBotData.map);
     saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
+  };
+
+  const calculateImages = () => {
+    const { map } = benchBotData;
+    const { potsPerRow, numberOfRows } = benchBotConfig;
+    let availablePots = 0;
+    for (let i = 0; i < numberOfRows; i++) {
+      for (let j = 0; j < potsPerRow; j++) {
+        if (map[i][j].species !== "none") availablePots += 1;
+      }
+    }
+    setSnackBarContent(`0 / ${availablePots * 2}`);
+    setOpen(true);
   };
 
   const traverseBenchBot = async (
@@ -244,8 +258,9 @@ export default function Traversal({
       if (stopRef.current === "running") {
         setStatusBarText("paused");
         stopRef.current = "paused";
-        setOpen(true);
-        setSnackBarContent("Traversal paused.");
+        // TODO: comment snackbar message for now
+        // setOpen(true);
+        // setSnackBarContent("Traversal paused.");
       }
     },
     []
@@ -258,13 +273,21 @@ export default function Traversal({
           name={"Start"}
           onClick={startTraversal}
           disabled={stopTriggered === true}
-          styles={{ width: "150px", color: stopTriggered ? "#61dac46a" : "#61dac3", marginLeft: "25px" }}
+          styles={{
+            width: "150px",
+            color: stopTriggered ? "#61dac46a" : "#61dac3",
+            marginLeft: "25px",
+          }}
         />
         <Button
           name={"Pause"}
           onClick={pauseTraversal}
-          disabled={stopRef.current === 'paused'}
-          styles={{ width: "150px", color: stopRef.current === 'paused' ? "#f65a5a79" : "#f65a5b", marginLeft: "25px" }}
+          disabled={stopRef.current === "paused"}
+          styles={{
+            width: "150px",
+            color: stopRef.current === "paused" ? "#f65a5a79" : "#f65a5b",
+            marginLeft: "25px",
+          }}
         />
         <Button
           name={stopRef.current === "stopped" ? "Reset" : "Stop"}

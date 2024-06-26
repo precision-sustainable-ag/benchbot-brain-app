@@ -206,10 +206,10 @@ export const motorHold = async (param: "start" | "end") => {
 
 export const initializeWifi = async () => {
   const url = baseUrl + `/initialize_wifi`;
-  const res = await customFetch(url, {method: 'PUT'});
+  const res = await customFetch(url, { method: "PUT" });
   if (res.error) {
-    console.log('Error initializing Wifi.');
+    console.log("Error initializing Wifi.");
   } else {
     return res.data;
   }
-}
+};

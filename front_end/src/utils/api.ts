@@ -1,7 +1,7 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 const baseUrl = "http://localhost:8042";
 
-const imageUrl = "http://10.95.76.50:5000";
+const imageUrl = "http://192.168.8.11:5000";
 // testing api
 // const imageUrl = "http://localhost:5001";
 

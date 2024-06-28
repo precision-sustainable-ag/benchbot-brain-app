@@ -1,10 +1,12 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
+import { mini_comp } from "../../../brain_api/common/udp_config.json";
 const baseUrl = "http://localhost:8042";
 
-const imageUrl = "http://192.168.8.11:5000";
+const { ip, port } = mini_comp;
+
+const imageUrl = `http://${ip}:${port}`;
 // testing api
 // const imageUrl = "http://localhost:5001";
-
 
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log

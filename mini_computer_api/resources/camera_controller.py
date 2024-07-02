@@ -10,6 +10,7 @@ import glob
 import cv2
 import io
 import yaml
+import json
 
 
 with open('config.yaml', 'r') as f:
@@ -39,7 +40,9 @@ class CameraController():
             for istr in missing_list:
                 message += istr + " "
             message += "missing"
-            response = make_response(message, 417)
+            imageCount = len(missing_list)
+            content = json.dumps({'text': message, 'imageTaken': imageCount})
+            response = make_response(content, 417)
         return response
 
 

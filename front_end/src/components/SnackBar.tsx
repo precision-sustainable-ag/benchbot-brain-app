@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 interface SnackBarProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;

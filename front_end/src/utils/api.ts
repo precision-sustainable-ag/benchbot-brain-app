@@ -12,6 +12,7 @@ const imageUrl = `http://${ip}:${port}`;
 interface apiResponse {
   error: boolean;
   message: string;
+  imageTaken?: number;
   data?: Blob;
 }
 
@@ -130,8 +131,16 @@ export const takeImage = async () => {
   try {
     const res = await fetch(url);
     if (!res.ok) {
-      response.error = true;
-      response.message = await res.text();
+      if (res.status === 417) {
+        const data = await res.json();
+        const { text, imageTaken } = data;
+        response.error = true;
+        response.message = text;
+        response.imageTaken = imageTaken;
+      } else {
+        response.error = true;
+        response.message = await res.text();
+      }
       return response;
     } else {
       response.error = false;

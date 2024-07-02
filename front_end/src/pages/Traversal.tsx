@@ -51,33 +51,49 @@ export default function Traversal({
   };
 
   const loadImage = async (): Promise<Image> => {
+    let imageTakenNum = 0;
     appendLog("Taking image.");
     setImage((prev) => ({ ...prev, status: "pending" }));
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
+      console.log("image taken", 2);
       return {
         ...Image,
         status: "success",
         image: imageData.data,
+        imageTaken: 2,
       };
     } else {
       appendLog("Failed loading image, retrying...");
+      console.log("imageData", imageData);
+      if (imageData.imageTaken) {
+        console.log("imageTaken", imageData.imageTaken);
+        imageTakenNum += imageData.imageTaken;
+      }
       // retake image here
       const retakeImageData = await takeImage();
       if (!retakeImageData.error && retakeImageData.data) {
         appendLog("Loading image success.");
+        console.log("image taken", 2);
+        imageTakenNum += 2;
         return {
           ...Image,
           status: "success",
           image: retakeImageData.data,
+          imageTaken: imageTakenNum,
         };
       } else {
         appendLog("Failed loading image. Skipped");
+        if (imageData.imageTaken) {
+          console.log("image taken", imageData.imageTaken);
+          imageTakenNum += imageData.imageTaken;
+        }
         return {
           ...Image,
           status: "error",
           errorMsg: retakeImageData.message,
+          imageTaken: imageTakenNum,
         };
       }
     }
@@ -91,7 +107,7 @@ export default function Traversal({
     appendLog("Start BenchBot traversal.");
     setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
-    calculateImages();
+    setOpen(true);
   };
 
   const pauseTraversal = () => {
@@ -130,14 +146,16 @@ export default function Traversal({
         if (map[i][j].species !== "none") availablePots += 1;
       }
     }
-    setSnackBarContent(`0 / ${availablePots * 2}`);
-    setOpen(true);
+    console.log("availablePots", availablePots);
+    return 2 * availablePots;
   };
 
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
   ) => {
+    const totalImages = calculateImages();
+    let imageTaken = 0;
     // mock sleep function
     const sleep = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
@@ -195,6 +213,8 @@ export default function Traversal({
           setStatus(row, pot, "skipped");
         } else {
           const image = await loadImage();
+          imageTaken += image.imageTaken;
+          setSnackBarContent(`Image taken: ${imageTaken} / ${totalImages}`);
           setImage(image);
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
           if (image.status === "error") {

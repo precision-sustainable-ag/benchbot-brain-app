@@ -1,8 +1,6 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
-import { mini_comp } from "../../../brain_api/common/udp_config.json";
+import { ip, port } from "../../../brain_api/common/mini_comp_config.json";
 const baseUrl = "http://localhost:8042";
-
-const { ip, port } = mini_comp;
 
 const imageUrl = `http://${ip}:${port}`;
 // testing api

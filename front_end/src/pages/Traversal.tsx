@@ -29,6 +29,8 @@ interface TraversalProps {
   benchBotConfig: BenchBotConfig;
   benchBotData: BenchBotData;
   setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
+  imageTaken: number;
+  setImageTaken: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function Traversal({
@@ -38,6 +40,8 @@ export default function Traversal({
   benchBotConfig,
   benchBotData,
   setBenchBotData,
+  imageTaken: imageNumber,
+  setImageTaken,
 }: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
@@ -123,6 +127,7 @@ export default function Traversal({
       const { location, map, direction } = resetBenchBotData(benchBotData.map);
       saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
       setBenchBotData({ ...benchBotData, location, map, direction });
+      setImageTaken(0);
       return;
     }
     setStopTriggered(true);
@@ -155,7 +160,7 @@ export default function Traversal({
     data: BenchBotData
   ) => {
     const totalImages = calculateImages();
-    let imageTaken = 0;
+    let imageTaken = imageNumber;
     // mock sleep function
     const sleep = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
@@ -193,6 +198,7 @@ export default function Traversal({
           appendLog("Traversal paused.");
           let location = [row, pot];
           setBenchBotData({ ...benchBotData, location, map, direction });
+          setImageTaken(imageTaken);
           saveConfig(benchBotConfig, {
             ...benchBotData,
             location,

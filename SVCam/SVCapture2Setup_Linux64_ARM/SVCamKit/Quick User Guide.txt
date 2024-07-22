@@ -14,8 +14,12 @@ e.g under Ubuntu 18.04, goto "Settings/Network", pick up one interface setting (
 
 4. SVCapture 
 change to SVCapture folder, add execute right and run it 
-$chmod +x SVCapture
-$./SVCapture
+$chmod +x startSVCapture64.sh
+$./startSVCapture64.sh
+
+First time usage, the driver might not be auto located so follow steps below:
+    In the camera discovery dialog, click on TL Settings.
+    The GenTL Manager dialog will enable you add the specific GenTL driver (most propable a *.cti file) location on the system to SVCapture.
  
 5. SVCamMiniExample
 change to "Makefile_Linux_g++", compile it, and run

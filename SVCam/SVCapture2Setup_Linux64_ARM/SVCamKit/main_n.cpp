@@ -54,11 +54,15 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
             }
             // printf("Image Received FrameId:%lld Info Ptr:0x%p Width:%zd Height:%zd\n", bufferInfo.iImageId, bufferInfo.pImagePtr, bufferInfo.iSizeX, bufferInfo.iSizeY);
             printf("Image Received Width:%zd Height:%zd\n", bufferInfo.iSizeX, bufferInfo.iSizeY);
-            SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
+            string fileName = "img_" + to_string(bufferInfo.iTimeStamp);
+            // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
+            SVUtilSaveImageToFile(bufferInfo, fileName.c_str(), SV_IMAGE_FILE_RAW);
+            SVUtilSaveImageToFile(bufferInfo, fileName.c_str(), SV_IMAGE_FILE_PNG);
+
             printf("----------------------------------------------\n");
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);
-            this_thread::sleep_for(std::chrono::milliseconds(5000));
+            this_thread::sleep_for(std::chrono::milliseconds(3500));
         }
         else if (SV_ERROR_TIMEOUT == ret)
         {
@@ -304,6 +308,7 @@ bool openStream()
 
 void setFeatures()
 {
+    // SVDeviceLoadSettings(SV_DEVICE_HANDLE hDevice, const char *fileName);
     SV_FEATURE_HANDLE hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TriggerMode", &hFeature);
     SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 1);
@@ -344,7 +349,7 @@ void startStreaming()
 
     // do 10 software triggers
     int triggerCounter = 0;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("SoftwareTrigger:%d\n", triggerCounter++);
         SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);

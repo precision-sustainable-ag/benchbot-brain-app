@@ -3,9 +3,11 @@
 #include <vector>
 #include <thread>
 #include <cstring>
+#include <chrono>
 #include "sv_gen_sdk.h"
 #define INFINITE 0xFFFFFFFF
 using namespace std;
+using namespace std::chrono;
 
 // global variable
 SV_RETURN ret;
@@ -52,26 +54,37 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
                 printf("%s SVStreamBufferGetInfo Failed!:%d\n", __FUNCTION__, ret);
                 continue;
             }
-            // printf("Image Received FrameId:%lld Info Ptr:0x%p Width:%zd Height:%zd\n", bufferInfo.iImageId, bufferInfo.pImagePtr, bufferInfo.iSizeX, bufferInfo.iSizeY);
-            printf("Image Received Width:%zd Height:%zd\n", bufferInfo.iSizeX, bufferInfo.iSizeY);
-            string fileName = "img_" + to_string(bufferInfo.iTimeStamp);
-            // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
-            SVUtilSaveImageToFile(bufferInfo, fileName.c_str(), SV_IMAGE_FILE_RAW);
-            SVUtilSaveImageToFile(bufferInfo, fileName.c_str(), SV_IMAGE_FILE_PNG);
+            // printf("Image Received Width:%zd Height:%zd\n", bufferInfo.iSizeX, bufferInfo.iSizeY);
+            
+            auto start = high_resolution_clock::now();
 
-            printf("----------------------------------------------\n");
+            // string fileName1 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".PNG";
+            // SVUtilSaveImageToFile(bufferInfo, fileName1.c_str(), SV_IMAGE_FILE_PNG);
+            // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
+
+            // string fileName2 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".ARW";
+            // SVUtilSaveImageToFile(bufferInfo, fileName2.c_str(), SV_IMAGE_FILE_RAW);
+
+            string fileName3 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".BMP";
+            SVUtilSaveImageToFile(bufferInfo, fileName3.c_str(), SV_IMAGE_FILE_BMP);
+            
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<milliseconds>(stop - start);
+            printf("Time Taken: %ld\n", duration);
+            // printf("----------------------------------------------\n");
+            
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);
-            this_thread::sleep_for(std::chrono::milliseconds(3500));
+            // this_thread::sleep_for(std::chrono::milliseconds(3500));
         }
         else if (SV_ERROR_TIMEOUT == ret)
         {
-            printf("Buffer TIMEOUT\n");
+            // printf("Buffer TIMEOUT\n");
             continue;
         }
         else
         {
-            printf("Buffer EMPTY!\n");
+            // printf("Buffer EMPTY!\n");
             break;
         }
     }
@@ -351,11 +364,12 @@ void startStreaming()
     int triggerCounter = 0;
     for (int i = 0; i < 5; i++)
     {
-        printf("SoftwareTrigger:%d\n", triggerCounter++);
+        // printf("SoftwareTrigger:%d\n", triggerCounter++);
         SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);
-        this_thread::sleep_for(std::chrono::milliseconds(5000)); // e.g. 1/fps
+        this_thread::sleep_for(std::chrono::milliseconds(2000)); // e.g. 1/fps
     }
-
+    // printf("\nTriggers Done\n");
+    // this_thread::sleep_for(std::chrono::milliseconds(2000));
 }
 
 

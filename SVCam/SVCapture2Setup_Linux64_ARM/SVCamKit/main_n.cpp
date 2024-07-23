@@ -36,7 +36,7 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
     if (NULL == hDS)
         return nullptr;
 
-    printf("%s AcquisitionThread Running...\n", __FUNCTION__);
+    printf("\nAcquisitionThread Running...\n");
     while (true)
     {
         SV_BUFFER_HANDLE hBuffer = NULL;
@@ -58,19 +58,20 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
             printf("----------------------------------------------\n");
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);
+            this_thread::sleep_for(std::chrono::milliseconds(5000));
         }
         else if (SV_ERROR_TIMEOUT == ret)
         {
-            printf("%s Buffer TIMEOUT\n", __FUNCTION__);
+            printf("Buffer TIMEOUT\n");
             continue;
         }
         else
         {
-            printf("%s Buffer EMPTY!:%d\n", __FUNCTION__, ret);
+            printf("Buffer EMPTY!\n");
             break;
         }
     }
-    printf("%s AcquisitionThread End\n", __FUNCTION__);
+    printf("AcquisitionThread End\n");
     return 0;
 }
 
@@ -347,7 +348,7 @@ void startStreaming()
     {
         printf("SoftwareTrigger:%d\n", triggerCounter++);
         SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);
-        this_thread::sleep_for(std::chrono::milliseconds(500)); // e.g. 1/fps
+        this_thread::sleep_for(std::chrono::milliseconds(5000)); // e.g. 1/fps
     }
 
 }

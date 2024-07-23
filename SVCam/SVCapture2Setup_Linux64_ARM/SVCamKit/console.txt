@@ -1,0 +1,60 @@
+bb-nc@bb-nc-jetson:~/GitHub/SVCapture/SVCamKit/SVCamMiniExample/Makefile_Linux_g++$
+
+[0] Interface Id:Linux Socket:3c-6d-66-02-b9-ed
+        [0] device Id:shr661CXGE:ac-4f-fc-01-9f-e7
+[1] Interface Id:Linux Socket:1c-ce-51-f6-c9-a7
+main No Device Connected!
+HeartbeatRate 3000 
+lowerLimit:9000 upperLimit:9000
+retry_count 64
+retry 2
+retry 1
+retry 0
+packet_size:1500
+Maxpacket_Cam:1500
+AcquisitionThread AcquisitionThread Running...
+SoftwareTrigger:0
+SoftwareTrigger:1
+Image Received FrameId:1 Info Ptr:0x0xffff8864f010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:2
+Image Received FrameId:2 Info Ptr:0x0xffff80c9e010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:3
+Image Received FrameId:3 Info Ptr:0x0xffff792ed010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:4
+SoftwareTrigger:5
+Image Received FrameId:4 Info Ptr:0x0xffff7193c010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:6
+Image Received FrameId:5 Info Ptr:0x0xffff8864f010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:7
+Image Received FrameId:6 Info Ptr:0x0xffff80c9e010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:8
+Image Received FrameId:7 Info Ptr:0x0xffff792ed010 Width:13392 Height:9528
+----------------------------------------------
+SoftwareTrigger:9
+Image Received FrameId:8 Info Ptr:0x0xffff7193c010 Width:13392 Height:9528
+----------------------------------------------
+AcquisitionThread SVStreamWaitForNewBuffer Failed!:-1012
+AcquisitionThread AcquisitionThread End
+
+
+
+Image Size: Width:13392 Height:9528
+
+> sudo apt-get install g++
+> sudo apt-get install build-essential
+> https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s
+
+Pixel Formats:
+BayerRG8
+Mono8
+Mono12Packed
+Bayer RG12Packed
+
+Save options:
+BMP, PNG, RAW

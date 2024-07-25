@@ -126,7 +126,7 @@ int main(int argc, char**argv)
 bool InitSDK()
 {
     string ctiPath;
-    ctiPath ="/opt/SVS/SVCamKit/SDK/Linux64_ARM/cti";
+    ctiPath ="/opt/SVS/SVCamKit/SDK/Linux64_x64/cti";
     SV_RETURN ret = SVLibInit(ctiPath.c_str(), NULL, NULL, NULL);
     if (SV_ERROR_SUCCESS != ret)
     {

@@ -54,7 +54,7 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
                 printf("%s SVStreamBufferGetInfo Failed!:%d\n", __FUNCTION__, ret);
                 continue;
             }
-            // printf("Image Received Width:%zd Height:%zd\n", bufferInfo.iSizeX, bufferInfo.iSizeY);
+            printf("Image Received Width:%zd Height:%zd Type:%lld\n", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
             
             auto start = high_resolution_clock::now();
 
@@ -321,18 +321,44 @@ bool openStream()
 
 void setFeatures()
 {
-    // SVDeviceLoadSettings(SV_DEVICE_HANDLE hDevice, const char *fileName);
-    SV_FEATURE_HANDLE hFeature = NULL;
-    SVFeatureGetByName(g_hRemoteDevice, "TriggerMode", &hFeature);
-    SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 1);
+    SV_RETURN ret = SVDeviceLoadSettings(g_hDevice, "settings2.txt");
+    if (SV_ERROR_SUCCESS == ret)
+    {
+        printf("File loaded successfully \n");
+    }
+    else{
+        printf("Error loading file %d\n", ret);
+    }
 
-    hFeature = NULL;
-    SVFeatureGetByName(g_hRemoteDevice, "AcquisitionFrameRate", &hFeature);
-    SVFeatureSetValueFloat(g_hRemoteDevice, hFeature, 5.0f);
+    SV_FEATURE_HANDLE hFeature = NULL;
+    // SVFeatureGetByName(g_hRemoteDevice, "TriggerMode", &hFeature);
+    // SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 1);
+
+    // hFeature = NULL;
+    // SVFeatureGetByName(g_hRemoteDevice, "AcquisitionFrameRate", &hFeature);
+    // SVFeatureSetValueFloat(g_hRemoteDevice, hFeature, 2.0f);
 
     // insert other feature set values
+    // 
+    // SV_GVSP_PIX_MONO8            Type:17301505
+    // SV_GVSP_PIX_MONO12_PACKED    Type:17563654
+    // SV_GVSP_PIX_BAYRG8           Type:17301513
+    // SV_GVSP_PIX_BAYRG12_PACKED   Type:17563691
 
-    hFeature = NULL;
+    // hFeature = NULL;
+    // SVFeatureGetByName(g_hRemoteDevice, "PixelFormat", &hFeature);
+    // ret = SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, SV_GVSP_PIX_BAYRG8);
+    // if (SV_ERROR_SUCCESS == ret)
+    // {
+    //     printf("Type set \n");
+    // }
+    // else{
+    //     printf("Type not set %d\n", ret);
+    // }
+
+    // SVFeatureSetValueEnum();
+
+    // hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);
     SVFeatureSetValueInt64(g_hRemoteDevice,hFeature, 1);
 
@@ -341,6 +367,7 @@ void setFeatures()
 
 void startStreaming()
 {
+    // SVDeviceLoadSettings(g_hDevice, "cam_setting.txt");
     setFeatures();
     std::thread  hThreadAcquisition(AcquisitionThread, g_hStream);
     hThreadAcquisition.detach();

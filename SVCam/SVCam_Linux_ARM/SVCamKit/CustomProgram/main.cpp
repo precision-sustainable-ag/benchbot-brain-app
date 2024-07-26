@@ -54,7 +54,7 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
                 printf("%s SVStreamBufferGetInfo Failed!:%d\n", __FUNCTION__, ret);
                 continue;
             }
-            // printf("Image Received Width:%zd Height:%zd\n", bufferInfo.iSizeX, bufferInfo.iSizeY);
+            printf("Image Received Width:%zd Height:%zd\n Type:%lld", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
             
             auto start = high_resolution_clock::now();
 
@@ -321,7 +321,8 @@ bool openStream()
 
 void setFeatures()
 {
-    // SVDeviceLoadSettings(SV_DEVICE_HANDLE hDevice, const char *fileName);
+    // SVDeviceLoadSettings(g_hDevice, "cam_setting.txt");
+
     SV_FEATURE_HANDLE hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TriggerMode", &hFeature);
     SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 1);
@@ -331,6 +332,10 @@ void setFeatures()
     SVFeatureSetValueFloat(g_hRemoteDevice, hFeature, 5.0f);
 
     // insert other feature set values
+    // hFeature = NULL;
+    // SVFeatureGetByName(g_hRemoteDevice, "PixelFormat", &hFeature);
+    // SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 6);
+    // SVFeatureSetValueEnum();
 
     hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);

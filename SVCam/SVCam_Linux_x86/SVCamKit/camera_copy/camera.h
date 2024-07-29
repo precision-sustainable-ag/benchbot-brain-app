@@ -45,10 +45,6 @@ public:
 
     // Destructor
     ~Camera(){
-        // if (DeviceList.size() != 0)
-        //     DSDeleteContainer(DeviceList);
-        // if (InterfaceList.size() != 0)
-        //     DSDeleteContainer(InterfaceList);
         SVInterfaceClose(g_hInterface);
         SVSystemClose(g_hSystem);
         SVLibClose();

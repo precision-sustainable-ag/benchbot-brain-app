@@ -60,10 +60,6 @@ int main(int argc, char**argv){
     if (!bInitSuccessful)
         return -1;
 
-    // uint32_t tlCount = 0;
-    // SV_RETURN ret = SVLibSystemGetCount(&tlCount);
-    // printf("TL System Count %d\n", tlCount);
-
     SV_SYSTEM_HANDLE gh_system = findSystem();
     if (gh_system){
         Camera sv_cam(gh_system);
@@ -80,10 +76,8 @@ int main(int argc, char**argv){
         else
             printf("Opened a stream\n");
         sv_cam.startAcquisition();
+        sv_cam.stopAcquisition();
         sv_cam.disconnectCamera();
     }
-
-    // sv_cam->stopAcquisition();
-
     return 0;
 }

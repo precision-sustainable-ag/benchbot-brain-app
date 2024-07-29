@@ -13,7 +13,6 @@ private:
     SV_SYSTEM_HANDLE g_hSystem;
 
 public:
-    // SV_TL_INFO g_hSystemInfo;
     SV_INTERFACE_HANDLE g_hInterface;
     SV_DEVICE_HANDLE g_hDevice;
     SV_REMOTE_DEVICE_HANDLE g_hRemoteDevice;
@@ -37,12 +36,19 @@ public:
     void enumDevices(const char * interfaceId);
     void deviceDiscovery();
     bool connectCamera();
+    void prepareAcquisitionBuffer();
+    void deleteBuffer();
     bool openStream();
     void startAcquisition();
+    void stopAcquisition();
     void disconnectCamera();
 
     // Destructor
     ~Camera(){
+        // if (DeviceList.size() != 0)
+        //     DSDeleteContainer(DeviceList);
+        // if (InterfaceList.size() != 0)
+        //     DSDeleteContainer(InterfaceList);
         SVInterfaceClose(g_hInterface);
         SVSystemClose(g_hSystem);
         SVLibClose();
@@ -50,4 +56,5 @@ public:
     }
 };
 
-
+void * AcquisitionThread(SV_STREAM_HANDLE context);
+void saveImages(SV_BUFFER_INFO imageBuffer);

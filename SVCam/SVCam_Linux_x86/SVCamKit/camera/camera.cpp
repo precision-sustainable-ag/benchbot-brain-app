@@ -1,13 +1,30 @@
 #include "camera.h"
+#include "sv_gen_sdk.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <chrono>
+#include <thread>
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+
+#define INFINITE 0xFFFFFFFF
+using namespace std;
+
+using namespace std::chrono;
 
 // #include <opencv2\opencv.hpp>
 // using namespace cv;
+
 
 // query all SVS GenTL producers and establish connection
 void Camera::enumSystem(){
     uint32_t tlCount = 0;
     ret = SVLibSystemGetCount(&tlCount);
-    bool bOpenGev = true;
+    printf("TL System Count %d\n", tlCount);
+    bool bOpenGev = true;    
     for (uint32_t i = 0; i < tlCount; i++)
     {
         SV_TL_INFO tlInfo = { {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
@@ -137,7 +154,7 @@ void Camera::enumDevices(const char * interfaceId){
 
 
 void Camera::deviceDiscovery(){
-    enumSystem();   // added by me
+    // enumSystem();   // added by me
     enumInterface();
     for (int j = 0; j < InterfaceList.size(); j++)
     {
@@ -163,8 +180,7 @@ void Camera::disconnectCamera(){
 }
 
 
-void Camera::prepareAcquisitionBuffer()
-{
+void Camera::prepareAcquisitionBuffer(){
     SV_FEATURE_HANDLE hFeature = NULL;
     int64_t payloadSize = 0;
     SVFeatureGetByName(g_hRemoteDevice, "PayloadSize", &hFeature);
@@ -187,8 +203,7 @@ void Camera::prepareAcquisitionBuffer()
 }
 
 
-void Camera::deleteBuffer()
-{
+void Camera::deleteBuffer(){
     for (uint32_t i = 0; i < buffer_count; i++)
     {
         SV_BUFFER_HANDLE hBuffer = NULL;
@@ -204,8 +219,7 @@ void Camera::deleteBuffer()
 }
 
 
-bool Camera::openStream()
-{
+bool Camera::openStream(){
     char streamId0[SV_STRING_SIZE] = {0};
     size_t streamId0Size = SV_STRING_SIZE;
     // retrieve the stream ID
@@ -226,8 +240,7 @@ bool Camera::openStream()
 }
 
 
-void Camera::startAcquisition()
-{
+void Camera::startAcquisition(){
     ret = SVDeviceLoadSettings(g_hDevice, "camera_features.txt");
     if (ret != SV_ERROR_SUCCESS){
         printf("Failed to load camera settings from file! Error Code: %d\n", ret);
@@ -236,7 +249,8 @@ void Camera::startAcquisition()
     
     std::thread  hThreadAcquisition(AcquisitionThread, g_hStream);
     hThreadAcquisition.detach();
-    PrepareAcquisitionBuffer();
+    // acquisitionThread =  CreateThread(NULL, 0, AcquisitionThread, (void *)this, 0, NULL);
+    prepareAcquisitionBuffer();
 
     ret = SVStreamAcquisitionStart(g_hStream, SV_ACQ_START_FLAGS_DEFAULT, GENTL_INFINITE);
     if (SV_ERROR_SUCCESS != ret)
@@ -264,13 +278,11 @@ void Camera::startAcquisition()
 }
 
 
-void * Camera::AcquisitionThread(SV_STREAM_HANDLE context)
-{
+void * AcquisitionThread(SV_STREAM_HANDLE context){
     // hDS is g_hStream
     SV_STREAM_HANDLE hDS = (SV_STREAM_HANDLE)context;
     if (NULL == hDS)
         return nullptr;
-
     printf("\nAcquisitionThread Running...\n");
     while (true)
     {
@@ -279,14 +291,14 @@ void * Camera::AcquisitionThread(SV_STREAM_HANDLE context)
         if (SV_ERROR_SUCCESS == ret)
         {
             // query information of hBuffer on hStream
-            SV_BUFFER_INFO bufferInfo = {0};
+            SV_BUFFER_INFO bufferInfo = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             ret = SVStreamBufferGetInfo(hDS, hBuffer, &bufferInfo);
             if (ret != SV_ERROR_SUCCESS)
             {
                 printf("SVStreamBufferGetInfo Failed! Error Code: %d\n", ret);
                 continue;
             }
-            printf("Image Received Width:%zd Height:%zd Type:%lld \n", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
+            printf("Image Received Width:%zd Height:%zd Type:%ld \n", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
             
             auto start = high_resolution_clock::now();
             saveImages(bufferInfo);
@@ -302,11 +314,11 @@ void * Camera::AcquisitionThread(SV_STREAM_HANDLE context)
         else
             break;
     }
+    return 0;
 }
 
 
-void Camera::saveImages(SV_BUFFER_INFO imageBuffer)
-{
+void saveImages(SV_BUFFER_INFO imageBuffer){
     // string fileName1 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".PNG";
     // SVUtilSaveImageToFile(bufferInfo, fileName1.c_str(), SV_IMAGE_FILE_PNG);
     // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
@@ -322,8 +334,7 @@ void Camera::saveImages(SV_BUFFER_INFO imageBuffer)
 }
 
 
-void Camera::stopAcquisition()
-{
+void Camera::stopAcquisition(){
     SV_FEATURE_HANDLE hFeature = NULL;
     uint32_t ExecuteTimeout = 1000;
     SVFeatureGetByName(g_hRemoteDevice, "AcquisitionStop", &hFeature);
@@ -333,6 +344,7 @@ void Camera::stopAcquisition()
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);
     SVFeatureSetValueInt64(g_hRemoteDevice, hFeature, 0);
 
+    acqTerminated = true;
     SVStreamAcquisitionStop(g_hStream, SV_ACQ_STOP_FLAGS_DEFAULT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_INPUT_TO_OUTPUT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_OUTPUT_DISCARD);

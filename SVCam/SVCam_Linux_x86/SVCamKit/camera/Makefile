@@ -6,15 +6,15 @@ LFLAGS        = -Wl,-O1
 LIBS          = -lpthread -L/opt/SVS/SVCamKit/SDK/Linux64_x64/ -lSVGenSDK64
 
 OBJECTS       = main.o camera.o
-TARGET        = CustomProgram
+TARGET        = CameraProgram
 
-all: CustomProgram
+all: CameraProgram
 
-CustomProgram:  $(OBJECTS)  
+CameraProgram:  $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 
 clean:
 	-rm -f $(OBJECTS) $(TARGET)
 
-main.o: main.cpp camera.h sv_gen_sdk.h
+main.o: main.cpp sv_gen_sdk.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp

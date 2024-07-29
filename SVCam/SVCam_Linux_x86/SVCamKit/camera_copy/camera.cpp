@@ -300,7 +300,6 @@ void Camera::stopAcquisition(){
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);
     SVFeatureSetValueInt64(g_hRemoteDevice, hFeature, 0);
 
-    acqTerminated = true;
     SVStreamAcquisitionStop(g_hStream, SV_ACQ_STOP_FLAGS_DEFAULT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_INPUT_TO_OUTPUT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_OUTPUT_DISCARD);

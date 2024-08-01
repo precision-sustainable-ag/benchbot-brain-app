@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <chrono>
 #include <thread>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,38 +13,6 @@
 using namespace std;
 
 using namespace std::chrono;
-
-// #include <opencv2\opencv.hpp>
-// using namespace cv;
-
-
-// query all SVS GenTL producers and establish connection
-void Camera::enumSystem(){
-    uint32_t tlCount = 0;
-    ret = SVLibSystemGetCount(&tlCount);
-    printf("TL System Count %d\n", tlCount);
-    bool bOpenGev = true;    
-    for (uint32_t i = 0; i < tlCount; i++)
-    {
-        SV_TL_INFO tlInfo = { {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
-        ret = SVLibSystemGetInfo(i, &tlInfo);
-        if (ret != SV_ERROR_SUCCESS)
-        {
-            printf("SVLibSystemGetInfo Failed! Error Code: %d\n", ret);
-            continue;
-        }
-        bool bOpenTL = false;
-        if (bOpenGev &&  string("GEV") == string(tlInfo.tlType))
-            bOpenTL = true;
-        if (bOpenTL == false)
-            continue;
-        g_hSystem = NULL;
-        ret = SVLibSystemOpen(i, &g_hSystem);
-        if (ret != SV_ERROR_SUCCESS)
-            printf("SVLibSystemOpen Failed! Error Code: %d\n", ret);
-    }
-}
-
 
 // query all available interfaces
 void Camera::enumInterface(){
@@ -154,7 +121,6 @@ void Camera::enumDevices(const char * interfaceId){
 
 
 void Camera::deviceDiscovery(){
-    // enumSystem();   // added by me
     enumInterface();
     for (int j = 0; j < InterfaceList.size(); j++)
     {
@@ -344,7 +310,6 @@ void Camera::stopAcquisition(){
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);
     SVFeatureSetValueInt64(g_hRemoteDevice, hFeature, 0);
 
-    acqTerminated = true;
     SVStreamAcquisitionStop(g_hStream, SV_ACQ_STOP_FLAGS_DEFAULT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_INPUT_TO_OUTPUT);
     SVStreamFlushQueue(g_hStream, SV_ACQ_QUEUE_OUTPUT_DISCARD);

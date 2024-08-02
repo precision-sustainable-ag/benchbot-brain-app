@@ -22,3 +22,31 @@ change to "Makefile_Linux_g++", compile it, and run
 $cd SVCamMiniExample/Makefile_Linux_g++
 $make
 $./SVCamMiniExample
+
+
+Compiler
+
+sudo apt-get install g++
+sudo apt-get install build-essential
+
+OpenCV
+https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html?ref=wasyresearch.com
+
+https://www.geeksforgeeks.org/how-to-install-opencv-in-c-on-linux/
+
+
+# Install minimal prerequisites (Ubuntu 18.04 as reference)
+sudo apt update && sudo apt install -y cmake g++ wget unzip
+ 
+# Download and unpack sources
+wget -O opencv.zip https://github.com/opencv/opencv/archive/4.x.zip
+unzip opencv.zip
+ 
+# Create build directory
+mkdir -p build && cd build
+ 
+# Configure
+cmake  ../opencv-4.x
+ 
+# Build
+cmake --build .

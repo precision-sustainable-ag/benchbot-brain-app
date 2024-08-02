@@ -285,18 +285,8 @@ void * AcquisitionThread(SV_STREAM_HANDLE context){
 
 
 void saveImages(SV_BUFFER_INFO imageBuffer){
-    // string fileName1 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".PNG";
-    // SVUtilSaveImageToFile(bufferInfo, fileName1.c_str(), SV_IMAGE_FILE_PNG);
-    // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
-
-    // string fileName2 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".ARW";
-    // SVUtilSaveImageToFile(bufferInfo, fileName2.c_str(), SV_IMAGE_FILE_RAW);
-
     string fileName3 = "NC_2024-07-23/img_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
     SVUtilSaveImageToFile(imageBuffer, fileName3.c_str(), SV_IMAGE_FILE_BMP);
-
-    // imwrite(fileName3, imageBuffer.pImagePtr);
-
 }
 
 

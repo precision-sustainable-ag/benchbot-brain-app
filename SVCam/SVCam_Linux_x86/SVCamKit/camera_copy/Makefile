@@ -3,7 +3,7 @@ CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -Wextra
 INCPATH       = -I..
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = -lpthread -L/opt/SVS/SVCamKit/SDK/Linux64_x64/ -lSVGenSDK64
+LIBS          = -lpthread -L/opt/SVS/SVCamKit/SDK/Linux64_x64/ -lSVGenSDK64 -I/usr/local/include/opencv4/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc
 
 OBJECTS       = main.o camera.o
 TARGET        = CameraProgram
@@ -17,4 +17,7 @@ clean:
 	-rm -f $(OBJECTS) $(TARGET)
 
 main.o: main.cpp sv_gen_sdk.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) $(LIBS) -o main.o main.cpp
+
+camera.o: camera.cpp sv_gen_sdk.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) $(LIBS) -o camera.o camera.cpp

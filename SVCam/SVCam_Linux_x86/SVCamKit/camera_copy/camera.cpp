@@ -14,6 +14,10 @@ using namespace std;
 
 using namespace std::chrono;
 
+#include <opencv2/opencv.hpp>
+#include <stdio.h>
+using namespace cv;
+
 // query all available interfaces
 void Camera::enumInterface(){
     bool bChanged = false;
@@ -286,6 +290,14 @@ void * AcquisitionThread(SV_STREAM_HANDLE context){
 
 void saveImages(SV_BUFFER_INFO imageBuffer){
     string fileName3 = "NC_2024-07-23/img_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
+    SVUtilSaveImageToFile(imageBuffer, fileName3.c_str(), SV_IMAGE_FILE_BMP);
+
+    Mat mat8uc1_bayer = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC1, imageBuffer.pImagePtr);
+    cv::Mat mat8uc3_rgb(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC3);
+    cv::cvtColor(mat8uc1_bayer, mat8uc3_rgb, cv::COLOR_BayerRG2RGB);
+
+    imwrite("cv2_" + to_string(imageBuffer.iTimeStamp) + ".bmp", mat8uc3_rgb);
+    // waitKey(0);
     SVUtilSaveImageToFile(imageBuffer, fileName3.c_str(), SV_IMAGE_FILE_BMP);
 }
 

@@ -154,7 +154,9 @@ void Camera::prepareAcquisitionBuffer(){
     SV_FEATURE_HANDLE hFeature = NULL;
     int64_t payloadSize = 0;
     SVFeatureGetByName(g_hRemoteDevice, "PayloadSize", &hFeature);
+    
     SVFeatureGetValueInt64(g_hRemoteDevice, hFeature, &payloadSize);
+    printf("Payload size: %d\n", payloadSize);
     for (uint32_t i = 0; i<buffer_count; i++)
     {
         uint8_t *buffer = new uint8_t[(size_t)payloadSize];
@@ -239,12 +241,13 @@ void Camera::startAcquisition(){
     hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TriggerSoftware", &hFeature);
     
-    int triggerCounter = 5, trigger_freq = 2000;
+    int triggerCounter = 2, trigger_freq = 5000;
     for (int i = 0; i < triggerCounter; i++)
     {
         SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);
         this_thread::sleep_for(std::chrono::milliseconds(trigger_freq));
     }
+    this_thread::sleep_for(std::chrono::milliseconds(10000));
 }
 
 
@@ -289,16 +292,79 @@ void * AcquisitionThread(SV_STREAM_HANDLE context){
 
 
 void saveImages(SV_BUFFER_INFO imageBuffer){
-    string fileName3 = "NC_2024-07-23/img_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
-    SVUtilSaveImageToFile(imageBuffer, fileName3.c_str(), SV_IMAGE_FILE_BMP);
 
-    Mat mat8uc1_bayer = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC1, imageBuffer.pImagePtr);
-    cv::Mat mat8uc3_rgb(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC3);
-    cv::cvtColor(mat8uc1_bayer, mat8uc3_rgb, cv::COLOR_BayerRG2RGB);
+    /*  ------ Utility function to convert 12 bit Image format to 16 Bit Mono ------    */
 
-    imwrite("cv2_" + to_string(imageBuffer.iTimeStamp) + ".bmp", mat8uc3_rgb);
-    // waitKey(0);
-    SVUtilSaveImageToFile(imageBuffer, fileName3.c_str(), SV_IMAGE_FILE_BMP);
+    // int bufferSize = 13376 * 9528 * 2;
+    // printf("Buffer Size: %d\n", bufferSize);
+    // unsigned char *temp_buffer = new unsigned char[(size_t)bufferSize];
+    // printf("Buffer Created\n");
+    // SVUtilBuffer12BitTo16Bit(imageBuffer, temp_buffer, bufferSize);
+    // printf("Function Passed\n");
+
+
+    /*  ------ Using default image saving utility ------    */
+    
+    // string fileName = "test_images/sdk_" + to_string(imageBuffer.iTimeStamp) + ".RAW";
+    // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_BMP);
+    // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_PNG);
+    // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_RAW);
+    
+
+    /*  ------ Saving BayerRG8 ------    
+        For BayerRG8 payload size is 127598976 which is calculated as: 13392 * 9528 * 1
+    */
+    
+    // Mat Bayerimage = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC1, imageBuffer.pImagePtr);
+    // printf("Rows: %d, Columns: %d, Channels: %d\n", Bayerimage.rows, Bayerimage.cols, Bayerimage.channels());
+    // cv::Mat RGBimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC3);
+    // cv::cvtColor(Bayerimage, RGBimage, cv::COLOR_BayerRG2RGB);
+    // string imageName = "test_images/cv2_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
+    // imwrite(imageName, RGBimage);
+    
+
+
+    /*  ------ Saving BayerRG12Packed ------    
+        For BayerRG12Packed payload size is 191169792 which is calculated as: 13376 * 9528 * 1.5
+    */
+
+    // Packed
+
+    Mat Bayerimage = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX*1.5, CV_8UC1, imageBuffer.pImagePtr);
+    string imageName = "test_images/packed_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
+    imwrite(imageName, Bayerimage);
+
+
+    // Unpacked
+
+    // Mat Bayerimage_p = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX*1.5, CV_8UC1, imageBuffer.pImagePtr);
+    // cv::Mat Bayerimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_16UC1);
+    // int i, j, k;
+    // for (i = 0; i < Bayerimage_p.rows; ++i) {
+    //     k = 0;
+    //     for  (j = 0; j < Bayerimage_p.cols-2; ++j) {
+    //         if (j % 3 == 0) {
+    //             uint8_t pack_1 = Bayerimage_p.at<uint8_t>(i, j);
+    //             uint8_t pack_2 = Bayerimage_p.at<uint8_t>(i, j+1);
+    //             uint8_t pack_3 = Bayerimage_p.at<uint8_t>(i, j+2);
+
+    //             uint16_t val_1 = pack_1 | (pack_2 << 8);
+    //             uint16_t val_2 = (val_1 >> 4) & 0xFFF;
+    //             uint16_t val_3 = ( (val_1 & 0x0F) << 8 ) | pack_3;
+                
+    //             Bayerimage.at<uint16_t>(i, k++) = val_2 << 4;
+    //             Bayerimage.at<uint16_t>(i, k++) = val_3 << 4;
+    //         }
+    //     }
+    // }
+    // string imageName = "test_images/unpacked_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
+    // imwrite(imageName, Bayerimage);
+
+
+    // Convert to RGB
+    // cv::Mat RGBimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_16UC3);
+    // cv::cvtColor(Bayerimage, RGBimage, cv::COLOR_BayerRG2RGB);
+
 }
 
 

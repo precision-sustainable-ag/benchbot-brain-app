@@ -54,3 +54,6 @@ public:
 
 void * AcquisitionThread(SV_STREAM_HANDLE context);
 void saveImages(SV_BUFFER_INFO imageBuffer);
+
+bool InitSDK();
+SV_SYSTEM_HANDLE findSystem();

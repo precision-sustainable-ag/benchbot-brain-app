@@ -15,9 +15,11 @@ sudo apt-get install build-essential
 The follow the quick user guide to install the camera sdk.
 
 > NOTE: For ARM processor, the /others/svcamkit.conf should be corrected from 'Linux64_x64' to 'Linux64_ARM'.
+
 > For switching between x64 and ARM, simply change the ctiPath in InitSDK().
 
 <br>
+
 Additional information for running SVCapture program:
 * In guide lines 17 and 18 should be:
     * $chmod +x startSVCapture64.sh

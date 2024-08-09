@@ -11,9 +11,9 @@ FanControl	ON
 FanControlThreshold	70
 OffsetX	0
 OffsetY	0
-Width	13392
+Width	13376
 Height	9528
-PixelFormat	BayerRG8
+PixelFormat	BayerRG12Packed
 BinningHorizontal	1
 BinningVertical	1
 ReverseX	0

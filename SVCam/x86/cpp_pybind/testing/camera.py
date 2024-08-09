@@ -11,6 +11,9 @@ if not isConnected:
     exit(1)
 else:
     print("Found a camera connection\n")
-
-cam_obj.disconnectCamera()
-
+    isStreamOpen = cam_obj.openStream()
+    if isStreamOpen:
+        print("Opened a stream\n")
+        cam_obj.startAcquisition()
+        cam_obj.stopAcquisition()
+    cam_obj.disconnectCamera()

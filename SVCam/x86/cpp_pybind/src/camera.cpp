@@ -157,7 +157,7 @@ void Camera::prepareAcquisitionBuffer(){
     SVFeatureGetByName(g_hRemoteDevice, "PayloadSize", &hFeature);
     
     SVFeatureGetValueInt64(g_hRemoteDevice, hFeature, &payloadSize);
-    printf("Payload size: %d\n", payloadSize);
+    printf("Payload size: %ld\n", payloadSize);
     for (uint32_t i = 0; i<buffer_count; i++)
     {
         uint8_t *buffer = new uint8_t[(size_t)payloadSize];
@@ -278,7 +278,7 @@ void * AcquisitionThread(SV_STREAM_HANDLE context){
             saveImages(bufferInfo);
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<milliseconds>(stop - start);
-            printf("Time Taken: %ld\n", duration);
+            printf("Time Taken: %d\n", duration);
 
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);

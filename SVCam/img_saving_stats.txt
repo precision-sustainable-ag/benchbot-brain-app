@@ -1,0 +1,61 @@
+PNG+RAW
+
+Time Taken: 5337
+Time Taken: 5527
+Time Taken: 5351
+Time Taken: 5337
+Time Taken: 5314
+
+
+PNG
+
+Time Taken: 5327
+Time Taken: 5211
+Time Taken: 5206
+Time Taken: 5232
+Time Taken: 5208
+
+
+RAW
+
+Time Taken: 104
+Time Taken: 289
+Time Taken: 113
+Time Taken: 113
+Time Taken: 121
+
+
+BMP
+
+Time Taken: 540
+Time Taken: 543
+Time Taken: 542
+Time Taken: 542
+Time Taken: 536
+
+Time Taken: 538
+Time Taken: 535
+Time Taken: 542
+Time Taken: 4625
+Time Taken: 546
+
+Time Taken: 521
+Time Taken: 530
+Time Taken: 530
+Time Taken: 540
+Time Taken: 533
+
+
+RAW+BMP
+
+(Shortest-Trigger=1000, 900)
+Time Taken: 632
+Time Taken: 794
+Time Taken: 649
+Time Taken: 685
+Time Taken: 672
+Time Taken: 667
+Time Taken: 641
+Time Taken: 634
+Time Taken: 702
+Time Taken: 642

@@ -16,7 +16,7 @@ The follow the quick user guide to install the camera sdk.
 
 > NOTE: For ARM processor, the /others/svcamkit.conf should be corrected from 'Linux64_x64' to 'Linux64_ARM'.
 
-> For switching between x64 and ARM, simply change the ctiPath in InitSDK().
+> For switching between x64 and ARM, simply change the ctiPath in InitSDK() and in LIBS parameter of Makefile.
 
 <br>
 
@@ -36,10 +36,10 @@ Additional information for running SVCapture program:
 ## Camera Operational Specs
 
 **Pixel Formats**
-* BayerRG8
-* Mono8
-* Mono12Packed
-* BayerRG12Packed
+* BayerRG8 - SV_GVSP_PIX_BAYRG8 - Type:17301513
+* Mono8 - SV_GVSP_PIX_MONO8 - Type:17301505
+* Mono12Packed - SV_GVSP_PIX_MONO12_PACKED - Type:17563654
+* BayerRG12Packed - SV_GVSP_PIX_BAYRG12_PACKED - Type:17563691
 
 **Util Saving Options**
 * Bayer8 - Width:13392 Height:9528

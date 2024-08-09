@@ -54,19 +54,13 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
                 printf("%s SVStreamBufferGetInfo Failed!:%d\n", __FUNCTION__, ret);
                 continue;
             }
-            printf("Image Received Width:%zd Height:%zd\n Type:%lld", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
+            printf("Image Received Width:%zd Height:%zd Type:%lld\n", bufferInfo.iSizeX, bufferInfo.iSizeY, bufferInfo.iPixelType);
             
             auto start = high_resolution_clock::now();
 
-            // string fileName1 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".PNG";
-            // SVUtilSaveImageToFile(bufferInfo, fileName1.c_str(), SV_IMAGE_FILE_PNG);
-            // SVUtilSaveImageToPNGFile(bufferInfo, "image.PNG");
-
-            // string fileName2 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".ARW";
-            // SVUtilSaveImageToFile(bufferInfo, fileName2.c_str(), SV_IMAGE_FILE_RAW);
-
-            string fileName3 = "NC_2024-07-23/img_" + to_string(bufferInfo.iTimeStamp) + ".BMP";
-            SVUtilSaveImageToFile(bufferInfo, fileName3.c_str(), SV_IMAGE_FILE_BMP);
+            // SV_IMAGE_FILE_PNG SV_IMAGE_FILE_RAW
+            string fileName = "images/img_" + to_string(bufferInfo.iTimeStamp) + ".BMP";
+            SVUtilSaveImageToFile(bufferInfo, fileName.c_str(), SV_IMAGE_FILE_BMP);
             
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<milliseconds>(stop - start);
@@ -75,7 +69,6 @@ void * AcquisitionThread(SV_STREAM_HANDLE context)
             
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);
-            // this_thread::sleep_for(std::chrono::milliseconds(3500));
         }
         else if (SV_ERROR_TIMEOUT == ret)
         {
@@ -321,23 +314,16 @@ bool openStream()
 
 void setFeatures()
 {
-    // SVDeviceLoadSettings(g_hDevice, "cam_setting.txt");
+    SV_RETURN ret = SVDeviceLoadSettings(g_hDevice, "camera_features.txt");
+    if (SV_ERROR_SUCCESS == ret)
+    {
+        printf("File loaded successfully \n");
+    }
+    else{
+        printf("Error loading file %d\n", ret);
+    }
 
     SV_FEATURE_HANDLE hFeature = NULL;
-    SVFeatureGetByName(g_hRemoteDevice, "TriggerMode", &hFeature);
-    SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 1);
-
-    hFeature = NULL;
-    SVFeatureGetByName(g_hRemoteDevice, "AcquisitionFrameRate", &hFeature);
-    SVFeatureSetValueFloat(g_hRemoteDevice, hFeature, 5.0f);
-
-    // insert other feature set values
-    // hFeature = NULL;
-    // SVFeatureGetByName(g_hRemoteDevice, "PixelFormat", &hFeature);
-    // SVFeatureSetValueInt64Enum(g_hRemoteDevice, hFeature, 6);
-    // SVFeatureSetValueEnum();
-
-    hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "TLParamsLocked", &hFeature);
     SVFeatureSetValueInt64(g_hRemoteDevice,hFeature, 1);
 

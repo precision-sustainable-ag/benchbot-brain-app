@@ -1,7 +1,11 @@
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <thread>
 #include "camera.h"
 
+using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char**argv){
     printf("\nInitialisation...\n");
@@ -25,6 +29,15 @@ int main(int argc, char**argv){
         else
             printf("Opened a stream\n");
         sv_cam.startAcquisition();
+        
+        int triggerCounter = 2, trigger_freq = 5000;
+        for (int i = 0; i < triggerCounter; i++)
+        {
+            sv_cam.trigger();
+            this_thread::sleep_for(std::chrono::milliseconds(trigger_freq));
+        }
+        this_thread::sleep_for(std::chrono::milliseconds(10000));
+
         sv_cam.stopAcquisition();
         sv_cam.disconnectCamera();
     }

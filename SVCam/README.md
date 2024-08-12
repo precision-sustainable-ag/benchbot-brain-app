@@ -46,6 +46,11 @@ Additional information for running SVCapture program:
     * BMP (383 MB, ~ 0.55s)
     * PNG (383 MB, ~ 5.35s)
     * RAW (127 MB, 0.1s ~ 0.3s)
+* Bayer12Packed - Width:13376 Height:9528
+    * BMP
+    * PNG
+    * RAW
+    * TIFF
 <br>
 
 ------
@@ -83,14 +88,6 @@ cmake --build .
 cp SVCamKit/others/svcamkit.conf /etc/ld.so.conf.d
 check
 ldconfig
-
-
-cp /etc/environment /etc/environment_`date +"%Y%m%d_%H%M%S"`
-check
-echo 'SVS_GENICAM_CACHE="/opt/SVS/SVCamKit/SDK/Linux64_x64/cache/"' >> /etc/environment
-echo 'SVS_SDK_BIN_64="/opt/SVS/SVCamKit/SDK/Linux64_x64/"' >> /etc/environment
-echo 'GENICAM_GENTL64_PATH="/opt/SVS/SVCamKit/SDK/Linux64_x64/cti"' >> /etc/environment
-check
 
 export LD_LIBRARY_PATH=/usr/local/lib/
 ```

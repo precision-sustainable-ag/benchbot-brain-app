@@ -18,6 +18,7 @@ using namespace std::chrono;
 #include <stdio.h>
 using namespace cv;
 
+
 // query all available interfaces
 void Camera::enumInterface(){
     bool bChanged = false;
@@ -156,7 +157,7 @@ void Camera::prepareAcquisitionBuffer(){
     SVFeatureGetByName(g_hRemoteDevice, "PayloadSize", &hFeature);
     
     SVFeatureGetValueInt64(g_hRemoteDevice, hFeature, &payloadSize);
-    printf("Payload size: %d\n", payloadSize);
+    printf("Payload size: %ld\n", payloadSize);
     for (uint32_t i = 0; i<buffer_count; i++)
     {
         uint8_t *buffer = new uint8_t[(size_t)payloadSize];
@@ -277,7 +278,7 @@ void * AcquisitionThread(SV_STREAM_HANDLE context){
             saveImages(bufferInfo);
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<milliseconds>(stop - start);
-            printf("Time Taken: %ld\n", duration);
+            printf("Time Taken: %d\n", duration);
 
             // queue particular buffer for acquisition
             SVStreamQueueBuffer(hDS, hBuffer);
@@ -384,4 +385,48 @@ void Camera::stopAcquisition(){
 
     deleteBuffer();
     SVStreamClose(g_hStream);
+}
+
+
+bool InitSDK(){
+    string ctiPath;
+    ctiPath ="/opt/SVS/SVCamKit/SDK/Linux64_x64/cti";
+    SV_RETURN ret = SVLibInit(ctiPath.c_str(), NULL, NULL, NULL);
+    if (SV_ERROR_SUCCESS != ret)
+    {
+        printf("SVLibInit Failed! :%d", ret);
+        return false;
+    }
+    return true;
+}
+
+
+SV_SYSTEM_HANDLE findSystem(){
+    SV_SYSTEM_HANDLE cam_system;
+    uint32_t tlCount = 0;
+    SV_RETURN ret = SVLibSystemGetCount(&tlCount);
+    if(tlCount==0)
+        printf("Error! No systems found\n");
+    bool bOpenGev = true;    
+    for (uint32_t i = 0; i < tlCount; i++)
+    {
+        SV_TL_INFO tlInfo = { {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
+        ret = SVLibSystemGetInfo(i, &tlInfo);
+        if (ret != SV_ERROR_SUCCESS)
+        {
+            printf("SVLibSystemGetInfo Failed! Error Code: %d\n", ret);
+            continue;
+        }
+        // printf("System type: %s\n", string(tlInfo.tlType));
+        bool bOpenTL = false;
+        if (bOpenGev &&  string("GEV") == string(tlInfo.tlType))
+            bOpenTL = true;
+        if (bOpenTL == false)
+            continue;
+        cam_system = NULL;
+        ret = SVLibSystemOpen(i, &cam_system);
+        if (ret != SV_ERROR_SUCCESS)
+            printf("SVLibSystemOpen Failed! Error Code: %d\n", ret);
+    }
+    return cam_system;
 }

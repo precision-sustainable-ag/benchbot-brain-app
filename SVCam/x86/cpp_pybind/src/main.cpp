@@ -18,6 +18,7 @@ PYBIND11_MODULE(SVCam, m) {
         .def("disconnectCamera", &Camera::disconnectCamera)
         .def("openStream", &Camera::openStream)
         .def("startAcquisition", &Camera::startAcquisition)
+        .def("trigger", &Camera::trigger)
         .def("stopAcquisition", &Camera::stopAcquisition);
         
 }

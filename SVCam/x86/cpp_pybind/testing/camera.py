@@ -1,5 +1,5 @@
 import SVCam
-
+import time
 
 SVCam.InitSDK()
 
@@ -15,5 +15,9 @@ else:
     if isStreamOpen:
         print("Opened a stream\n")
         cam_obj.startAcquisition()
+        for i in range(5):
+            cam_obj.trigger()
+            time.sleep(3)
+
         cam_obj.stopAcquisition()
     cam_obj.disconnectCamera()

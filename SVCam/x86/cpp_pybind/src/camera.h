@@ -4,9 +4,13 @@
 #include <thread>
 #include <cstring>
 #include "sv_gen_sdk.h"
+#include <opencv2/opencv.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #define INFINITE 0xFFFFFFFF
 using namespace std;
-
+using namespace cv;
+namespace py = pybind11;
 class Camera {
 
 private:
@@ -43,6 +47,7 @@ public:
     bool openStream();
     void startAcquisition();
     void trigger();
+    py::array_t<uchar> fetchImage();
     void stopAcquisition();
     void disconnectCamera();
 

@@ -1,5 +1,8 @@
 #include "camera.h"
 #include "sv_gen_sdk.h"
+#include <opencv2/opencv.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
@@ -11,13 +14,12 @@
 
 #define INFINITE 0xFFFFFFFF
 using namespace std;
-
 using namespace std::chrono;
-
-#include <opencv2/opencv.hpp>
-#include <stdio.h>
 using namespace cv;
+namespace py = pybind11;
 
+
+Mat latestImage = cv::Mat(9528, 13376*1.5, CV_8UC1);
 
 // query all available interfaces
 void Camera::enumInterface(){
@@ -157,7 +159,7 @@ void Camera::prepareAcquisitionBuffer(){
     SVFeatureGetByName(g_hRemoteDevice, "PayloadSize", &hFeature);
     
     SVFeatureGetValueInt64(g_hRemoteDevice, hFeature, &payloadSize);
-    printf("Payload size: %ld\n", payloadSize);
+    // printf("Payload size: %ld\n", payloadSize);
     for (uint32_t i = 0; i<buffer_count; i++)
     {
         uint8_t *buffer = new uint8_t[(size_t)payloadSize];
@@ -337,8 +339,9 @@ void saveImages(SV_BUFFER_INFO imageBuffer){
     // Packed
 
     Mat Bayerimage = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX*1.5, CV_8UC1, imageBuffer.pImagePtr);
-    string imageName = "test_images/packed_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
-    imwrite(imageName, Bayerimage);
+    latestImage = Bayerimage.clone();
+    // string imageName = "test_images/packed_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
+    // imwrite(imageName, Bayerimage);
 
 
     // Unpacked
@@ -371,6 +374,14 @@ void saveImages(SV_BUFFER_INFO imageBuffer){
     // cv::Mat RGBimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_16UC3);
     // cv::cvtColor(Bayerimage, RGBimage, cv::COLOR_BayerRG2RGB);
 
+}
+
+py::array_t<uchar> Camera::fetchImage(){
+    return py::array_t<uchar>(
+        {latestImage.rows, latestImage.cols, latestImage.channels()},
+        {latestImage.step[0], latestImage.step[1], latestImage.elemSize()},
+        latestImage.data
+    );
 }
 
 

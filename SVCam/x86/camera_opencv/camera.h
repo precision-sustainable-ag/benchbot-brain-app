@@ -19,6 +19,7 @@ public:
     SV_STREAM_HANDLE g_hStream;
     SV_RETURN ret;
     uint32_t buffer_count = 10;
+    SV_FEATURE_HANDLE swTrigger;
 
 public:
     // Constructor
@@ -27,6 +28,7 @@ public:
         g_hRemoteDevice = NULL;
         g_hStream = NULL;
         g_hSystem = cam_system;
+        swTrigger = NULL;
     }
     
     vector<SV_INTERFACE_INFO *>  InterfaceList;
@@ -40,6 +42,7 @@ public:
     void deleteBuffer();
     bool openStream();
     void startAcquisition();
+    void trigger();
     void stopAcquisition();
     void disconnectCamera();
 

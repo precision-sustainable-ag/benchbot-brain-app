@@ -239,16 +239,21 @@ void Camera::startAcquisition(){
     hFeature = NULL;
     SVFeatureGetByName(g_hRemoteDevice, "AcquisitionStart", &hFeature);
     SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000);
-    hFeature = NULL;
-    SVFeatureGetByName(g_hRemoteDevice, "TriggerSoftware", &hFeature);
+    // hFeature = NULL;
+    SVFeatureGetByName(g_hRemoteDevice, "TriggerSoftware", &swTrigger);
     
-    int triggerCounter = 2, trigger_freq = 5000;
-    for (int i = 0; i < triggerCounter; i++)
-    {
-        SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);
-        this_thread::sleep_for(std::chrono::milliseconds(trigger_freq));
-    }
-    this_thread::sleep_for(std::chrono::milliseconds(10000));
+    // int triggerCounter = 2, trigger_freq = 5000;
+    // for (int i = 0; i < triggerCounter; i++)
+    // {
+    //     SVFeatureCommandExecute(g_hRemoteDevice, hFeature, 1000, true);
+    //     this_thread::sleep_for(std::chrono::milliseconds(trigger_freq));
+    // }
+    // this_thread::sleep_for(std::chrono::milliseconds(10000));
+}
+
+
+void Camera::trigger(){
+    SVFeatureCommandExecute(g_hRemoteDevice, swTrigger, 1000, true);
 }
 
 

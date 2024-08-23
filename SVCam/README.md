@@ -21,7 +21,7 @@ The follow the quick user guide to install the camera sdk.
 <br>
 
 Additional information for running SVCapture program:
-* In guide lines 17 and 18 should be:
+* In guide, lines 17 and 18 should be:
     * $chmod +x startSVCapture64.sh
     * $./startSVCapture64.sh
 * First time usage, the driver might not be auto located so follow steps below:
@@ -52,42 +52,3 @@ Additional information for running SVCapture program:
     * RAW
     * TIFF
 <br>
-
-------
-
-## OpenCV
-
-[Reference 1](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html?ref=wasyresearch.com)
-[Reference 2](https://www.geeksforgeeks.org/how-to-install-opencv-in-c-on-linux/)
-
-```
-# Install minimal prerequisites (Ubuntu 18.04 as reference)
-sudo apt update && sudo apt install -y cmake g++ wget unzip
-
-# Download and unpack sources
-wget -O opencv.zip https://github.com/opencv/opencv/archive/4.x.zip
-unzip opencv.zip
-
-# Create build directory
-mkdir -p build && cd build
-
-# Configure
-cmake  ../opencv-4.x
- 
-# Build
-cmake --build .
-```
-<br>
-
-------
-
-## Pybind
-
-
-```
-cp SVCamKit/others/svcamkit.conf /etc/ld.so.conf.d
-check
-ldconfig
-
-export LD_LIBRARY_PATH=/usr/local/lib/
-```

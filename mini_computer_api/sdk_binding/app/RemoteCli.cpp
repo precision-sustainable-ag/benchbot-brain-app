@@ -52,32 +52,24 @@ public:
 		camera->release();
 		SDK::Release();
 	}
-}
+};
 
 int main()
 {
 	bool success;
-	Sony_Camera cam_obj();
+	Sony_Camera cam_obj;
 	
 	success = cam_obj.init_sdk();
 	if (!success)
-		tout << std::endl << "Failed to initialize SDK\n";
-	// success = NULL;
+		cli::tout << std::endl << "Failed to initialize SDK\n";
 
 	success = cam_obj.connect_camera();
 	if (!success)
-		tout << std::endl << "Failed to connect to a camera\n";
-	else
+		cli::tout << std::endl << "Failed to connect to a camera\n";
+	else{
 		cam_obj.click_picture();
-	
-	tout << std::endl << "Will disconnect soon\n";
-	std::this_thread::sleep_for(2s);
-	cam_obj.disconnect_camera();
-	
-	// Sony_Camera cam_obj();
-	// cam_obj.init_sdk();
-	// cam_obj.connect_camera();
-	// cam_obj.click_picture();
-	// std::this_thread::sleep_for(2s);
-	// cam_obj.disconnect_camera();
+		cli::tout << std::endl << "Will disconnect soon\n";
+		std::this_thread::sleep_for(2s);
+		cam_obj.disconnect_camera();
+	}
 }

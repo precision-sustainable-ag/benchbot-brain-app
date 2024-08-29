@@ -174,3 +174,6 @@ species_map.json
 
 # config files
 mini_computer_api/resources/config.yaml
+
+/mini_computer_api/sdk_binding/build/
+/mini_computer_api/sdk_binding/pybind11/

@@ -14,6 +14,9 @@ namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 namespace SDK = SCRSDK;
 
+
+Sony_Camera::Sony_Camera(){}
+
 bool Sony_Camera::init_sdk(){
 	auto init_success = SDK::Init();
 	if (!init_success) {

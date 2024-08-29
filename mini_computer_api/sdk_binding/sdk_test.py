@@ -1,6 +1,8 @@
 import time
-# import SonyCam
-from SonyCam import Camera
+import build.SonyCam
+
+
+from build.SonyCam import Camera
 
 cam_obj = Camera()
 
@@ -8,7 +10,7 @@ isInit = cam_obj.initSDK()
 if not isInit:
 	exit(1)
 else:
-	print("Initialized SDK\n")
+	print("Initialized SDK")
 
 isConnected = cam_obj.connectCamera()
 if not isConnected:

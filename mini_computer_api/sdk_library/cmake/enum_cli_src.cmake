@@ -7,7 +7,7 @@ set(__cli_srcs
     ${__cli_src_dir}/CameraDevice.cpp
     ${__cli_src_dir}/ConnectionInfo.cpp
     ${__cli_src_dir}/PropertyValueTable.cpp
-    ${__cli_src_dir}/RemoteCli.cpp
+    ${__cli_src_dir}/Camera.cpp
     ${__cli_src_dir}/Text.cpp
     ${__cli_src_dir}/MessageDefine.cpp
 )

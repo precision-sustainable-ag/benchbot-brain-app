@@ -3,7 +3,7 @@
 namespace fs = std::filesystem;
 #include <cstdlib>
 #include <iomanip>
-#include "RemoteCli.h"
+#include "Camera.h"
 #include "CRSDK/CameraRemote_SDK.h"
 #include "CameraDevice.h"
 #include "Text.h"

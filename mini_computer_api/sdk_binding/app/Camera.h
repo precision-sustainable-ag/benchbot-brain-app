@@ -1,5 +1,5 @@
-#ifndef REMOTECLI_H
-#define REMOTECLI_H
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include "CameraDevice.h"
 

@@ -14,10 +14,9 @@ namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 namespace SDK = SCRSDK;
 
-
-Sony_Camera::Sony_Camera(){}
-
-bool Sony_Camera::init_sdk(){
+namespace cli
+{
+bool init_sdk(){
 	auto init_success = SDK::Init();
 	if (!init_success) {
 		cli::tout << "Failed to initialize Remote SDK. Terminating.\n";
@@ -27,36 +26,39 @@ bool Sony_Camera::init_sdk(){
 	return true;
 }
 
-bool Sony_Camera::connect_camera(){
+bool connect_camera(){
 	SDK::ICrEnumCameraObjectInfo* camera_list = nullptr;
 	auto enum_status = SDK::EnumCameraObjects(&camera_list);
-	cli::tout << "Return Code:  " << enum_status << "\n";
+	if (CR_FAILED(enum_status))
+		cli::tout << "CR Failure " << enum_status << "\n";
+	else if (camera_list == nullptr)
+		cli::tout << "Null pointer\n";
 	if (CR_FAILED(enum_status) || camera_list == nullptr) {
 		cli::tout << "No camera(s) detected. Connect a camera and retry.\n";
 		SDK::Release();
 		return false;
 	}
 	auto* camera_info = camera_list->GetCameraObjectInfo(0);
-	cli::tout << "Camera Info:  " << camera_info << "\n";
 	camera = CameraDevicePtr(new cli::CameraDevice(1, camera_info));
 	return true;
 }
 
-bool Sony_Camera::check_connection(){
+bool check_connection(){
 	if (camera->is_connected())
 		return true;
 	else
 		return false;
 }
 
-void Sony_Camera::click_picture(){
+void click_picture(){
 	camera->connect(SDK::CrSdkControlMode_Remote, SDK::CrReconnecting_ON);
 	camera->af_shutter();
 	std::this_thread::sleep_for(5s);
 }
 
-void Sony_Camera::disconnect_camera(){
+void disconnect_camera(){
 	camera->disconnect();
 	camera->release();
 	SDK::Release();
+}
 }

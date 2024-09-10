@@ -1,9 +1,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "CameraDevice.h"
+#include <memory>
 
-namespace SDK = SCRSDK;
+namespace cli {
+	class CameraDevice;
+}
 
 typedef std::shared_ptr<cli::CameraDevice> CameraDevicePtr;
 

@@ -17,7 +17,7 @@ include(enum_crsdk_hdr)
 
 ### Define output target ###
 set(remotecli "RemoteCli")
-add_library(${remotecli} STATIC
+add_library(${remotecli} SHARED
     ${cli_hdrs}
     ${cli_srcs}
     ${crsdk_hdrs}
@@ -50,6 +50,6 @@ target_link_libraries( ${remotecli} PRIVATE ${camera_remote} )
 
 include_directories(${crsdk_hdr_dir})
 
-pybind11_add_module( ${PROJECT_NAME} app/main.cpp)
+pybind11_add_module( ${PROJECT_NAME} main.cpp)
 target_link_libraries( ${PROJECT_NAME} PUBLIC ${pybind11_LIBRARIES} )
 target_link_libraries( ${PROJECT_NAME} PUBLIC ${remotecli} )

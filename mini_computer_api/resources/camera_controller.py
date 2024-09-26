@@ -1,5 +1,5 @@
 from flask import make_response, send_file
-from from_root import from_root
+from from_root import from_root, from_here
 from datetime import date
 from pathlib import Path
 import os
@@ -13,7 +13,7 @@ import yaml
 import json
 
 
-with open('config.yaml', 'r') as f:
+with open(str(from_here('config.yaml')), 'r') as f:
     config_data = yaml.load(f, Loader=yaml.SafeLoader)
 
 class CameraController():
@@ -40,7 +40,7 @@ class CameraController():
             for istr in missing_list:
                 message += istr + " "
             message += "missing"
-            imageCount = len(missing_list)
+            imageCount = 2-len(missing_list)
             content = json.dumps({'text': message, 'imageTaken': imageCount})
             response = make_response(content, 417)
         return response

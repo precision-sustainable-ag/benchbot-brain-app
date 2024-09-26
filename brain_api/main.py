@@ -36,7 +36,16 @@ def initialize_wifi():
     with open(from_root('mini_computer_api/resources/config.yaml'), 'r') as f:
         config_data = yaml.load(f, Loader=yaml.SafeLoader)
     location = config_data['state']
-    os.system(f"sudo ./common/network_config.sh {location}")
+    if location=='NC':
+        os.system("echo 'nameserver 152.1.14.14' | sudo tee -a /etc/resolv.conf")
+        os.system("echo 'nameserver 152.1.14.53' | sudo tee -a /etc/resolv.conf")
+        os.system("sudo ip addr add 192.168.8.10/24 dev eth0")
+        os.system("sudo ip route add default via 192.168.8.1")
+    else:
+        os.system("sudo sysctl -w net.ipv4.ip_forward=1")
+        os.system("sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE")
+        os.system("sudo mkdir -p /etc/iptables")
+        os.system("sudo sh -c 'iptables-save > /etc/iptables/rules.v4'")
 
 @app.get("/move_y_axis/{dist}")
 async def move_y_axis(dist):

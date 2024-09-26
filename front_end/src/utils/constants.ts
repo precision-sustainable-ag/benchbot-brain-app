@@ -36,4 +36,5 @@ export const defaultImage: Image = {
   status: "error",
   image: null,
   errorMsg: "No image available",
+  imageTaken: 0,
 };

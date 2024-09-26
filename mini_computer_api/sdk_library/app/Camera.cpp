@@ -37,7 +37,6 @@ bool Sony_Camera::connect_camera(){
 		return false;
 	}
 	auto* camera_info = camera_list->GetCameraObjectInfo(0);
-	cli::tout << "Camera Info:  " << camera_info << "\n";
 	camera = CameraDevicePtr(new cli::CameraDevice(1, camera_info));
 	return true;
 }

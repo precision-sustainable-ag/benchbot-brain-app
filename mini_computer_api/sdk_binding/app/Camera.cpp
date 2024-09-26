@@ -31,7 +31,8 @@ bool Sony_Camera::connect_camera(){
 	SDK::ICrEnumCameraObjectInfo* camera_list = nullptr;
 	auto enum_status = SDK::EnumCameraObjects(&camera_list);
 	if (CR_FAILED(enum_status) || camera_list == nullptr) {
-		cli::tout << "No cameras detected. Connect a camera and retry.\n";
+		cli::tout << "Return Code: " << enum_status << "\n";
+		cli::tout << "No camera(s) detected. Connect a camera and retry.\n";
 		SDK::Release();
 		return false;
 	}

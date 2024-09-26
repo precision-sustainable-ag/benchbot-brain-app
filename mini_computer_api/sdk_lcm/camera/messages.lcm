@@ -1,0 +1,12 @@
+package message;
+
+struct sdk_resp
+{
+    boolean  resp;
+}
+
+
+struct sdk_reqs
+{
+    int32  req;
+}

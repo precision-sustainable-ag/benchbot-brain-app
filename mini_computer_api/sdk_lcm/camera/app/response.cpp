@@ -15,34 +15,39 @@ using namespace std::chrono_literals;
 
 class Handler {
   public:
-    Handler()
-    {
-        lcm::LCM lcm_publisher;
-        // if(!lcm_publisher.good())
-        //     return 1;
-        exlcm::sdk_resp sdk_reply;
-        Sony_Camera cam_obj;
-    }
+    lcm::LCM lcm_publisher;
+    // if(!lcm_publisher.good())
+    //     return 1;
+    message::sdk_resp sdk_reply;
+    Sony_Camera cam_obj;
+    bool success;
+    // Handler()
+    // {
+        
+    // }
 
     ~Handler() {}
 
     void handleMessage(const lcm::ReceiveBuffer *rbuf, const std::string &chan,
-                       const exlcm::sdk_reqs *msg)
+                       const message::sdk_reqs *msg)
     {
         try{
             switch (msg->req) {
-                case 5349:
-                    bool success = cam_obj.init_sdk();
+                case 5349: {
+                    success = cam_obj.init_sdk();
                     sdk_reply.resp = (success) ? true : false;
                     break;
-                case 4343:
-                    bool success = cam_obj.connect_camera();
+                }
+                case 4343: {
+                    success = cam_obj.connect_camera();
                     sdk_reply.resp = (success) ? true : false;
                     break;
-                case 4353:
-                    bool success = cam_obj.check_connection();
+                }
+                case 4353: {
+                    success = cam_obj.check_connection();
                     sdk_reply.resp = (success) ? true : false;
                     break;
+                }
                 case 4354:
                     cam_obj.click_picture();
                     sdk_reply.resp = true;

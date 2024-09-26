@@ -8,5 +8,5 @@ struct sdk_resp
 
 struct sdk_reqs
 {
-    int32  req;
+    int32_t  req;
 }

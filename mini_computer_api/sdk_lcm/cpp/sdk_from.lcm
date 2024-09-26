@@ -1,0 +1,8 @@
+package exlcm;
+
+struct sdk_resp
+{
+    boolean  resp_init;
+    boolean  resp_conn;
+    boolean  resp_status;
+}

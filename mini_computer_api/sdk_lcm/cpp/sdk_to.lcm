@@ -1,0 +1,11 @@
+package exlcm;
+
+struct sdk_reqs
+{
+    boolean  init_sdk;
+    boolean  cam_conn;
+    boolean  cam_status;
+    boolean  cam_trigger;
+    boolean  cam_disconn;
+    boolean  release_sdk;
+}

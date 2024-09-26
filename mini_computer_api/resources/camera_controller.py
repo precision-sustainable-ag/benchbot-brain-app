@@ -1,7 +1,8 @@
 from flask import make_response, send_file
-from from_root import from_root
+from from_root import from_root, from_here
 from datetime import date
 from pathlib import Path
+import socket
 import os
 import time
 import shutil
@@ -12,7 +13,7 @@ import io
 import yaml
 
 
-with open('config.yaml', 'r') as f:
+with open(str(from_here('config.yaml')), 'r') as f:
     config_data = yaml.load(f, Loader=yaml.SafeLoader)
 
 class CameraController():
@@ -25,9 +26,31 @@ class CameraController():
         imgDir = f"images/{self.location}_{date.today()}"
         self.dirName = from_root(parent_dir, imgDir)
         self.create_img_dir = True
+        self.camera_client = SocketClient()
         # define the path to executable file of the camera
-        self.camera_exe_path = from_root(parent_dir, "resources", "RemoteCli")
+        # self.camera_exe_path = from_root(parent_dir, "resources", "RemoteCli")
+        self.camera_exe_path = from_root(parent_dir, "sdk_socket", "build", "main")
+        self.start_camera_server()
 
+    def start_camera_server(self):
+        # command = str(self.camera_exe_path) + " > /dev/null 2>&1 &"
+        command = str(self.camera_exe_path) + " > out.txt 2>&1 &"
+        # command = str(self.camera_exe_path) + " &"
+        print(command)
+        os.system(command)
+        time.sleep(2)
+        self.camera_client.init_connection()
+        if self.camera_client.up():
+            self.camera_client.cameraConnect()
+
+    def stop_camera_server(self):
+        # self.camera_client.cameraDisconnect()
+        self.camera_client.shutdown_server()
+        self.camera_client.close_connection()
+
+    def restart_camera_server(self):
+        self.stop_camera_server()
+        self.start_camera_server()
 
     # function for capturing a set of images and if successful, send a preview of the image captured
     def capture_images(self):
@@ -42,15 +65,19 @@ class CameraController():
             response = make_response(message, 417)
         return response
 
-
     # function for triggering the camera to take the images
     def trigger_camera(self):
-        os.system(self.camera_exe_path)
-        time.sleep(3)
+        if self.camera_client.up():
+            time.sleep(1)
+            print(f"\ngone {time.time()}")
+            self.camera_client.cameraTrigger()
+            print(f"back {time.time()}")
+            time.sleep(3)
+        else:
+            self.restart_camera_server()       
         t_stamp = str(int(time.time()))
         missing_images = self.find_and_rename_files(t_stamp)
         return missing_images
-
 
     # function to check whether both the image files have been downloaded from camera, if yes then rename them appropriately
     def find_and_rename_files(self, time_stamp):
@@ -77,7 +104,6 @@ class CameraController():
                 elif not missing_files or (time.time()-timeout_start > 5):
                     return missing_files
 
-
     # funtion to move image files to day's image collection directory
     def move_files(self, file_name):
         if self.create_img_dir:
@@ -88,7 +114,6 @@ class CameraController():
         except:
             return
 
-
     # function to find the latest jpeg file in the image directory
     def find_latest_image(self):
         list_of_files = glob.glob(f'{self.dirName}/*.JPG')
@@ -96,7 +121,6 @@ class CameraController():
         if list_of_files:
             fileName = max(list_of_files, key=os.path.getctime)
         return fileName
-
 
     # function to encode latest jpeg file
     def encode_latest_image(self):
@@ -114,3 +138,97 @@ class CameraController():
         else:
             response = make_response("No image file found!", 400)
         return response
+
+    def __del__(self):
+        self.stop_camera_server()
+
+
+class SocketClient():
+    def __init__(self):
+        # Define server address and port
+        self.server_address = ('127.0.0.1', 8080)
+        # Create a socket object
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.settimeout(5.0)
+        self.connection_status = False
+    
+    def init_connection(self):
+        try:
+            # Connect to the server
+            self.client_socket.connect(self.server_address)
+            print("\nConnected established")
+            self.connection_status = True
+        except ConnectionRefusedError:
+            print("\nConnection refused")
+            self.connection_status = False
+
+    def close_connection(self):
+        try:
+            self.client_socket.close()
+            print("\nConnection closed")
+            self.connection_status = False
+        except:
+            pass
+
+    def up(self):
+        return self.connection_status
+
+    def send_msg(self, message):
+        try:
+            self.client_socket.sendall(message.encode('utf-8'))
+            print(f"\nSent message: {message}")
+            response = self.client_socket.recv(1024)
+            msg_decoded = response.decode('utf-8')
+            print(f"Received response: {msg_decoded}")
+        except:
+            msg_decoded = ""
+        return msg_decoded
+
+    def cameraConnect(self):
+        msg_reply = self.send_msg("Initialize_SDK")
+        if(msg_reply=="Success"):
+            msg_reply = self.send_msg("Camera_Connect")
+            if(msg_reply=="Success"):
+                print("\nCamera connected")
+            else:
+                print("\nCamera not connected")
+        else:
+            print("\nSDK not initialized")
+    
+    def cameraDisconnect(self):
+        self.send_msg("Camera_Disconnect")
+
+    def cameraStatus(self):
+        msg_reply = self.send_msg("Camera_Status")
+        if(msg_reply=="Up"):
+            return True
+        else:
+            return False
+
+    def cameraTrigger(self):
+        self.send_msg("Camera_Trigger")
+        time.sleep(5)
+        # if self.cameraStatus():
+        #     self.send_msg("Camera_Trigger")
+        #     time.sleep(5)
+        # else:
+        #     print("\nNo trigger sent, camera not connected")
+
+    def shutdown_server(self):
+        self.send_msg("Close_Connection")
+        self.connection_status = False
+
+
+
+
+if __name__ == '__main__':
+    sony_camera = CameraController()
+
+    for i in range(5):
+        try:
+            sony_camera.capture_images()
+        except RuntimeError as e:
+            print(f"\n {e} \n")
+        time.sleep(5)
+
+    # sony_camera.stop_camera_server()

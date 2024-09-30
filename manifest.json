@@ -3,14 +3,14 @@
     "benchbot-app": {
       "name": "benchbot-app",
       "type": "app",
-      "exec_cmd": "/mnt/managed_home/farm-ng-user-ted-xu/benchbot-brain-app/venv/bin/python3 /mnt/managed_home/farm-ng-user-ted-xu/benchbot-brain-app/brain_api/main.py",
+      "exec_cmd": "/mnt/managed_home/farm-ng-user-priyajakhar/benchbot-brain-app/brain_api/venv/bin/python3 /mnt/managed_home/farm-ng-user-priyajakhar/benchbot-brain-app/brain_api/main.py",
       "args": [
         "--config",
         "/opt/farmng/config.json",
         "--port",
         "8042"
       ],
-      "autostart": true,
+      "autostart": false,
       "app_route": "8042",
       "display_name": "BenchBot App"
     }

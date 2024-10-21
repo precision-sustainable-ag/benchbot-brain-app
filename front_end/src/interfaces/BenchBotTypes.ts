@@ -36,4 +36,5 @@ export interface Image {
   status: "pending" | "success" | "error";
   image: Blob | null;
   errorMsg: string;
+  imageTaken: number;
 }

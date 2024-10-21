@@ -29,6 +29,8 @@ interface TraversalProps {
   benchBotConfig: BenchBotConfig;
   benchBotData: BenchBotData;
   setBenchBotData: React.Dispatch<React.SetStateAction<BenchBotData>>;
+  imageTaken: number;
+  setImageTaken: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function Traversal({
@@ -38,6 +40,8 @@ export default function Traversal({
   benchBotConfig,
   benchBotData,
   setBenchBotData,
+  imageTaken: imageNumber,
+  setImageTaken,
 }: TraversalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [Image, setImage] = useState<Image>(defaultImage);
@@ -51,33 +55,49 @@ export default function Traversal({
   };
 
   const loadImage = async (): Promise<Image> => {
+    let imageTakenNum = 0;
     appendLog("Taking image.");
     setImage((prev) => ({ ...prev, status: "pending" }));
     const imageData = await takeImage();
     if (!imageData.error && imageData.data) {
       appendLog("Loading image success.");
+      console.log("image taken", 2);
       return {
         ...Image,
         status: "success",
         image: imageData.data,
+        imageTaken: 2,
       };
     } else {
       appendLog("Failed loading image, retrying...");
+      console.log("imageData", imageData);
+      if (imageData.imageTaken) {
+        console.log("imageTaken", imageData.imageTaken);
+        imageTakenNum += imageData.imageTaken;
+      }
       // retake image here
       const retakeImageData = await takeImage();
       if (!retakeImageData.error && retakeImageData.data) {
         appendLog("Loading image success.");
+        console.log("image taken", 2);
+        imageTakenNum += 2;
         return {
           ...Image,
           status: "success",
           image: retakeImageData.data,
+          imageTaken: imageTakenNum,
         };
       } else {
         appendLog("Failed loading image. Skipped");
+        if (imageData.imageTaken) {
+          console.log("image taken", imageData.imageTaken);
+          imageTakenNum += imageData.imageTaken;
+        }
         return {
           ...Image,
           status: "error",
           errorMsg: retakeImageData.message,
+          imageTaken: imageTakenNum,
         };
       }
     }
@@ -91,6 +111,7 @@ export default function Traversal({
     appendLog("Start BenchBot traversal.");
     setStatusBarText("running");
     traverseBenchBot(benchBotConfig, benchBotData);
+    setOpen(true);
   };
 
   const pauseTraversal = () => {
@@ -106,6 +127,7 @@ export default function Traversal({
       const { location, map, direction } = resetBenchBotData(benchBotData.map);
       saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
       setBenchBotData({ ...benchBotData, location, map, direction });
+      setImageTaken(0);
       return;
     }
     setStopTriggered(true);
@@ -120,10 +142,25 @@ export default function Traversal({
     saveConfig(benchBotConfig, { ...benchBotData, location, map, direction });
   };
 
+  const calculateImages = () => {
+    const { map } = benchBotData;
+    const { potsPerRow, numberOfRows } = benchBotConfig;
+    let availablePots = 0;
+    for (let i = 0; i < numberOfRows; i++) {
+      for (let j = 0; j < potsPerRow; j++) {
+        if (map[i][j].species !== "none") availablePots += 1;
+      }
+    }
+    console.log("availablePots", availablePots);
+    return 2 * availablePots;
+  };
+
   const traverseBenchBot = async (
     config: BenchBotConfig,
     data: BenchBotData
   ) => {
+    const totalImages = calculateImages();
+    let imageTaken = imageNumber;
     // mock sleep function
     const sleep = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
@@ -161,6 +198,7 @@ export default function Traversal({
           appendLog("Traversal paused.");
           let location = [row, pot];
           setBenchBotData({ ...benchBotData, location, map, direction });
+          setImageTaken(imageTaken);
           saveConfig(benchBotConfig, {
             ...benchBotData,
             location,
@@ -181,6 +219,8 @@ export default function Traversal({
           setStatus(row, pot, "skipped");
         } else {
           const image = await loadImage();
+          imageTaken += image.imageTaken;
+          setSnackBarContent(`Image taken: ${imageTaken} / ${totalImages}`);
           setImage(image);
           appendLog(`visited pot at row ${row + 1} pot ${pot + 1}`);
           if (image.status === "error") {
@@ -244,8 +284,9 @@ export default function Traversal({
       if (stopRef.current === "running") {
         setStatusBarText("paused");
         stopRef.current = "paused";
-        setOpen(true);
-        setSnackBarContent("Traversal paused.");
+        // TODO: comment snackbar message for now
+        // setOpen(true);
+        // setSnackBarContent("Traversal paused.");
       }
     },
     []
@@ -258,13 +299,21 @@ export default function Traversal({
           name={"Start"}
           onClick={startTraversal}
           disabled={stopTriggered === true}
-          styles={{ width: "150px", color: stopTriggered ? "#61dac46a" : "#61dac3", marginLeft: "25px" }}
+          styles={{
+            width: "150px",
+            color: stopTriggered ? "#61dac46a" : "#61dac3",
+            marginLeft: "25px",
+          }}
         />
         <Button
           name={"Pause"}
           onClick={pauseTraversal}
-          disabled={stopRef.current === 'paused'}
-          styles={{ width: "150px", color: stopRef.current === 'paused' ? "#f65a5a79" : "#f65a5b", marginLeft: "25px" }}
+          disabled={stopRef.current === "paused"}
+          styles={{
+            width: "150px",
+            color: stopRef.current === "paused" ? "#f65a5a79" : "#f65a5b",
+            marginLeft: "25px",
+          }}
         />
         <Button
           name={stopRef.current === "stopped" ? "Reset" : "Stop"}

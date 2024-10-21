@@ -1,32 +1,32 @@
 # abbreviation of state in which the image acquisition is happening
-state: 'NC'
+state: NC
 
 # first 2 letters of default image names which are generated on camera (default is usually DSC so use 'DS')
-cam_img_name: 'NC'
+cam_img_name: NC
 
 
 NC:
     # configuration for mini computer (for capturing images)
     mini_computer:
-        ip: "192.168.8.11"
+        ip: 192.168.8.11
         port: 5000
     # configuration for clear-core (for x-z axes movement)
     clear-core:
-        ip: "192.168.8.21"
+        ip: 192.168.8.21
         port: 8888
 
 MD:
     mini_computer:
-        ip: "10.95.76.50"
+        ip: 10.95.76.50
         port: 5000
     clear-core:
-        ip: "10.95.76.21"
+        ip: 10.95.76.21
         port: 8888
 
 TX:
     mini_computer:
-        ip: "10.95.76.50"
+        ip: 10.95.76.50
         port: 5000
     clear-core:
-        ip: "10.95.76.21"
+        ip: 10.95.76.21
         port: 8888

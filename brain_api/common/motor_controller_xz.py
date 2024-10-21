@@ -1,7 +1,8 @@
-import json
+import yaml
 import socket
-from from_root import from_here
+from from_root import from_root
 import logging
+
 
 class MotorControllerXZ():
     def __init__(self):
@@ -11,11 +12,13 @@ class MotorControllerXZ():
         self.z_steps_to_cm = 0.000529167
         self.conn_status = False
 
-        self.config_file = from_here('udp_config.json')
+        self.config_file = from_root('config.yaml')
         with open(self.config_file, 'r') as openfile:
-            udp_info = json.load(openfile)
-        ip = udp_info.get("ip")
-        port = udp_info.get("port")
+            self.config_data = yaml.load(openfile, Loader=yaml.SafeLoader)
+            self.loc = self.config_data['state']
+            udp_info = self.config_data[self.loc]['clear-core']
+        ip = udp_info['ip']
+        port = udp_info['port']
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.init_connection(ip, port)
  
@@ -24,9 +27,9 @@ class MotorControllerXZ():
             "ip": new_ip,
             "port": new_port,
         }
-        json_obj = json.dumps(udp_config, indent=4)
+        self.config_data[self.loc]['clear-core'] = udp_config
         with open(self.config_file, 'w') as outfile:
-            outfile.write(json_obj)
+            yaml.dump(self.config_data, outfile, default_flow_style=False)
         self.init_connection(new_ip, new_port)
         logging.info(f"Updated UDP configuration [{new_ip}:{new_port}]")
 

@@ -2,7 +2,7 @@
 
 This repository contains the front end and the back end to create the benchbot application that is deployable to the Amiga brain.
 
-It used a template provided by farm-ng, for the most up-to-date documentation on using this template repository, please refer to:
+It used a template provided by farm-ng. For the most up-to-date documentation, please refer to:
 
 [**Developing Custom Applications**](https://amiga.farm-ng.com/docs/brain/brain-apps)
 
@@ -38,5 +38,5 @@ To build the frontend after changes:
 ```
 cd front_end
 npm install
-npm run build #build the frontend
+npm run build # build the frontend
 ```

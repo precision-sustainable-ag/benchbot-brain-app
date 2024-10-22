@@ -1,7 +1,7 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
 import configYaml from "../../../config.yaml";
 
-const { ip, port } = configYaml.NC["mini_computer"];
+const { ip, port } = configYaml[configYaml.state]["mini_computer"];
 
 const baseUrl = "http://localhost:8042";
 

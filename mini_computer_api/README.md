@@ -48,6 +48,11 @@ conda activate api_env
 ```
 
 
+## Globus setup
+
+Follow instructions on [page](https://precision-sustainable-ag.atlassian.net/wiki/spaces/BB/pages/532643851/Setting+Up+Globus+Upload)
+
+
 ## Launch on boot setup
 
 The file setup.sh is used to activate the conda environment and get the server running. In order to have this file launched on boot up, follow these instructions:

@@ -1,5 +1,8 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
-import { ip, port } from "../../../brain_api/common/mini_comp_config.json";
+import configYaml from "../../../config.yaml";
+
+const { ip, port } = configYaml[configYaml.state]["mini_computer"];
+
 const baseUrl = "http://localhost:8042";
 
 const imageUrl = `http://${ip}:${port}`;

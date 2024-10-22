@@ -33,7 +33,7 @@ logging.info(f"Using species file {species_map_filename}")
 
 @app.put("/initialize_wifi")
 def initialize_wifi():
-    with open(from_root('mini_computer_api/resources/config.yaml'), 'r') as f:
+    with open(from_root('config.yaml'), 'r') as f:
         config_data = yaml.load(f, Loader=yaml.SafeLoader)
     location = config_data['state']
     if location=='NC':

@@ -173,4 +173,4 @@ species_map.json
 .test_api
 
 # config files
-mini_computer_api/resources/config.yaml
+config.yaml

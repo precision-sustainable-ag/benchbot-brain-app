@@ -28,6 +28,9 @@ function App() {
   );
   const [benchBotData, setBenchBotData] =
     useState<BenchBotData>(defaultBenchBotData);
+  const [imageTaken, setImageTaken] = useState(0);
+
+  console.log("imageTaken", imageTaken);
 
   // load config from local file
   useEffect(() => {
@@ -113,6 +116,8 @@ function App() {
                 benchBotConfig={benchBotConfig}
                 benchBotData={benchBotData}
                 setBenchBotData={setBenchBotData}
+                imageTaken={imageTaken}
+                setImageTaken={setImageTaken}
               />
             }
           />

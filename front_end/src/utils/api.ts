@@ -1,10 +1,10 @@
 import { BenchBotConfig, BenchBotData } from "../interfaces/BenchBotTypes";
+import { ip, port } from "../../../brain_api/common/mini_comp_config.json";
 const baseUrl = "http://localhost:8042";
 
-const imageUrl = "http://10.95.76.50:5000";
+const imageUrl = `http://${ip}:${port}`;
 // testing api
 // const imageUrl = "http://localhost:5001";
-
 
 // TODO: build a interface for error message, add error handling for all apis,
 // if an error happens, show it in the log
@@ -12,6 +12,7 @@ const imageUrl = "http://10.95.76.50:5000";
 interface apiResponse {
   error: boolean;
   message: string;
+  imageTaken?: number;
   data?: Blob;
 }
 
@@ -130,8 +131,16 @@ export const takeImage = async () => {
   try {
     const res = await fetch(url);
     if (!res.ok) {
-      response.error = true;
-      response.message = await res.text();
+      if (res.status === 417) {
+        const data = await res.json();
+        const { text, imageTaken } = data;
+        response.error = true;
+        response.message = text;
+        response.imageTaken = imageTaken;
+      } else {
+        response.error = true;
+        response.message = await res.text();
+      }
       return response;
     } else {
       response.error = false;
@@ -206,10 +215,10 @@ export const motorHold = async (param: "start" | "end") => {
 
 export const initializeWifi = async () => {
   const url = baseUrl + `/initialize_wifi`;
-  const res = await customFetch(url, {method: 'PUT'});
+  const res = await customFetch(url, { method: "PUT" });
   if (res.error) {
-    console.log('Error initializing Wifi.');
+    console.log("Error initializing Wifi.");
   } else {
     return res.data;
   }
-}
+};

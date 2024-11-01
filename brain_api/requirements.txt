@@ -3,3 +3,4 @@ fastapi
 uvicorn
 from_root
 requests
+pyyaml

@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 interface SnackBarProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,13 +31,13 @@ export default function SnackBar({
   };
 
   // auto close snackbar after 5s
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        closeSnackBar();
-      }, 5000);
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   if (open) {
+  //     setTimeout(() => {
+  //       closeSnackBar();
+  //     }, 5000);
+  //   }
+  // }, [open]);
 
   return (
     <div style={style}>

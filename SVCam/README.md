@@ -8,11 +8,11 @@
 
 To begin, install these packages:
 ```
-sudo apt-get install g++
-sudo apt-get install build-essential
+sudo apt install g++
+sudo apt install build-essential
 ```
 
-The follow the quick user guide to install the camera sdk.
+Then follow the quick user guide to install the camera sdk.
 
 > NOTE: For ARM processor, the /others/svcamkit.conf should be corrected from 'Linux64_x64' to 'Linux64_ARM'.
 

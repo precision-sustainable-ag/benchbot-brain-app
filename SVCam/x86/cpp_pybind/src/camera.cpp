@@ -313,10 +313,10 @@ void saveImages(SV_BUFFER_INFO imageBuffer){
 
     /*  ------ Using default image saving utility ------    */
     
-    // string fileName = "test_images/sdk_" + to_string(imageBuffer.iTimeStamp) + ".RAW";
+    string fileName = "DSC_" + to_string(imageBuffer.iTimeStamp) + ".RAW";
     // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_BMP);
     // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_PNG);
-    // SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_RAW);
+    SVUtilSaveImageToFile(imageBuffer, fileName.c_str(), SV_IMAGE_FILE_RAW);
     
 
     /*  ------ Saving BayerRG8 ------    

@@ -20,6 +20,9 @@ cmake  ../opencv-4.x
  
 # Build
 cmake --build .
+
+# Install
+sudo make install
 ```
 <br>
 
@@ -37,7 +40,7 @@ mkdir -p build && cd build
 cmake ../OpenCV
 make -j4
 
-# Install teh OpenCV package
+# Install the OpenCV package
 sudo make install
 ```
 <br>
@@ -54,7 +57,13 @@ sudo make install
 
 ```
 # Install Python dev package (use right package version)
-sudo apt-get install python3.5-dev
+sudo apt install python3.5-dev
+
+# Download the sources and CMake files as a Python package 
+pip install pybind11
+
+# Reboot the system
+sudo reboot
 ```
 
 <br>

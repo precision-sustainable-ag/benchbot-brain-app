@@ -182,7 +182,7 @@ class CameraController():
         else:
             response = make_response("No image file found!", 400)
         threading.Thread(target=self.remove_bmp(img_file)).start()
-        self.camera_timer = threading.Thread(60, target=self.stop_camera).start()
+        # self.camera_timer = threading.Thread(60, target=self.stop_camera).start()
         return response
     
     def remove_bmp(self, filename):

@@ -32,6 +32,7 @@ class CameraController():
         self.dirName = from_root(parent_dir, imgDir)
         self.create_img_dir = True
         self.cam_conn = False
+        self.camera_timer = []
         SVCam.InitSDK()
 
     def start_camera(self):
@@ -59,10 +60,10 @@ class CameraController():
     
     # function for capturing a set of images and if successful, send a preview of the image captured
     def capture_images(self):
-        try:
-            self.camera_timer.cancel()
-        except:
-            pass
+        if self.camera_timer:
+            timer_obj = self.camera_timer.pop(0)
+            if timer_obj.is_alive():
+                timer_obj.cancel()
         if not self.cam_conn:
             self.start_camera()
         missing_list = self.trigger_camera()
@@ -90,6 +91,7 @@ class CameraController():
         except Exception as e:
             self.img_array = np.arrray([])
             logging.error(e)
+            self.stop_camera()
         finally:
             missing_images = self.find_and_rename_files(t_stamp)
             return missing_images
@@ -181,8 +183,10 @@ class CameraController():
                 response.status_code = 200
         else:
             response = make_response("No image file found!", 400)
+        new_timer = threading.Timer(60, self.stop_camera)
+        self.camera_timer.append(new_timer)
+        new_timer.start()
         threading.Thread(target=self.remove_bmp(img_file)).start()
-        # self.camera_timer = threading.Thread(60, target=self.stop_camera).start()
         return response
     
     def remove_bmp(self, filename):

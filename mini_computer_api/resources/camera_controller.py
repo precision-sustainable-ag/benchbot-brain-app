@@ -59,7 +59,10 @@ class CameraController():
     
     # function for capturing a set of images and if successful, send a preview of the image captured
     def capture_images(self):
-        self.camera_timer.cancel()
+        try:
+            self.camera_timer.cancel()
+        except:
+            pass
         if not self.cam_conn:
             self.start_camera()
         missing_list = self.trigger_camera()

@@ -239,6 +239,7 @@ export default function Traversal({
           await sleep(1000);
           await moveXandZ(direction * potSpacing, 0);
           await sleep(potSpacing * 100);
+          await sleep(800);
           appendLog(`move completed.`);
         }
       }
@@ -249,6 +250,7 @@ export default function Traversal({
         await sleep(1000);
         appendLog(`move Y: ${rowSpacing / 100}`);
         await moveY(rowSpacing);
+        await sleep(800);
       }
       // set overflowed postPerRow back
       if (pot === potsPerRow) pot -= 1;

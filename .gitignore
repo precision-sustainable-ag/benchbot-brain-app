@@ -174,3 +174,7 @@ species_map.json
 
 # config files
 mini_computer_api/resources/config.yaml
+
+# pybind files
+SVCam/x86/cpp_pybind/build/
+SVCam/x86/cpp_pybind/pybind11/

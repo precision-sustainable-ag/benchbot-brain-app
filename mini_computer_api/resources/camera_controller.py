@@ -7,13 +7,13 @@ import os
 import time
 import shutil
 import threading
+import logging
 import glob
 import cv2
 import io
 import yaml
 import json
 import resources.SVCam as SVCam
-# from colour_demosaicing import demosaicing_CFA_Bayer_Malvar2004
 
 
 im_height = 9528
@@ -28,11 +28,9 @@ class CameraController():
         # setup directory to save images
         self.location = config_data['state']
         parent_dir = "mini_computer_api"
-        # imgDir = f"images/{self.location}/{date.today()}"
         imgDir = f"images/{self.location}_{date.today()}"
         self.dirName = from_root(parent_dir, imgDir)
         self.create_img_dir = True
-
         self.cam_conn = False
         SVCam.InitSDK()
 
@@ -41,26 +39,27 @@ class CameraController():
         self.cam_obj.deviceDiscovery()
         isConnected = self.cam_obj.connectCamera()
         if isConnected:
-            print("Found a camera connection\n")
+            logging.info("Found a camera connection")
             self.cam_conn = True
             isStreamOpen = self.cam_obj.openStream()
             if isStreamOpen:
-                print("Opened a stream\n")
+                logging.info("Opened a stream")
                 self.cam_obj.startAcquisition()
         else:
-            print("No camera found\n")
+            logging.info("No camera found")
 
     def stop_camera(self):
         try:
             self.cam_obj.stopAcquisition()
             self.cam_obj.disconnectCamera()
         except Exception as e:
-            print(e)
+            logging.error(e)
         finally:
-            self.cam_conn = True
+            self.cam_conn = False
     
     # function for capturing a set of images and if successful, send a preview of the image captured
     def capture_images(self):
+        self.camera_timer.cancel()
         if not self.cam_conn:
             self.start_camera()
         missing_list = self.trigger_camera()
@@ -87,7 +86,7 @@ class CameraController():
             cv2.imwrite(f"DSC_{t_stamp}.tiff", self.img_array)
         except Exception as e:
             self.img_array = np.arrray([])
-            print(e)
+            logging.error(e)
         finally:
             missing_images = self.find_and_rename_files(t_stamp)
             return missing_images
@@ -169,7 +168,7 @@ class CameraController():
         # image = self.create_preview_img()
         if img_file is not None:
             image = cv2.imread(img_file)
-            preview = cv2.resize(image, None, fx = 0.2, fy = 0.2)
+            preview = cv2.resize(image, None, fx = 0.1, fy = 0.1)
             _, img_encoded = cv2.imencode('.jpg', preview)
             byte_stream = img_encoded.tobytes()
             if byte_stream is None:
@@ -179,7 +178,15 @@ class CameraController():
                 response.status_code = 200
         else:
             response = make_response("No image file found!", 400)
+        threading.Thread(target=self.remove_bmp(img_file)).start()
+        self.camera_timer = threading.Thread(60, target=self.stop_camera).start()
         return response
+    
+    def remove_bmp(self, filename):
+        try:
+            os.remove(filename)
+        except:
+            pass
 
     def __del__(self):
         self.stop_camera()

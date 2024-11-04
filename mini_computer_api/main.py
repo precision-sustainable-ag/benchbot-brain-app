@@ -5,7 +5,6 @@ from datetime import date
 import logging
 from from_root import from_here
 from pathlib import Path
-import atexit
 
 
 # setup the logging directory, file and logging configurations
@@ -16,10 +15,6 @@ logfile = str(log_file_path)
 logging.basicConfig(filename=logfile, filemode="a", format="[ %(asctime)s ] %(message)s ", datefmt="%m-%d-%y %H:%M:%S", level=logging.INFO)
 
 sony_camera = CameraController()
-# @atexit.register
-# def close_out():
-#     del sony_camera
-
 app = Flask(__name__)
 CORS(app)
 
@@ -48,4 +43,3 @@ def latest_jpeg_image():
  
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-    del sony_camera

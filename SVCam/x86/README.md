@@ -42,6 +42,9 @@ make -j4
 
 # Install the OpenCV package
 sudo make install
+
+# Then setup config for cmake by running (in /opencv_setup)
+sudo ./setup_ld.bash
 ```
 <br>
 

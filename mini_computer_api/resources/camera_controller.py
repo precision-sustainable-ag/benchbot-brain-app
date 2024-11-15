@@ -79,11 +79,10 @@ class CameraController():
         t_stamp = str(int(time.time()))
         try:
             self.cam_obj.trigger()
-            time.sleep(2)
-            self.img_array = self.cam_obj.fetchImage()
-            cv2.imwrite(f"DSC_{t_stamp}.tiff", self.img_array)
+            time.sleep(5)
+            # self.img_array = self.cam_obj.fetchImage()
+            # cv2.imwrite(f"DSC_{t_stamp}.tiff", self.img_array)
         except Exception as e:
-            self.img_array = np.arrray([])
             print(e)
             self.stop_camera()
         finally:
@@ -92,17 +91,14 @@ class CameraController():
 
     # function to check whether both the image files have been downloaded from camera, if yes then rename them appropriately
     def find_and_rename_files(self, time_stamp):
-        missing_files = ["TIFF", "RAW", "BMP"]
+        missing_files = ["RAW", "BMP"]
         timeout_start = time.time()
         new_filename = f"{self.location}_{time_stamp}"
         while True:
             for file_name in os.listdir('.'):
                 # if image file is found
                 if file_name.startswith(config_data['cam_img_name']) and os.path.isfile(file_name):
-                    if file_name.endswith('.tiff'):
-                        new_name = new_filename + ".tiff"
-                        to_remove = "TIFF"
-                    elif file_name.endswith('.RAW'):
+                    if file_name.endswith('.RAW'):
                         new_name = new_filename + ".RAW"
                         to_remove = "RAW"
                     elif file_name.endswith('.BMP'):

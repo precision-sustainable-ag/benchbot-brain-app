@@ -31,6 +31,7 @@ class MotorControllerXZ():
         logging.info(f"Updated UDP configuration [{new_ip}:{new_port}]")
 
     def init_connection(self, ip, port):
+        self.server_socket.settimeout(2)
         self.server_socket.connect((ip, port))
         response_msg = self.move_motors(0, 0)
         if "Error" not in response_msg:
@@ -44,7 +45,6 @@ class MotorControllerXZ():
         self.server_socket.send(msgbyte)
         logging.info(f"Message {msg_in} sent")
         try:
-            self.server_socket.settimeout(2)
             cc_reply = self.server_socket.recv(1024)
             msg_reply = cc_reply.decode()
             logging.info(f"Received reply: {msg_reply}")

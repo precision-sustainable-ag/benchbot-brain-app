@@ -41,6 +41,8 @@ def initialize_wifi():
         os.system("echo 'nameserver 152.1.14.53' | sudo tee -a /etc/resolv.conf")
         os.system("sudo ip addr add 192.168.8.10/24 dev eth0")
         os.system("sudo ip route add default via 192.168.8.1")
+    elif location=='MD':
+        os.system("sudo ip route add default via 10.95.76.5")
     else:
         os.system("sudo sysctl -w net.ipv4.ip_forward=1")
         os.system("sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE")

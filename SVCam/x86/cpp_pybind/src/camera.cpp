@@ -1,6 +1,5 @@
 #include "camera.h"
 #include "sv_gen_sdk.h"
-#include <opencv2/opencv.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <stdio.h>
@@ -15,11 +14,8 @@
 #define INFINITE 0xFFFFFFFF
 using namespace std;
 using namespace std::chrono;
-using namespace cv;
 namespace py = pybind11;
 
-
-Mat latestImage = cv::Mat(9528, 13376*1.5, CV_8UC1);
 
 // query all available interfaces
 void Camera::enumInterface(){
@@ -310,7 +306,6 @@ void saveImages(SV_BUFFER_INFO imageBuffer){
     // SVUtilBuffer12BitTo16Bit(imageBuffer, temp_buffer, bufferSize);
     // printf("Function Passed\n");
 
-
     /*  ------ Using default image saving utility ------    */
     
     string fileName = "DSC_" + to_string(imageBuffer.iTimeStamp) + ".RAW";
@@ -319,71 +314,6 @@ void saveImages(SV_BUFFER_INFO imageBuffer){
 
     string fileName2 = "DSC_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
     SVUtilSaveImageToFile(imageBuffer, fileName2.c_str(), SV_IMAGE_FILE_BMP);
-    
-
-    /*  ------ Saving BayerRG8 ------    
-        For BayerRG8 payload size is 127598976 which is calculated as: 13392 * 9528 * 1
-    */
-    
-    // Mat Bayerimage = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC1, imageBuffer.pImagePtr);
-    // printf("Rows: %d, Columns: %d, Channels: %d\n", Bayerimage.rows, Bayerimage.cols, Bayerimage.channels());
-    // cv::Mat RGBimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_8UC3);
-    // cv::cvtColor(Bayerimage, RGBimage, cv::COLOR_BayerRG2RGB);
-    // string imageName = "test_images/cv2_" + to_string(imageBuffer.iTimeStamp) + ".BMP";
-    // imwrite(imageName, RGBimage);
-    
-
-
-    /*  ------ Saving BayerRG12Packed ------    
-        For BayerRG12Packed payload size is 191169792 which is calculated as: 13376 * 9528 * 1.5
-    */
-
-    // Packed
-
-    Mat Bayerimage = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX*1.5, CV_8UC1, imageBuffer.pImagePtr);
-    latestImage = Bayerimage.clone();
-    // string imageName = "test_images/packed_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
-    // imwrite(imageName, Bayerimage);
-
-
-    // Unpacked
-
-    // Mat Bayerimage_p = cv::Mat(imageBuffer.iSizeY, imageBuffer.iSizeX*1.5, CV_8UC1, imageBuffer.pImagePtr);
-    // cv::Mat Bayerimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_16UC1);
-    // int i, j, k;
-    // for (i = 0; i < Bayerimage_p.rows; ++i) {
-    //     k = 0;
-    //     for  (j = 0; j < Bayerimage_p.cols-2; ++j) {
-    //         if (j % 3 == 0) {
-    //             uint8_t pack_1 = Bayerimage_p.at<uint8_t>(i, j);
-    //             uint8_t pack_2 = Bayerimage_p.at<uint8_t>(i, j+1);
-    //             uint8_t pack_3 = Bayerimage_p.at<uint8_t>(i, j+2);
-
-    //             uint16_t val_1 = pack_1 | (pack_2 << 8);
-    //             uint16_t val_2 = (val_1 >> 4) & 0xFFF;
-    //             uint16_t val_3 = ( (val_1 & 0x0F) << 8 ) | pack_3;
-                
-    //             Bayerimage.at<uint16_t>(i, k++) = val_2 << 4;
-    //             Bayerimage.at<uint16_t>(i, k++) = val_3 << 4;
-    //         }
-    //     }
-    // }
-    // string imageName = "test_images/unpacked_" + to_string(imageBuffer.iTimeStamp) + ".tiff";
-    // imwrite(imageName, Bayerimage);
-
-
-    // Convert to RGB
-    // cv::Mat RGBimage(imageBuffer.iSizeY, imageBuffer.iSizeX, CV_16UC3);
-    // cv::cvtColor(Bayerimage, RGBimage, cv::COLOR_BayerRG2RGB);
-
-}
-
-py::array_t<uchar> Camera::fetchImage(){
-    return py::array_t<uchar>(
-        {latestImage.rows, latestImage.cols, latestImage.channels()},
-        {latestImage.step[0], latestImage.step[1], latestImage.elemSize()},
-        latestImage.data
-    );
 }
 
 

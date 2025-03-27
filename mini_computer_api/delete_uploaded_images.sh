@@ -1,10 +1,10 @@
 #!/bin/bash
 # source_path=/home/benchbot/benchbot-brain-app/mini_computer_api/images/*
 
-/home/benchbot/globusconnectpersonal-3.2.3/globusconnectpersonal -start &
+/home/benchbot/globusconnectpersonal-3.2.5/globusconnectpersonal -start &
 
-export PATH="~/.local/bin:$PATH"
-echo 'export PATH="~/.local/bin:$PATH"' >> "$HOME/.bashrc"
+# export PATH="~/.local/bin:$PATH"
+# echo 'export PATH="~/.local/bin:$PATH"' >> "$HOME/.bashrc"
 
 data_age_limit=1
 
@@ -23,7 +23,7 @@ for i in $(globus ls "ea8aff4a-274e-4c48-bc23-5b93da0cc941:/semifield-upload/");
     limit_days_ago=$(date +%F -d "$data_age_limit days ago")
 
     # if folder date is older than $data_age_limit, fetch all files in the directory
-    if [[ $date -ge $limit_days_ago ]]
+    if [[ $date < $limit_days_ago ]]
     then
         echo "Folder date: $date is $data_age_limit days old or older"
 

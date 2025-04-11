@@ -27,7 +27,6 @@ class CameraController():
         self.dirName = from_root(parent_dir, imgDir)
         self.create_img_dir = True
         self.cam_conn = False
-        # self.camera_timer = []
         SVCam.InitSDK()
 
     def start_camera(self):
@@ -55,10 +54,6 @@ class CameraController():
     
     # function for capturing a set of images and if successful, send a preview of the image captured
     def capture_images(self):
-        # if self.camera_timer:
-        #     timer_obj = self.camera_timer.pop(0)
-        #     if timer_obj.is_alive():
-        #         timer_obj.cancel()
         if not self.cam_conn:
             self.start_camera()
         missing_list = self.trigger_camera()
@@ -80,8 +75,6 @@ class CameraController():
         try:
             self.cam_obj.trigger()
             time.sleep(5)
-            # self.img_array = self.cam_obj.fetchImage()
-            # cv2.imwrite(f"DSC_{t_stamp}.tiff", self.img_array)
         except Exception as e:
             print(e)
             self.stop_camera()
@@ -101,13 +94,13 @@ class CameraController():
                     if file_name.endswith('.RAW'):
                         new_name = new_filename + ".RAW"
                         to_remove = "RAW"
+                        os.rename(file_name, new_name)
+                        threading.Thread(target=self.move_files(new_name)).start()
+                        
                     elif file_name.endswith('.BMP'):
-                        new_name = new_filename + ".BMP"
                         to_remove = "BMP"
                     try:
                         missing_files.remove(to_remove)
-                        os.rename(file_name, new_name)
-                        threading.Thread(target=self.move_files(new_name)).start()
                     except:
                         continue
                 # if both images files are found or timeout occurs
@@ -126,7 +119,7 @@ class CameraController():
 
     # function to find the latest preview image file in the image directory
     def find_latest_image(self):
-        list_of_files = glob.glob(f'{self.dirName}/*.BMP')
+        list_of_files = glob.glob('*.BMP')
         fileName = None
         if list_of_files:
             fileName = max(list_of_files, key=os.path.getctime)
@@ -147,9 +140,6 @@ class CameraController():
                 response.status_code = 200
         else:
             response = make_response("No image file found!", 400)
-        # new_timer = threading.Timer(60, self.stop_camera)
-        # self.camera_timer.append(new_timer)
-        # new_timer.start()
         threading.Thread(target=self.remove_bmp(img_file)).start()
         return response
     

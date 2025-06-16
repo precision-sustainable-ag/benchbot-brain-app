@@ -40,7 +40,7 @@ TriggerDelay	0
 TriggerSelector	AcquisitionStart
 ExposureMode	Timed
 AcquisitionFrameRate	2
-ExposureTime	500
+ExposureTime	300
 ExposureAuto	Off
 ExposureAutoOrder	1
 ExposureTimeMin	1000

@@ -3,10 +3,11 @@
 
 # export PATH="~/.local/bin:$PATH"
 
-# if bash config file doesn't exist, export local bin to path
-output_file="$HOME/.bashrc"
-if [ ! -f "$output_file" ]; then
-    echo 'export PATH="~/.local/bin:$PATH"' >> "$HOME/.bashrc"
+# if line does not already exist in .bashrc, export local bin to path
+config_file="$HOME/.bashrc"
+export_line='export PATH="~/.local/bin:$PATH"'
+if ! grep -qF "$export_line" "$config_file"; then
+    echo "$export_line" >> "$config_file"
 fi
 
 data_age_limit=1

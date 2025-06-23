@@ -13,7 +13,6 @@ import io
 import yaml
 import json
 import resources.SVCam as SVCam
-from PIL import Image, UnidentifiedImageError
 
 with open(str(from_here('config.yaml')), 'r') as f:
     config_data = yaml.load(f, Loader=yaml.SafeLoader)
@@ -130,29 +129,23 @@ class CameraController():
     def encode_latest_image(self):
         img_file = self.find_latest_image()
         if img_file is not None:
-
             try:
-                with Image.open(img_file, formats=['BMP']) as img:
-                    img.verify()
-                    good_file = True
-            except (UnidentifiedImageError):
-                good_file = False
-                response = make_response("Bad image file!", 400)
-
-            if good_file:
                 image = cv2.imread(img_file)
-                if (image is None) or (image.shape is None) or (not good_file):
-                    response = make_response("Bad image file!", 400)
-                else:
-                    preview = cv2.resize(image, None, fx = 0.1, fy = 0.1)
+            except:
+                image = None
 
-                    _, img_encoded = cv2.imencode('.jpg', preview)
-                    byte_stream = img_encoded.tobytes()
-                    if byte_stream is None:
-                        response = make_response("Image encoding failed!", 400)
-                    else:
-                        response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
-                        response.status_code = 200
+            if image is None:
+                response = make_response("Bad image file!", 400)
+            else:
+                preview = cv2.resize(image, None, fx = 0.1, fy = 0.1)
+
+                _, img_encoded = cv2.imencode('.jpg', preview)
+                byte_stream = img_encoded.tobytes()
+                if byte_stream is None:
+                    response = make_response("Image encoding failed!", 400)
+                else:
+                    response = make_response(send_file(io.BytesIO(byte_stream), download_name="preview.jpg", mimetype="image/jpeg"))
+                    response.status_code = 200
         else:
             response = make_response("No image file found!", 400)
         threading.Thread(target=self.remove_bmp(img_file)).start()

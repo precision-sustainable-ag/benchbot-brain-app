@@ -1,10 +1,14 @@
 #!/bin/bash
 # source_path=/home/benchbot/benchbot-brain-app/mini_computer_api/images/*
 
-/home/benchbot/globusconnectpersonal-3.2.5/globusconnectpersonal -start &
-
 # export PATH="~/.local/bin:$PATH"
-# echo 'export PATH="~/.local/bin:$PATH"' >> "$HOME/.bashrc"
+
+# if line does not already exist in .bashrc, export local bin to path
+config_file="$HOME/.bashrc"
+export_line='export PATH="~/.local/bin:$PATH"'
+if ! grep -qF "$export_line" "$config_file"; then
+    echo "$export_line" >> "$config_file"
+fi
 
 data_age_limit=1
 
@@ -56,8 +60,8 @@ for i in $(globus ls "ea8aff4a-274e-4c48-bc23-5b93da0cc941:/semifield-upload/");
         # else, all files are uploaded, delete folder
         else
           echo "deleting folder: /home/benchbot/benchbot-brain-app/mini_computer_api/images/$i"
-          echo "$i" >> ./logs/deleted_files.log 
-          echo $(ls "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i") >> ./logs/deleted_files.log
+          echo "$i" >> deleted_files.log 
+          echo $(ls "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i") >> deleted_files.log
           echo $(rm -r "/home/benchbot/benchbot-brain-app/mini_computer_api/images/$i")
         fi
     fi
